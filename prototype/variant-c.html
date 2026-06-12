@@ -1,0 +1,297 @@
+<!doctype html>
+<!-- PROTOTYPE variant C — "Swiss Poster": cold gray, signal red, Archivo
+     Expanded 900 + Fragment Mono. Zero radius, zero shadows, visible grid.
+     Signature: ~16vw name with clip-path line reveal, marquee strip, and a
+     scroll-pinned horizontal project gallery. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nico Sutheimer — Fullstack Engineer, Data &amp; BI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400;62..125,700;62..125,900&family=Fragment+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EDEDED;
+    --ink: #0A0A0A;
+    --red: #FF3000;
+    --line: #C9C9C9;
+    --display: "Archivo", system-ui, sans-serif;
+    --mono: "Fragment Mono", ui-monospace, monospace;
+    --ease-hard: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 400 14px/1.6 var(--mono);
+  }
+  ::selection { background: var(--red); color: var(--bg); }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+  /* faint vertical grid over the whole page */
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px calc(100% / 6));
+    opacity: .35;
+  }
+  main { position: relative; z-index: 1; }
+
+  /* ---------- poster hero ---------- */
+  .hero {
+    min-height: 100svh; display: flex; flex-direction: column;
+    justify-content: space-between; padding: 20px 20px 0;
+  }
+  .hero-meta {
+    display: flex; justify-content: space-between; gap: 16px;
+    text-transform: uppercase; font-size: 12px; letter-spacing: .08em;
+  }
+  .hero-meta .red { color: var(--red); }
+  @media (max-width: 700px) { .hero-meta span:nth-child(2) { display: none; } }
+
+  .poster { padding-bottom: 8px; }
+  .poster .row { overflow: hidden; }
+  .poster .word {
+    display: block;
+    font-family: var(--display);
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: clamp(64px, 16.5vw, 280px);
+    line-height: .86;
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+    clip-path: inset(0 0 105% 0);
+  }
+  .poster .word.outline {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--ink);
+  }
+  .loaded .poster .word { clip-path: inset(-5% 0 -5% 0); transition: clip-path 950ms var(--ease-hard); }
+  .loaded .poster .row:nth-child(2) .word { transition-delay: 120ms; }
+  .poster-sub {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    border-top: 2px solid var(--ink); margin-top: 28px; padding: 12px 0 16px;
+    text-transform: uppercase; font-size: 12px; letter-spacing: .08em;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .poster .word, .loaded .poster .word { clip-path: none; transition: none; }
+  }
+
+  /* ---------- marquee ---------- */
+  .marquee {
+    background: var(--red); color: var(--bg);
+    border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+    overflow: hidden; white-space: nowrap; padding: 14px 0;
+    font-family: var(--display); font-weight: 700; font-stretch: 110%;
+    font-size: 22px; text-transform: uppercase; letter-spacing: .02em;
+  }
+  .marquee .track { display: inline-block; animation: scroll 22s linear infinite; will-change: transform; }
+  .marquee:hover .track { animation-play-state: paused; }
+  .marquee span { margin: 0 18px; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee .track { animation: none; } }
+
+  /* ---------- horizontal pinned gallery ---------- */
+  .gallery { height: 380vh; position: relative; }
+  .gallery .pin { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; }
+  .gallery .head {
+    display: flex; justify-content: space-between; padding: 20px;
+    text-transform: uppercase; font-size: 12px; letter-spacing: .08em;
+    border-bottom: 2px solid var(--ink); background: var(--bg);
+  }
+  .track-h { display: flex; flex: 1; will-change: transform; }
+  .panel {
+    flex: 0 0 min(82vw, 760px); border-right: 2px solid var(--ink);
+    padding: 40px 36px; display: flex; flex-direction: column; justify-content: space-between;
+    background: var(--bg);
+  }
+  .panel .no {
+    font-family: var(--display); font-weight: 900; font-stretch: 125%;
+    font-size: clamp(80px, 14vw, 180px); line-height: .9; color: transparent;
+    -webkit-text-stroke: 2px var(--ink);
+  }
+  .panel:hover .no { color: var(--red); -webkit-text-stroke: 2px var(--red); transition: color 120ms linear; }
+  .panel h3 {
+    font-family: var(--display); font-weight: 900; font-stretch: 115%;
+    font-size: clamp(28px, 4vw, 54px); line-height: 1; text-transform: uppercase;
+    letter-spacing: -.01em; margin: 24px 0 12px;
+  }
+  .panel .desc { max-width: 44ch; font-size: 14px; }
+  .panel .meta {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    border-top: 2px solid var(--ink); padding-top: 14px; margin-top: 28px;
+    text-transform: uppercase; font-size: 12px; letter-spacing: .06em;
+  }
+  .panel .meta .year { color: var(--red); }
+  /* reduced motion: no scroll-pinning — stack the panels vertically instead */
+  @media (prefers-reduced-motion: reduce) {
+    .gallery { height: auto; }
+    .gallery .pin { position: static; height: auto; overflow: visible; }
+    .track-h { flex-wrap: wrap; }
+    .panel { flex: 1 1 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
+  }
+
+  /* ---------- stack ---------- */
+  .stack { border-top: 2px solid var(--ink); }
+  .stack-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    border-bottom: 2px solid var(--ink); padding: 26px 20px;
+    font-family: var(--display); font-weight: 900; font-stretch: 120%;
+    font-size: clamp(26px, 5vw, 64px); text-transform: uppercase; line-height: 1;
+    transition: background 120ms linear, color 120ms linear;
+  }
+  .stack-row small { font: 400 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; text-align: right; }
+  .stack-row:hover { background: var(--ink); color: var(--bg); }
+
+  /* ---------- contact ---------- */
+  .contact { min-height: 90svh; display: flex; flex-direction: column; justify-content: center; padding: 40px 20px; }
+  .contact .label { text-transform: uppercase; font-size: 12px; letter-spacing: .08em; margin-bottom: 24px; }
+  .contact a.big {
+    font-family: var(--display); font-weight: 900; font-stretch: 125%;
+    font-size: clamp(34px, 7.4vw, 120px); line-height: .95; text-transform: uppercase;
+    letter-spacing: -.02em; display: inline-block; padding: 8px 12px; margin-left: -12px;
+    transition: background 120ms linear, color 120ms linear;
+  }
+  .contact a.big:hover { background: var(--red); color: var(--bg); }
+  .contact .alt { margin-top: 40px; display: flex; gap: 32px; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
+  .contact .alt a { border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
+  .contact .alt a:hover { color: var(--red); border-color: var(--red); }
+
+  footer {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    border-top: 2px solid var(--ink); padding: 16px 20px 80px;
+    text-transform: uppercase; font-size: 11px; letter-spacing: .08em;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+<main>
+
+  <header class="hero">
+    <div class="hero-meta">
+      <span>Portfolio — 2026</span>
+      <span>Fullstack / Data / BI</span>
+      <span class="red">Open for work</span>
+    </div>
+    <div class="poster">
+      <h1 style="margin:0">
+        <span class="row"><span class="word">Nico</span></span>
+        <span class="row"><span class="word outline">Sutheimer</span></span>
+      </h1>
+      <div class="poster-sub">
+        <span>Fullstack engineer — data platforms &amp; business intelligence</span>
+        <span>Scroll</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track" id="marquee-track">
+      <span>Fullstack</span><span>—</span><span>SQL</span><span>—</span><span>Python</span><span>—</span>
+      <span>TypeScript</span><span>—</span><span>Azure</span><span>—</span><span>dbt</span><span>—</span>
+      <span>Snowflake</span><span>—</span><span>Airflow</span><span>—</span><span>React</span><span>—</span>
+    </div>
+  </div>
+
+  <section class="gallery" id="work" aria-label="Selected work">
+    <div class="pin">
+      <div class="head"><span>Selected work</span><span id="progress">01 / 04</span></div>
+      <div class="track-h" id="track-h">
+        <article class="panel">
+          <div class="no">01</div>
+          <div>
+            <h3>After-Sales BI Platform</h3>
+            <p class="desc">Multi-tenant analytics for automotive after-sales: orchestrated
+            ingestion, warehouse modelling, row-level-secured APIs, React dashboards.</p>
+          </div>
+          <div class="meta"><span>Airflow · Snowflake · dbt · React</span><span class="year">2024–26</span></div>
+        </article>
+        <article class="panel">
+          <div class="no">02</div>
+          <div>
+            <h3>Scouting RAG Study</h3>
+            <p class="desc">Controlled comparison of retrieval techniques under a strict
+            evaluation harness — one variable per cycle, measured honestly.</p>
+          </div>
+          <div class="meta"><span>Python · Embeddings · Eval</span><span class="year">2026</span></div>
+        </article>
+        <article class="panel">
+          <div class="no">03</div>
+          <div>
+            <h3>Multi-Source Ingestion</h3>
+            <p class="desc">Pull and push pipelines for dealer management systems:
+            on-prem ODBC, REST APIs and file drops, normalized into one lake.</p>
+          </div>
+          <div class="meta"><span>Python · Azure · Polars</span><span class="year">2025</span></div>
+        </article>
+        <article class="panel">
+          <div class="no">04</div>
+          <div>
+            <h3>Serving Layer &amp; Dashboard</h3>
+            <p class="desc">Warehouse data products loaded into Postgres and exposed
+            through a metric API and a React dashboard.</p>
+          </div>
+          <div class="meta"><span>Postgres · TypeScript · React</span><span class="year">2025</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack" aria-label="Stack">
+    <div class="stack-row"><span>SQL + Python</span><small>Pipelines · Modelling<br>since 2023</small></div>
+    <div class="stack-row"><span>TypeScript</span><small>React · Vite<br>growing edge</small></div>
+    <div class="stack-row"><span>Azure</span><small>Functions · ACI · Blob<br>production</small></div>
+    <div class="stack-row"><span>dbt + Snowflake</span><small>Layered warehouse<br>raw → product</small></div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="label">Got data? Get in touch —</div>
+    <a class="big" href="mailto:hello@nicosutheimer.dev">hello@<br>nicosutheimer.dev</a>
+    <div class="alt">
+      <a href="https://github.com/sutheimernico">GitHub</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Nico Sutheimer</span>
+    <span>Archivo / Fragment Mono — No template</span>
+  </footer>
+</main>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(() => document.body.classList.add('loaded'));
+
+  // duplicate marquee content so translateX(-50%) loops seamlessly
+  const mq = document.getElementById('marquee-track');
+  mq.innerHTML += mq.innerHTML;
+
+  /* ---- scroll-driven horizontal gallery: sticky pin + translateX ---- */
+  const gallery = document.querySelector('.gallery');
+  const track = document.getElementById('track-h');
+  const progress = document.getElementById('progress');
+  const panels = track.children.length;
+
+  function onScroll() {
+    const r = gallery.getBoundingClientRect();
+    const total = r.height - innerHeight;
+    const p = Math.min(Math.max(-r.top / total, 0), 1);
+    const max = track.scrollWidth - innerWidth;
+    track.style.transform = reduced ? 'none' : `translateX(${-p * max}px)`;
+    progress.textContent = String(Math.min(Math.floor(p * panels) + 1, panels)).padStart(2, '0') + ' / ' + String(panels).padStart(2, '0');
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  onScroll();
+
+  // forward arrow keys to the prototype switcher shell
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>

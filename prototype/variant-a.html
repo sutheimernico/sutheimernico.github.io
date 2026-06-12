@@ -1,0 +1,320 @@
+<!doctype html>
+<!-- PROTOTYPE variant A — "Terminal Archive": portfolio as a precise engineering
+     document. Dark warm black, amber accent, IBM Plex Mono/Sans, deliberate
+     near-absence of motion. Signature: a SQL query whose result set materializes. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nico Sutheimer — Fullstack Engineer, Data &amp; BI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0C0C;
+    --surface: #141311;
+    --rule: #262522;
+    --text: #E8E6E1;
+    --muted: #8A877F;
+    --amber: #FFB000;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 15px/1.7 var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  ::selection { background: var(--amber); color: #0C0C0C; }
+  a { color: var(--text); text-decoration: none; }
+  a:hover, a:focus-visible { color: var(--amber); }
+  a:focus-visible { outline: 1px solid var(--amber); outline-offset: 3px; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: fixed; inset: 0 0 auto 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 14px 24px; background: rgba(12,12,12,.92);
+    border-bottom: 1px solid var(--rule);
+    font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .topbar .id { font-weight: 600; }
+  .topbar .meta { color: var(--muted); display: flex; gap: 24px; }
+  .status { color: var(--amber); }
+  .status::before {
+    content: ""; display: inline-block; width: 7px; height: 7px;
+    background: var(--amber); margin-right: 8px; vertical-align: 1px;
+  }
+  @media (max-width: 700px) { .topbar .meta .hide-sm { display: none; } }
+
+  main { max-width: 980px; margin: 0 auto; padding: 140px 24px 80px; }
+
+  section { margin-bottom: 96px; }
+  .sec-head {
+    display: flex; align-items: baseline; gap: 16px;
+    border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 32px;
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  .sec-head .no { color: var(--amber); }
+
+  /* ---------- 00 / query hero ---------- */
+  .terminal {
+    border: 1px solid var(--rule); background: var(--surface);
+    padding: 28px 28px 22px; overflow-x: auto;
+  }
+  .terminal .line { white-space: pre; }
+  .terminal .prompt { color: var(--muted); }
+  .terminal .kw { color: var(--amber); }
+  .result { margin-top: 18px; }
+  .result .line { color: var(--text); }
+  .result .rule-line { color: var(--muted); }
+  .result .row-line { font-weight: 500; }
+  .result .count { color: var(--muted); margin-top: 6px; }
+  .caret {
+    display: inline-block; width: 9px; height: 18px; background: var(--amber);
+    vertical-align: -3px; animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .lede {
+    margin: 56px 0 0; max-width: 64ch;
+    font: 400 21px/1.65 var(--sans); color: var(--text);
+  }
+  .lede strong { font-weight: 500; color: var(--amber); }
+
+  /* staged reveal: terminal lines + result rows appear in sequence */
+  .stage { opacity: 0; }
+  .stage.on { opacity: 1; transition: opacity 240ms linear; }
+  @media (prefers-reduced-motion: reduce) {
+    .stage { opacity: 1; transition: none; }
+    .caret { animation: none; }
+  }
+
+  /* ---------- 01 / work index ---------- */
+  .index { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .index th {
+    text-align: left; font-weight: 400; font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--rule); padding: 0 16px 10px 0;
+  }
+  .index td { border-bottom: 1px solid var(--rule); padding: 16px 16px 16px 0; vertical-align: top; }
+  .index .no { color: var(--muted); width: 48px; }
+  .index .name { font-weight: 500; min-width: 220px; }
+  .index .desc { display: block; color: var(--muted); font-family: var(--sans); font-size: 14px; margin-top: 4px; max-width: 46ch; }
+  .index .stack { color: var(--muted); }
+  .index .year { text-align: right; padding-right: 0; white-space: nowrap; }
+  .index tbody tr { transition: background 120ms linear; }
+  .index tbody tr:hover { background: var(--surface); }
+  .index tbody tr:hover .no { color: var(--amber); }
+  .reveal { opacity: 0; transform: translateY(6px); }
+  .reveal.on { opacity: 1; transform: none; transition: opacity 360ms linear, transform 360ms cubic-bezier(0.23,1,0.32,1); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+  @media (max-width: 700px) {
+    .index .stack-col { display: none; }
+  }
+
+  /* ---------- 02 / stack & figures ---------- */
+  .figures {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--rule); border: 1px solid var(--rule); margin-bottom: 40px;
+  }
+  .fig { background: var(--bg); padding: 24px; }
+  .fig .num { font-size: 34px; font-weight: 600; letter-spacing: -.01em; }
+  .fig .lbl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  @media (max-width: 700px) { .figures { grid-template-columns: 1fr; } }
+
+  .stacklist { display: grid; grid-template-columns: 180px 1fr; row-gap: 14px; font-size: 14px; }
+  .stacklist dt { color: var(--muted); text-transform: uppercase; font-size: 11px; letter-spacing: .12em; padding-top: 3px; }
+  .stacklist dd { margin: 0; }
+  @media (max-width: 700px) { .stacklist { grid-template-columns: 1fr; row-gap: 4px; } .stacklist dd { margin-bottom: 12px; } }
+
+  /* ---------- 03 / about ---------- */
+  .prose { font: 400 17px/1.75 var(--sans); max-width: 62ch; }
+  .prose p { margin: 0 0 1.2em; }
+
+  /* ---------- 04 / contact ---------- */
+  .contact { list-style: none; margin: 0; padding: 0; font-size: 15px; }
+  .contact li {
+    display: flex; align-items: baseline; gap: 12px;
+    border-bottom: 1px solid var(--rule); padding: 14px 0;
+  }
+  .contact .k { color: var(--muted); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; min-width: 90px; }
+  .contact .leader { flex: 1; border-bottom: 1px dotted var(--rule); transform: translateY(-4px); }
+
+  footer {
+    border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 24px;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="id">Nico Sutheimer</span>
+  <span class="meta">
+    <span class="hide-sm">Fullstack — Data / BI</span>
+    <span class="hide-sm" id="clock">--:--:--</span>
+    <span class="status">Available</span>
+  </span>
+</header>
+
+<main>
+  <!-- 00 -->
+  <section aria-label="Intro">
+    <div class="terminal" aria-label="SQL query introducing Nico Sutheimer">
+      <div class="line stage prompt">portfolio=# <span class="kw">SELECT</span> name, role, focus, status</div>
+      <div class="line stage prompt">portfolio-#   <span class="kw">FROM</span> engineers <span class="kw">WHERE</span> ships_to_prod = <span class="kw">true</span>;</div>
+      <div class="result">
+        <div class="line stage">      name      |   role    |   focus   |  status</div>
+        <div class="line stage rule-line">----------------+-----------+-----------+-----------</div>
+        <div class="line stage row-line"> nico sutheimer | fullstack | data / bi | available</div>
+        <div class="line stage count">(1 row) <span class="caret" aria-hidden="true"></span></div>
+      </div>
+    </div>
+    <p class="lede stage">
+      I build data platforms end to end — from ingestion and warehouse modelling
+      to the API and the chart on screen. <strong>Precision over decoration.</strong>
+    </p>
+  </section>
+
+  <!-- 01 -->
+  <section aria-labelledby="work">
+    <div class="sec-head"><span class="no">01</span><span id="work">Selected work</span></div>
+    <table class="index">
+      <thead>
+        <tr><th>No.</th><th>Project</th><th class="stack-col">Stack</th><th style="text-align:right">Year</th></tr>
+      </thead>
+      <tbody>
+        <tr class="reveal">
+          <td class="no">001</td>
+          <td class="name">Automotive after-sales BI platform
+            <span class="desc">Multi-tenant analytics: orchestrated ingestion, warehouse modelling, row-level-secured serving APIs and dashboards.</span>
+          </td>
+          <td class="stack stack-col">Airflow · Snowflake · dbt · FastAPI · React</td>
+          <td class="year">2024–26</td>
+        </tr>
+        <tr class="reveal">
+          <td class="no">002</td>
+          <td class="name">Scouting RAG — retrieval study
+            <span class="desc">Controlled comparison of retrieval techniques with a strict evaluation harness; one variable per cycle.</span>
+          </td>
+          <td class="stack stack-col">Python · Embeddings · Eval harness</td>
+          <td class="year">2026</td>
+        </tr>
+        <tr class="reveal">
+          <td class="no">003</td>
+          <td class="name">Multi-source DMS ingestion
+            <span class="desc">Pull and push pipelines for dealer management systems: on-prem ODBC, REST APIs, file drops — normalized into one lake.</span>
+          </td>
+          <td class="stack stack-col">Python · Azure · Polars</td>
+          <td class="year">2025</td>
+        </tr>
+        <tr class="reveal">
+          <td class="no">004</td>
+          <td class="name">Serving layer &amp; dashboard
+            <span class="desc">Warehouse data products loaded to Postgres, exposed through a metric API and a React dashboard.</span>
+          </td>
+          <td class="stack stack-col">Postgres · TypeScript · React</td>
+          <td class="year">2025</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 02 -->
+  <section aria-labelledby="stack">
+    <div class="sec-head"><span class="no">02</span><span id="stack">Stack &amp; figures</span></div>
+    <div class="figures">
+      <div class="fig"><div class="num"><span class="count-up" data-target="17">0</span></div><div class="lbl">Pipelines in production</div></div>
+      <div class="fig"><div class="num"><span class="count-up" data-target="4.2" data-decimals="1">0</span>M</div><div class="lbl">Rows processed daily</div></div>
+      <div class="fig"><div class="num"><span class="count-up" data-target="3">0</span></div><div class="lbl">Years building data systems</div></div>
+    </div>
+    <dl class="stacklist">
+      <dt>Languages</dt><dd>SQL · Python · TypeScript</dd>
+      <dt>Data</dt><dd>dbt · Snowflake · Airflow · Postgres</dd>
+      <dt>Cloud</dt><dd>Azure — Functions, Container Instances, Blob, DevOps</dd>
+      <dt>Frontend</dt><dd>React · Vite · Tailwind</dd>
+    </dl>
+  </section>
+
+  <!-- 03 -->
+  <section aria-labelledby="about">
+    <div class="sec-head"><span class="no">03</span><span id="about">About</span></div>
+    <div class="prose">
+      <p>I'm a fullstack developer with a data spine. My home turf is the unglamorous
+      middle of the stack — pipelines that don't wake anyone at night, models that
+      survive an audit, APIs that say exactly what they mean.</p>
+      <p>Currently deepening the front of the stack: React, TypeScript and the craft
+      of interfaces that make numbers legible. This site is part of that practice.</p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section aria-labelledby="contact">
+    <div class="sec-head"><span class="no">04</span><span id="contact">Contact</span></div>
+    <ul class="contact">
+      <li><span class="k">Email</span><span class="leader"></span><a href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a></li>
+      <li><span class="k">GitHub</span><span class="leader"></span><a href="https://github.com/sutheimernico">github.com/sutheimernico</a></li>
+      <li><span class="k">LinkedIn</span><span class="leader"></span><a href="#">linkedin.com/in/nicosutheimer</a></li>
+    </ul>
+    <footer>
+      <span>© 2026 Nico Sutheimer</span>
+      <span>Set in IBM Plex — no template, no tracker</span>
+    </footer>
+  </section>
+</main>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // staged terminal reveal — fast, sequential, runs once on load
+  const stages = document.querySelectorAll('.stage');
+  stages.forEach((el, i) => setTimeout(() => el.classList.add('on'), reduced ? 0 : 160 + i * 170));
+
+  // work index rows + counters reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      if (e.target.classList.contains('reveal')) {
+        const rows = [...e.target.parentElement.children];
+        const i = rows.indexOf(e.target);
+        setTimeout(() => e.target.classList.add('on'), reduced ? 0 : i * 60);
+      }
+      if (e.target.classList.contains('count-up')) animateCount(e.target);
+    });
+  }, { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.reveal, .count-up').forEach(el => io.observe(el));
+
+  function animateCount(el) {
+    const target = parseFloat(el.dataset.target);
+    const dec = parseInt(el.dataset.decimals || '0', 10);
+    if (reduced) { el.textContent = target.toFixed(dec); return; }
+    const t0 = performance.now(), dur = 900;
+    (function tick(t) {
+      const p = Math.min((t - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = (target * eased).toFixed(dec);
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  // local time in the top bar
+  const clock = document.getElementById('clock');
+  (function tickClock() {
+    clock.textContent = new Date().toLocaleTimeString('de-DE');
+    setTimeout(tickClock, 1000);
+  })();
+
+  // forward arrow keys to the prototype switcher shell
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>
