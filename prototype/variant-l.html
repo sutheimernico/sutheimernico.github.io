@@ -1,0 +1,288 @@
+<!doctype html>
+<!-- PROTOTYPE variant L — "Overprint Engine": synthesis of J (riso overprint),
+     I (bauhaus shapes), C (poster scale) and G (kinetic response). Light paper,
+     real riso inks. New signature: the giant name is printed in two ink layers
+     whose misregistration splits apart per letter as the cursor approaches —
+     like rubbing a fresh print. Shape parallax, rotated marquee, ink swap per
+     section, stamps and hard shadows. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nico Sutheimer — Fullstack Engineer, Data &amp; BI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF5EB;
+    --ink: #111111;
+    --blue: #0078BF;
+    --pink: #FF48B0;
+    --green: #00A95C;
+    --orange: #FF6C2F;
+    --yellow: #FFE800;
+    --disp: "Archivo", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 15px/1.7 var(--mono); overflow-x: hidden; }
+  ::selection { background: var(--pink); color: var(--paper); }
+  a { color: inherit; }
+  a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+  .grain { position: fixed; inset: 0; pointer-events: none; z-index: 60; opacity: .07; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 26px; }
+
+  /* ---------- hero with kinetic overprint name ---------- */
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 60px 0; }
+  .shape { position: absolute; will-change: transform; mix-blend-mode: multiply; }
+  .sh-circle { width: 36vmin; height: 36vmin; border-radius: 50%; background: var(--pink); top: 6%; right: 4%; }
+  .sh-bar { width: 50vmin; height: 8vmin; background: var(--blue); bottom: 14%; left: -8%; rotate: -10deg; }
+  .sh-tri { width: 0; height: 0; border-left: 11vmin solid transparent; border-right: 11vmin solid transparent; border-bottom: 18vmin solid var(--yellow); bottom: 8%; right: 24%; }
+
+  .hero .kicker { font: 600 12px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; margin-bottom: 30px; }
+  .hero .kicker b { background: var(--ink); color: var(--paper); padding: 4px 9px; }
+
+  .oname {
+    position: relative; z-index: 2; margin: 0;
+    font-family: var(--disp); font-variation-settings: "wght" 900, "wdth" 118;
+    font-size: clamp(54px, 13.5vw, 230px); line-height: .88;
+    text-transform: uppercase; letter-spacing: -.025em;
+  }
+  .oname .lrow { display: block; }
+  /* each letter: two ink copies stacked, multiply = true overprint */
+  .och { position: relative; display: inline-block; color: transparent; }
+  .och i { position: absolute; inset: 0; font-style: normal; mix-blend-mode: multiply; will-change: transform; }
+  .och .i1 { color: var(--blue); }
+  .och .i2 { color: var(--pink); }
+  /* load: letters stamp in */
+  .och { opacity: 0; transform: scale(1.18) rotate(2deg); }
+  .stamped .och { opacity: 1; transform: none; transition: opacity 180ms linear var(--dl, 0ms), transform 320ms cubic-bezier(0.34,1.56,0.64,1) var(--dl, 0ms); }
+  @media (prefers-reduced-motion: reduce) {
+    .och, .stamped .och { opacity: 1; transform: none; transition: none; }
+  }
+
+  .hero .strap { position: relative; z-index: 2; margin-top: 38px; max-width: 46ch; font-size: 16px; }
+  .hero .strap mark { background: var(--yellow); padding: 1px 5px; }
+  .hint { position: relative; z-index: 2; margin-top: 16px; font: 600 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--blue); }
+  @media (hover: none) { .hint { display: none; } }
+
+  /* ---------- rotated marquee ---------- */
+  .marq { transform: rotate(-2deg); margin: 10px -50px 0; background: var(--ink); color: var(--paper); overflow: hidden; white-space: nowrap; padding: 13px 0; position: relative; z-index: 3; }
+  .marq .track { display: inline-block; animation: mscroll 24s linear infinite; font-family: var(--disp); font-variation-settings: "wght" 800, "wdth" 110; font-size: 19px; text-transform: uppercase; letter-spacing: .04em; }
+  .marq span { margin: 0 20px; }
+  .marq .p { color: var(--pink); } .marq .b { color: var(--yellow); }
+  @keyframes mscroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marq .track { animation: none; } }
+
+  /* ---------- work: poster rows with stretch + ink hover ---------- */
+  section { padding: 100px 0; }
+  .sechead { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 46px; font: 600 12px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; }
+  .sechead h2 { margin: 0; font-family: var(--disp); font-variation-settings: "wght" 900, "wdth" 120; font-size: clamp(36px, 6vw, 84px); line-height: 1; letter-spacing: -.02em; }
+
+  .work { list-style: none; margin: 0; padding: 0; counter-reset: w; }
+  .work li { border-top: 3px solid var(--ink); position: relative; }
+  .work li:last-child { border-bottom: 3px solid var(--ink); }
+  .work a { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 26px; padding: 26px 4px; text-decoration: none; }
+  .work .idx {
+    counter-increment: w; font: 600 13px/1 var(--mono);
+    background: var(--c1, var(--blue)); color: var(--paper); padding: 7px 9px;
+    rotate: -4deg; transition: rotate 200ms var(--ease-out);
+  }
+  .work .idx::before { content: "0" counter(w); }
+  .work a:hover .idx { rotate: 4deg; }
+  .work .t {
+    font-family: var(--disp); font-variation-settings: "wght" 700, "wdth" 90;
+    font-size: clamp(24px, 4vw, 54px); line-height: 1; text-transform: uppercase; letter-spacing: -.015em;
+    transition: font-variation-settings 420ms var(--ease-out), color 160ms linear;
+  }
+  .work a:hover .t { font-variation-settings: "wght" 900, "wdth" 122; color: var(--c1, var(--blue)); transition-duration: 230ms; }
+  .work .stack { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; text-align: right; color: #555; }
+  .work .yr { font: 600 13px/1 var(--mono); background: var(--ink); color: var(--paper); padding: 7px 9px; rotate: 2deg; }
+  .work p { margin: -14px 0 26px; max-width: 56ch; font-size: 13.5px; color: #444; padding-left: 2px; }
+  @media (max-width: 760px) { .work .stack { display: none; } .work a { grid-template-columns: auto 1fr auto; } }
+  @media (prefers-reduced-motion: reduce) { .work .t, .work .idx { transition: none; } }
+
+  /* second half swaps inks: blue/pink → green/orange */
+  .duo2 { --c1: var(--green); --c2: var(--orange); }
+
+  /* ---------- stack tags ---------- */
+  .tags { display: flex; flex-wrap: wrap; gap: 16px; }
+  .tag {
+    font-family: var(--disp); font-variation-settings: "wght" 800, "wdth" 105;
+    text-transform: uppercase; font-size: clamp(15px, 2.2vw, 24px);
+    border: 3px solid var(--ink); padding: 11px 18px; background: var(--paper);
+    rotate: var(--r, -1.5deg); transition: rotate 200ms var(--ease-out), background 120ms linear, color 120ms linear;
+  }
+  .tag:nth-child(2n) { --r: 1.5deg; } .tag:nth-child(3n) { --r: -2.5deg; }
+  .tag:hover { rotate: 0deg; background: var(--c1, var(--blue)); color: var(--paper); border-color: var(--c1, var(--blue)); }
+  @media (prefers-reduced-motion: reduce) { .tag { transition: none; } }
+
+  /* ---------- contact ---------- */
+  .contact { position: relative; }
+  .contact .dot2 { position: absolute; width: 26vmin; height: 26vmin; border-radius: 50%; background: var(--orange); mix-blend-mode: multiply; right: 0; top: -4vmin; }
+  .shout { position: relative; margin: 0 0 44px; font-family: var(--disp); font-variation-settings: "wght" 900, "wdth" 122; font-size: clamp(46px, 10vw, 160px); line-height: .9; text-transform: uppercase; letter-spacing: -.02em; }
+  .mailbtn {
+    position: relative; display: inline-block; font-family: var(--disp); font-variation-settings: "wght" 800, "wdth" 108;
+    text-transform: uppercase; font-size: clamp(15px, 2.2vw, 24px); text-decoration: none;
+    background: var(--pink); color: var(--paper); padding: 18px 30px; rotate: -1.5deg;
+    box-shadow: 6px 6px 0 var(--ink);
+    transition: rotate 200ms var(--ease-out), background 140ms linear, transform 140ms ease-out, box-shadow 140ms ease-out;
+  }
+  .mailbtn:hover { rotate: 0deg; background: var(--blue); }
+  .mailbtn:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--ink); }
+  .contact .alt { margin-top: 32px; display: flex; gap: 26px; font: 600 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+  .contact .alt a { border-bottom: 3px solid var(--ink); padding-bottom: 3px; text-decoration: none; }
+  .contact .alt a:hover { color: var(--blue); border-color: var(--blue); }
+
+  footer { border-top: 3px solid var(--ink); padding: 22px 0 90px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font: 600 11px/1.5 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<svg class="grain" aria-hidden="true"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+
+<header class="hero">
+  <div class="shape sh-circle" data-speed="0.22" aria-hidden="true"></div>
+  <div class="shape sh-bar" data-speed="-0.1" aria-hidden="true"></div>
+  <div class="shape sh-tri" data-speed="0.15" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="kicker"><b>Portfolio 2026</b> · fullstack × data × BI · printed in two inks</div>
+    <h1 class="oname" id="oname" aria-label="Nico Sutheimer">
+      <span class="lrow">NICO</span>
+      <span class="lrow">SUTHEIMER</span>
+    </h1>
+    <p class="strap">I build <mark>data that ships</mark> — pipelines, warehouses, APIs
+    and the dashboards on top. Two honest inks, no fake gradients.</p>
+    <div class="hint" aria-hidden="true">→ rub the cursor over the print</div>
+  </div>
+</header>
+
+<div class="marq" aria-hidden="true">
+  <div class="track" id="mtrack">
+    <span>Fullstack</span><span class="p">✕</span><span>SQL</span><span class="b">✕</span>
+    <span>Python</span><span class="p">✕</span><span>TypeScript</span><span class="b">✕</span>
+    <span>dbt</span><span class="p">✕</span><span>Snowflake</span><span class="b">✕</span>
+    <span>Airflow</span><span class="p">✕</span><span>Azure</span><span class="b">✕</span>
+    <span>React</span><span class="p">✕</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="work">
+    <div class="sechead"><h2>The Work</h2><span>overprint: blue × pink</span></div>
+    <ul class="work">
+      <li>
+        <a href="#"><span class="idx" aria-hidden="true"></span><span class="t">After-Sales BI Platform</span><span class="stack">Airflow · Snowflake · dbt · React</span><span class="yr">2024–26</span></a>
+        <p>Multi-tenant analytics for automotive after-sales: orchestrated ingestion, layered warehouse, secured APIs, dashboards.</p>
+      </li>
+      <li>
+        <a href="#"><span class="idx" aria-hidden="true"></span><span class="t">Scouting RAG Study</span><span class="stack">Python · Embeddings · Eval</span><span class="yr">2026</span></a>
+        <p>Controlled retrieval comparison — one technique per cycle, fixed eval harness, zero vibes-based conclusions.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="duo2" style="padding-top: 0">
+    <div class="sechead"><span style="visibility:hidden">.</span><span>ink swap: green × orange</span></div>
+    <ul class="work" style="counter-reset: w 2">
+      <li>
+        <a href="#"><span class="idx" aria-hidden="true" style="background:var(--green)"></span><span class="t">Multi-Source Ingestion</span><span class="stack">Python · Azure · Polars</span><span class="yr">2025</span></a>
+        <p>ODBC pulls, REST cursors, push-uploaded CSVs — every way data escapes a dealership, normalized into one lake.</p>
+      </li>
+      <li>
+        <a href="#"><span class="idx" aria-hidden="true" style="background:var(--green)"></span><span class="t">Serving Layer &amp; Dashboard</span><span class="stack">Postgres · TypeScript · React</span><span class="yr">2025</span></a>
+        <p>Warehouse data products to Postgres, a metric API in front, a React dashboard that answers before anyone asks.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="duo2" style="padding-top: 0">
+    <div class="sechead"><h2>The Tools</h2><span>p. 4</span></div>
+    <div class="tags">
+      <span class="tag">SQL</span><span class="tag">Python</span><span class="tag">TypeScript</span>
+      <span class="tag">dbt</span><span class="tag">Snowflake</span><span class="tag">Airflow</span>
+      <span class="tag">Azure</span><span class="tag">Postgres</span><span class="tag">React</span>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="dot2" aria-hidden="true"></div>
+    <h2 class="shout">Write<br>me!</h2>
+    <a class="mailbtn" href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a>
+    <div class="alt">
+      <a href="https://github.com/sutheimernico">GitHub</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 N. Sutheimer · riso blue 0078BF × fluo pink FF48B0</span>
+    <span>Archivo (all axes) / IBM Plex Mono</span>
+  </footer>
+</div>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ---- split name into letters, each with two ink layers ---- */
+  const oname = document.getElementById('oname');
+  oname.querySelectorAll('.lrow').forEach(row => {
+    row.innerHTML = row.textContent.split('').map(c =>
+      `<span class="och">${c}<i class="i1" aria-hidden="true">${c}</i><i class="i2" aria-hidden="true">${c}</i></span>`
+    ).join('');
+  });
+  const letters = [...oname.querySelectorAll('.och')].map(el => ({
+    el, i1: el.querySelector('.i1'), i2: el.querySelector('.i2'),
+    x: 0, y: 0,            // current misregistration vector (lerped)
+  }));
+
+  /* stamp-in on load, 40ms stagger */
+  letters.forEach((l, i) => l.el.style.setProperty('--dl', (i * 40) + 'ms'));
+  requestAnimationFrame(() => oname.closest('body').classList.add('stamped'));
+
+  /* ---- signature: misregistration splits away from the cursor ---- */
+  const BASE = 2.2, MAX = 9, RADIUS = 240;
+  let mx = -9999, my = -9999;
+  addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  if (!reduced && fine) (function frame() {
+    letters.forEach(l => {
+      const r = l.el.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const dx = cx - mx, dy = cy - my;
+      const dist = Math.hypot(dx, dy);
+      const t = Math.max(0, 1 - dist / RADIUS);
+      // inks split along the cursor→letter direction; at rest a 2px offset remains
+      const len = dist || 1;
+      const tx = (dx / len) * (BASE + t * MAX), ty = (dy / len) * (BASE + t * MAX);
+      l.x += (tx - l.x) * 0.14; l.y += (ty - l.y) * 0.14;
+      l.i1.style.transform = `translate(${(-l.x).toFixed(2)}px, ${(-l.y).toFixed(2)}px)`;
+      l.i2.style.transform = `translate(${l.x.toFixed(2)}px, ${l.y.toFixed(2)}px)`;
+    });
+    requestAnimationFrame(frame);
+  })();
+  else letters.forEach(l => { l.i1.style.transform = 'translate(-1.5px,-1.5px)'; l.i2.style.transform = 'translate(1.5px,1.5px)'; });
+
+  /* ---- marquee + shape parallax ---- */
+  const mt = document.getElementById('mtrack');
+  mt.innerHTML += mt.innerHTML;
+  if (!reduced) {
+    const shapes = [...document.querySelectorAll('.shape')];
+    function onScroll() {
+      shapes.forEach(s => s.style.transform = `translateY(${scrollY * parseFloat(s.dataset.speed)}px)`);
+    }
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>

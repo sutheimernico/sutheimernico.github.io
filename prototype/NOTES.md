@@ -18,6 +18,13 @@ Ten radically different variants of the landing page, switchable via
 | `i` | Bauhaus           | Muted Itten triad, poster geometry, shape parallax, circle→square morph hovers with overshoot, rotated marquee divider. |
 | `j` | Riso Zine         | Risograph overprint (blue × fluo pink via multiply, ink swap to green × orange), static grain, misregistration steps-hover, sticker badges. |
 
+Round 3 — syntheses of the favorites (a, c, d, g, i, j):
+
+| Key | Name              | Synthesis                                                              |
+| --- | ----------------- | ---------------------------------------------------------------------- |
+| `k` | Kinetic Terminal  | a × d × c × g. Dark amber terminal world: boot sequence, typed SQL hero, name in variable Martian Mono with per-letter cursor swell, stats marquee, scroll-pinned job queue with status badges, counters. |
+| `l` | Overprint Engine  | j × i × c × g. Poster-scale riso print: per-letter ink misregistration that splits away from the cursor, stamp-in load, shape parallax, rotated marquee, ink-swap sections, width-stretch title hovers, hard-shadow buttons. |
+
 ## Run
 
 ```

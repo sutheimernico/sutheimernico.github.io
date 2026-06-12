@@ -1,0 +1,396 @@
+<!doctype html>
+<!-- PROTOTYPE variant K — "Kinetic Terminal": synthesis of A (terminal archive),
+     D (phosphor session), C (poster scale + pinned gallery) and G (kinetic
+     variable type). Dark warm black + amber. New signature: the name is set in
+     variable Martian Mono whose letters swell toward the cursor — kinetic
+     typography INSIDE the terminal aesthetic. Boot sequence, typed SQL hero,
+     stats marquee, scroll-pinned job queue. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nico Sutheimer — Fullstack Engineer, Data &amp; BI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0A08;
+    --surface: #14120E;
+    --rule: #2A2722;
+    --text: #EDEAE2;
+    --muted: #97917F;
+    --amber: #FFB000;
+    --green: #33FF66;
+    --disp: "Martian Mono", ui-monospace, monospace;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --ease-hard: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 14px/1.7 var(--mono); font-variant-numeric: tabular-nums;
+  }
+  ::selection { background: var(--amber); color: var(--bg); }
+  a { color: var(--text); text-decoration: none; }
+  a:hover { color: var(--amber); }
+  a:focus-visible { outline: 1px solid var(--amber); outline-offset: 3px; }
+
+  /* ---------- fixed HUD bars ---------- */
+  .hud {
+    position: fixed; left: 0; right: 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    padding: 12px 20px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    background: rgba(11,10,8,.9);
+  }
+  .hud.top { top: 0; border-bottom: 1px solid var(--rule); }
+  .hud .amber { color: var(--amber); }
+  .hud .dot::before { content: "●"; color: var(--green); margin-right: 7px; animation: pulse 2.4s ease-in-out infinite; display: inline-block; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @media (max-width: 700px) { .hud .hide-sm { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .hud .dot::before { animation: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 90px 20px 40px; max-width: 1280px; margin: 0 auto; }
+  .bootline { color: var(--muted); margin-bottom: 26px; min-height: 1.7em; }
+  .bootline .cmd { color: var(--green); font-weight: 500; }
+  .caret { display: inline-block; width: 8px; height: 15px; background: var(--green); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
+
+  .kname {
+    font-family: var(--disp); text-transform: uppercase; margin: 0;
+    font-size: clamp(40px, 9.2vw, 150px); line-height: .98; letter-spacing: -.02em;
+    font-variation-settings: "wght" 250, "wdth" 80;
+  }
+  .kname .row { display: block; overflow: hidden; }
+  .kname .rin { display: block; transform: translateY(110%); }
+  .booted .kname .rin { transform: none; transition: transform 850ms var(--ease-hard); }
+  .booted .kname .row:nth-child(2) .rin { transition-delay: 110ms; }
+  .kname .ch { display: inline-block; will-change: font-variation-settings; font-variation-settings: inherit; }
+  .kname .amber { color: var(--amber); text-shadow: 0 0 14px rgba(255,176,0,.35); }
+  @media (prefers-reduced-motion: reduce) { .kname .rin, .booted .kname .rin { transform: none; transition: none; } }
+
+  /* typed SQL block */
+  .sqlbox { margin-top: 44px; max-width: 760px; border: 1px solid var(--rule); background: var(--surface); padding: 20px 22px; opacity: 0; }
+  .booted .sqlbox { opacity: 1; transition: opacity 400ms linear 600ms; }
+  .sqlbox .q { white-space: pre-wrap; }
+  .sqlbox .kw { color: var(--amber); }
+  .sqlbox .res { margin-top: 10px; opacity: 0; white-space: pre; overflow-x: auto; }
+  .sqlbox .res.show { opacity: 1; }
+  .sqlbox .res .hl { color: var(--amber); font-weight: 500; }
+  .sqlbox .res .dim { color: var(--muted); }
+  .scrollcue { margin-top: 40px; color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: 0; }
+  .booted .scrollcue { opacity: 1; transition: opacity 400ms linear 1100ms; }
+  @media (prefers-reduced-motion: reduce) { .sqlbox, .booted .sqlbox, .scrollcue, .booted .scrollcue { opacity: 1; transition: none; } }
+
+  /* ---------- stats marquee ---------- */
+  .marquee {
+    background: var(--amber); color: var(--bg);
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    overflow: hidden; white-space: nowrap; padding: 11px 0;
+    font: 500 14px/1 var(--disp); font-variation-settings: "wght" 600, "wdth" 100;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .marquee .track { display: inline-block; animation: mscroll 26s linear infinite; will-change: transform; }
+  .marquee:hover .track { animation-play-state: paused; }
+  .marquee span { margin: 0 20px; }
+  @keyframes mscroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee .track { animation: none; } }
+
+  /* ---------- job queue: scroll-pinned horizontal gallery ---------- */
+  .queue { height: 360vh; position: relative; }
+  .queue .pin { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; }
+  .queue .qhead {
+    display: flex; justify-content: space-between; gap: 14px; padding: 56px 20px 14px;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+  }
+  .queue .qhead .amber { color: var(--amber); }
+  .qtrack { display: flex; flex: 1; will-change: transform; }
+  .job {
+    flex: 0 0 min(84vw, 720px); border-right: 1px solid var(--rule);
+    padding: 36px 32px; display: flex; flex-direction: column; gap: 18px; background: var(--bg);
+  }
+  .job .jid { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  .job .badge { border: 1px solid var(--green); color: var(--green); padding: 2px 8px; font-size: 10px; }
+  .job .badge.res { border-color: var(--amber); color: var(--amber); }
+  .job .no {
+    font-family: var(--disp); font-variation-settings: "wght" 800, "wdth" 112;
+    font-size: clamp(70px, 11vw, 150px); line-height: .95; color: transparent;
+    -webkit-text-stroke: 1.5px var(--muted);
+  }
+  .job:hover .no { color: var(--amber); -webkit-text-stroke: 1.5px var(--amber); text-shadow: 0 0 24px rgba(255,176,0,.25); transition: color 140ms linear; }
+  .job h3 {
+    font-family: var(--disp); font-variation-settings: "wght" 700, "wdth" 105;
+    font-size: clamp(20px, 2.6vw, 34px); line-height: 1.15; text-transform: uppercase; margin: 0;
+    transition: font-variation-settings 420ms var(--ease-out);
+  }
+  .job:hover h3 { font-variation-settings: "wght" 800, "wdth" 112.5; transition-duration: 220ms; }
+  .job p { margin: 0; color: var(--muted); max-width: 50ch; font-size: 13px; }
+  .job .jfoot { margin-top: auto; display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid var(--rule); padding-top: 12px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .job .jfoot .yr { color: var(--amber); }
+  @media (prefers-reduced-motion: reduce) {
+    .queue { height: auto; }
+    .queue .pin { position: static; height: auto; overflow: visible; }
+    .qtrack { flex-wrap: wrap; }
+    .job { flex: 1 1 100%; border-right: 0; border-bottom: 1px solid var(--rule); }
+    .job h3 { transition: none; }
+  }
+
+  /* ---------- figures ---------- */
+  .figures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .fig { background: var(--bg); padding: 34px 24px; }
+  .fig .num {
+    font-family: var(--disp); font-variation-settings: "wght" 800, "wdth" 112;
+    font-size: clamp(34px, 4.6vw, 60px); line-height: 1; color: var(--amber);
+    text-shadow: 0 0 18px rgba(255,176,0,.22);
+  }
+  .fig .lbl { margin-top: 8px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  @media (max-width: 700px) { .figures { grid-template-columns: 1fr; } }
+
+  /* ---------- stack + about ---------- */
+  .duo { max-width: 1280px; margin: 0 auto; padding: 90px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 70px; }
+  .duo h2 { font: 500 11px/1 var(--mono); color: var(--muted); letter-spacing: .14em; text-transform: uppercase; margin: 0 0 22px; }
+  .duo h2::before { content: "// "; color: var(--amber); }
+  .stacklist { display: grid; grid-template-columns: 130px 1fr; row-gap: 12px; font-size: 13px; }
+  .stacklist dt { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: .12em; padding-top: 3px; }
+  .stacklist dd { margin: 0; }
+  .duo .prose { font-size: 14px; color: var(--text); max-width: 56ch; }
+  .duo .prose p { margin: 0 0 1.1em; }
+  .duo .prose b { color: var(--amber); font-weight: 500; }
+  @media (max-width: 820px) { .duo { grid-template-columns: 1fr; gap: 44px; } }
+
+  /* ---------- contact ---------- */
+  .contact { border-top: 1px solid var(--rule); padding: 110px 20px 130px; max-width: 1280px; margin: 0 auto; }
+  .contact .lbl { color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 22px; }
+  .bigmail {
+    display: inline-block; font-family: var(--disp); text-transform: uppercase;
+    font-size: clamp(26px, 6.4vw, 96px); line-height: 1.05; letter-spacing: -.02em;
+    font-variation-settings: "wght" 300, "wdth" 80;
+    transition: font-variation-settings 450ms var(--ease-out), color 160ms linear, text-shadow 160ms linear;
+  }
+  .bigmail:hover {
+    font-variation-settings: "wght" 800, "wdth" 112.5;
+    color: var(--amber); text-shadow: 0 0 28px rgba(255,176,0,.3);
+    transition-duration: 240ms;
+  }
+  .bigmail:active { transform: scale(0.985); }
+  .contact .alt { margin-top: 36px; display: flex; gap: 30px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+  .contact .alt a { border-bottom: 1px solid var(--rule); padding-bottom: 3px; }
+  .contact .alt a:hover { border-color: var(--amber); }
+  .prompt-out { margin-top: 70px; color: var(--muted); }
+  .prompt-out .u { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .bigmail { transition: color 160ms linear; } }
+</style>
+</head>
+<body>
+
+<header class="hud top">
+  <span>NS/OS 2.6 — portfolio.service</span>
+  <span class="hide-sm" id="clock">--:--:--</span>
+  <span class="dot amber">All pipelines green</span>
+</header>
+
+<section class="hero">
+  <div class="bootline"><span class="u">nico@sutheimer:~$</span> <span class="cmd" id="boot"></span><span class="caret" id="bootcaret" aria-hidden="true"></span></div>
+  <h1 class="kname" id="kname" aria-label="Nico Sutheimer">
+    <span class="row"><span class="rin" data-kinetic>NICO</span></span>
+    <span class="row"><span class="rin" data-kinetic>SUTHEIMER<span class="amber">_</span></span></span>
+  </h1>
+  <div class="sqlbox">
+    <div class="q"><span class="kw">SELECT</span> role, focus <span class="kw">FROM</span> engineers <span class="kw">WHERE</span> ships_to_prod;</div>
+    <div class="res" id="sqlres"> role      → <span class="hl">fullstack</span>
+ focus     → <span class="hl">data &amp; BI</span> — pipeline to pixel
+ status    → <span class="hl">available</span>   <span class="dim">(1 row, 0.4 ms)</span></div>
+  </div>
+  <div class="scrollcue">scroll to run job queue ↓</div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="track" id="mtrack">
+    <span>4.2M rows/day</span><span>●</span><span>17 pipelines</span><span>●</span>
+    <span>99.9% uptime</span><span>●</span><span>SQL · Python · TypeScript</span><span>●</span>
+    <span>Snowflake · dbt · Airflow</span><span>●</span><span>0 broken builds</span><span>●</span>
+  </div>
+</div>
+
+<section class="queue" id="work" aria-label="Selected work">
+  <div class="pin">
+    <div class="qhead"><span>./jobs — selected work</span><span><span class="amber" id="qprog">01 / 04</span></span></div>
+    <div class="qtrack" id="qtrack">
+      <article class="job">
+        <div class="jid"><span>job_id: bi-platform</span><span class="badge">RUNNING</span></div>
+        <div class="no">01</div>
+        <h3>After-Sales BI Platform</h3>
+        <p>Multi-tenant analytics for automotive after-sales: orchestrated ingestion,
+        layered Snowflake/dbt warehouse, row-level-secured APIs, React dashboards.</p>
+        <div class="jfoot"><span>Airflow · Snowflake · dbt · React</span><span class="yr">2024–26</span></div>
+      </article>
+      <article class="job">
+        <div class="jid"><span>job_id: scouting-rag</span><span class="badge res">RESEARCH</span></div>
+        <div class="no">02</div>
+        <h3>Scouting RAG Study</h3>
+        <p>Controlled retrieval comparison: one technique per cycle against a fixed
+        eval harness. Honest numbers, zero vibes.</p>
+        <div class="jfoot"><span>Python · Embeddings · Eval</span><span class="yr">2026</span></div>
+      </article>
+      <article class="job">
+        <div class="jid"><span>job_id: dms-ingestion</span><span class="badge">RUNNING</span></div>
+        <div class="no">03</div>
+        <h3>Multi-Source Ingestion</h3>
+        <p>ODBC pulls, REST cursors, push-uploaded files — every way data leaves a
+        dealership, normalized into one lake.</p>
+        <div class="jfoot"><span>Python · Azure · Polars</span><span class="yr">2025</span></div>
+      </article>
+      <article class="job">
+        <div class="jid"><span>job_id: serving-layer</span><span class="badge">RUNNING</span></div>
+        <div class="no">04</div>
+        <h3>Serving Layer &amp; Dashboard</h3>
+        <p>Warehouse data products to Postgres, exposed through a metric API and a
+        React dashboard people actually open.</p>
+        <div class="jfoot"><span>Postgres · TypeScript · React</span><span class="yr">2025</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="figures">
+  <div class="fig"><div class="num"><span class="count" data-t="17">0</span></div><div class="lbl">Pipelines in production</div></div>
+  <div class="fig"><div class="num"><span class="count" data-t="4.2" data-d="1">0</span>M</div><div class="lbl">Rows processed daily</div></div>
+  <div class="fig"><div class="num"><span class="count" data-t="3">0</span>+</div><div class="lbl">Years building data systems</div></div>
+</div>
+
+<section class="duo">
+  <div>
+    <h2>stack.toml</h2>
+    <dl class="stacklist">
+      <dt>Languages</dt><dd>SQL · Python · TypeScript</dd>
+      <dt>Data</dt><dd>dbt · Snowflake · Airflow · Postgres</dd>
+      <dt>Cloud</dt><dd>Azure — Functions, ACI, Blob, DevOps</dd>
+      <dt>Frontend</dt><dd>React · Vite · Tailwind</dd>
+    </dl>
+  </div>
+  <div>
+    <h2>about.txt</h2>
+    <div class="prose">
+      <p>I build data platforms end to end — ingestion that survives flaky sources,
+      models that survive audits, interfaces that make numbers legible.</p>
+      <p>Currently sharpening the front of the stack. <b>This page is the practice:</b>
+      the type you just moved through is a variable font on a terminal grid.</p>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="lbl">// open a connection</div>
+  <a class="bigmail" data-kinetic href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a>
+  <div class="alt">
+    <a href="https://github.com/sutheimernico">GitHub</a>
+    <a href="#">LinkedIn</a>
+  </div>
+  <div class="prompt-out">nico@sutheimer:~$ <span class="caret" aria-hidden="true"></span></div>
+</section>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ---- boot sequence: type the command, then reveal name + sql result ---- */
+  const bootEl = document.getElementById('boot');
+  const bootCaret = document.getElementById('bootcaret');
+  const BOOT = 'run portfolio --env=prod';
+  function finishBoot() {
+    document.body.classList.add('booted');
+    setTimeout(() => document.getElementById('sqlres').classList.add('show'), reduced ? 0 : 900);
+    splitKinetic();
+  }
+  if (reduced) { bootEl.textContent = BOOT; finishBoot(); }
+  else {
+    let i = 0;
+    (function type() {
+      bootEl.textContent = BOOT.slice(0, ++i);
+      if (i < BOOT.length) setTimeout(type, 24 + (i % 7 === 0 ? 55 : 0));
+      else { bootCaret.style.display = 'none'; setTimeout(finishBoot, 150); }
+    })();
+  }
+
+  /* ---- kinetic letters: variable mono swells toward the cursor ---- */
+  let chars = [], state = [];
+  function splitKinetic() {
+    document.querySelectorAll('[data-kinetic]').forEach(el => {
+      el.innerHTML = [...el.childNodes].map(n => {
+        if (n.nodeType !== 3) return n.outerHTML;                  // keep the amber "_" span
+        return n.textContent.split('').map(c =>
+          c === ' ' ? ' ' : `<span class="ch">${c}</span>`).join('');
+      }).join('');
+    });
+    chars = [...document.querySelectorAll('.ch')];
+    state = chars.map(() => ({ w: 250, d: 80 }));
+    if (!reduced && fine) requestAnimationFrame(frame);
+  }
+  let mx = -9999, my = -9999;
+  addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  const RADIUS = 200;
+  function frame() {
+    chars.forEach((ch, i) => {
+      const r = ch.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;             // skip offscreen glyphs
+      const dist = Math.hypot(mx - (r.left + r.width / 2), my - (r.top + r.height / 2));
+      const t = Math.max(0, 1 - dist / RADIUS);
+      state[i].w += ((250 + t * 550) - state[i].w) * 0.13;
+      state[i].d += ((80 + t * 32.5) - state[i].d) * 0.13;
+      ch.style.fontVariationSettings = `"wght" ${state[i].w.toFixed(0)}, "wdth" ${state[i].d.toFixed(1)}`;
+    });
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- marquee loop ---- */
+  const mt = document.getElementById('mtrack');
+  mt.innerHTML += mt.innerHTML;
+
+  /* ---- job queue: sticky pin + scroll-driven translateX ---- */
+  const queue = document.querySelector('.queue');
+  const qtrack = document.getElementById('qtrack');
+  const qprog = document.getElementById('qprog');
+  const njobs = qtrack.children.length;
+  function onScroll() {
+    if (reduced) return;
+    const r = queue.getBoundingClientRect();
+    const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 1);
+    qtrack.style.transform = `translateX(${-p * (qtrack.scrollWidth - innerWidth)}px)`;
+    qprog.textContent = String(Math.min(Math.floor(p * njobs) + 1, njobs)).padStart(2, '0') + ' / 0' + njobs;
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  onScroll();
+
+  /* ---- counters ---- */
+  const io = new IntersectionObserver((es, obs) => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    obs.unobserve(e.target);
+    const t = parseFloat(e.target.dataset.t), d = +(e.target.dataset.d || 0);
+    if (reduced) { e.target.textContent = t.toFixed(d); return; }
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / 900, 1);
+      e.target.textContent = (t * (1 - Math.pow(1 - p, 3))).toFixed(d);
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }), { threshold: .5 });
+  document.querySelectorAll('.count').forEach(el => io.observe(el));
+
+  /* ---- clock ---- */
+  (function tickClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('de-DE');
+    setTimeout(tickClock, 1000);
+  })();
+
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>
