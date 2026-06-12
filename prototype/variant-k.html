@@ -30,11 +30,11 @@
     --ease-hard: cubic-bezier(0.77, 0, 0.175, 1);
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   }
-  body[data-theme="phosphor"] { --accent: #33FF66; --accent-rgb: 51,255,102;  --accent-2: #B6FFC9; }
-  body[data-theme="violet"]   { --accent: #BD93F9; --accent-rgb: 189,147,249; --accent-2: #50FA7B; }
-  body[data-theme="cyan"]     { --accent: #4FD8FF; --accent-rgb: 79,216,255;  --accent-2: #B8F1FF; }
-  body[data-theme="red"]      { --accent: #FF4538; --accent-rgb: 255,69,56;   --accent-2: #FFB000; }
-  body[data-theme="mono"]     { --accent: #F5F2EA; --accent-rgb: 245,242,234; --accent-2: #97917F; }
+  html[data-theme="phosphor"] { --accent: #33FF66; --accent-rgb: 51,255,102;  --accent-2: #B6FFC9; }
+  html[data-theme="violet"]   { --accent: #BD93F9; --accent-rgb: 189,147,249; --accent-2: #50FA7B; }
+  html[data-theme="cyan"]     { --accent: #4FD8FF; --accent-rgb: 79,216,255;  --accent-2: #B8F1FF; }
+  html[data-theme="red"]      { --accent: #FF4538; --accent-rgb: 255,69,56;   --accent-2: #FFB000; }
+  html[data-theme="mono"]     { --accent: #F5F2EA; --accent-rgb: 245,242,234; --accent-2: #97917F; }
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--bg); color: var(--text);
@@ -416,7 +416,7 @@
     twrap.append(b);
   });
   function setTheme(name) {
-    document.body.dataset.theme = name;
+    document.documentElement.dataset.theme = name;
     sessionStorage.setItem('k-theme', name);
     [...twrap.children].forEach((b, i) => b.classList.toggle('on', THEMES[i][0] === name));
   }
