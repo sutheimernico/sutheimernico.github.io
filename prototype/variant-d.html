@@ -1,0 +1,224 @@
+<!doctype html>
+<!-- PROTOTYPE variant D — "Phosphor Shell": the portfolio as an interactive
+     terminal session. Green phosphor on near-black, JetBrains Mono, commands
+     type themselves as you scroll; output renders instantly (only commands
+     type — typed output gets old fast). Glow over scanline kitsch. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nico@sutheimer:~$</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0E0A;
+    --green: #33FF66;
+    --dim: #1C8C45;
+    --bright: #B6FFC9;
+    --err: #FF5555;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--green);
+    font: 400 15px/1.75 var(--mono);
+    text-shadow: 0 0 2px currentColor, 0 0 8px rgba(51,255,102,.35);
+  }
+  ::selection { background: var(--green); color: var(--bg); }
+  a { color: var(--bright); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { background: var(--green); color: var(--bg); text-shadow: none; text-decoration: none; }
+  a:focus-visible { outline: 1px solid var(--bright); outline-offset: 2px; }
+
+  /* faint scanlines — texture, not kitsch */
+  .scan {
+    position: fixed; inset: 0; pointer-events: none; z-index: 5;
+    background: repeating-linear-gradient(to bottom, rgba(0,0,0,.5) 0 1px, transparent 1px 3px);
+    opacity: .06;
+  }
+
+  main { max-width: 880px; margin: 0 auto; padding: 48px 24px 120px; }
+
+  .session-head { color: var(--dim); margin-bottom: 32px; }
+  .session-head .ok { color: var(--green); }
+
+  .block { margin-bottom: 56px; }
+  .promptline { white-space: pre-wrap; word-break: break-word; }
+  .promptline .user { color: var(--dim); }
+  .promptline .cmd { color: var(--bright); font-weight: 700; }
+  .caret {
+    display: inline-block; width: 9px; height: 17px; background: var(--green);
+    vertical-align: -3px; animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .out { margin-top: 10px; opacity: 0; }
+  .out.show { opacity: 1; }
+  .out pre { margin: 0; overflow-x: auto; }
+  .dim { color: var(--dim); }
+  .bright { color: var(--bright); }
+  .err { color: var(--err); }
+
+  .banner { font-size: clamp(7px, 1.6vw, 14px); line-height: 1.2; color: var(--bright); }
+
+  .lstable { width: 100%; border-collapse: collapse; }
+  .lstable td { padding: 6px 18px 6px 0; vertical-align: top; }
+  .lstable .perm { color: var(--dim); white-space: nowrap; }
+  .lstable .file { color: var(--bright); font-weight: 700; white-space: nowrap; }
+  .lstable tr:hover td { background: rgba(51,255,102,.07); }
+  .lstable .desc { color: var(--green); }
+  @media (max-width: 700px) { .lstable .perm { display: none; } }
+
+  .kv { display: grid; grid-template-columns: 150px 1fr; row-gap: 4px; }
+  .kv .k { color: var(--dim); }
+  @media (max-width: 600px) { .kv { grid-template-columns: 1fr; } .kv .k { margin-top: 8px; } }
+
+  .prose { max-width: 68ch; }
+  .prose p { margin: 0 0 1em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .caret { animation: none; }
+    .out { opacity: 1 !important; }
+  }
+</style>
+</head>
+<body>
+<div class="scan" aria-hidden="true"></div>
+<main>
+  <div class="session-head">
+    NS/OS 2.6.0 — tty1 · login: nico · last login 2026-06-12 from data-platform<br>
+    system status: <span class="ok">all pipelines green</span>
+  </div>
+
+  <!-- whoami -->
+  <div class="block" data-type>
+    <div class="promptline"><span class="user">nico@sutheimer:~$</span> <span class="cmd" data-text="whoami --verbose"></span></div>
+    <div class="out">
+<pre class="banner" aria-hidden="true">
+███╗   ██╗██╗ ██████╗ ██████╗
+████╗  ██║██║██╔════╝██╔═══██╗
+██╔██╗ ██║██║██║     ██║   ██║
+██║╚██╗██║██║██║     ██║   ██║
+██║ ╚████║██║╚██████╗╚██████╔╝
+╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝
+</pre>
+      <div class="kv" style="margin-top:14px">
+        <span class="k">name</span><span class="bright">Nico Sutheimer</span>
+        <span class="k">role</span><span>fullstack engineer — data &amp; BI</span>
+        <span class="k">location</span><span>Germany (UTC+2)</span>
+        <span class="k">status</span><span class="bright">available for interesting problems</span>
+        <span class="k">motto</span><span>"if it isn't measured, it's an opinion."</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- projects -->
+  <div class="block" data-type>
+    <div class="promptline"><span class="user">nico@sutheimer:~$</span> <span class="cmd" data-text="ls -la ./projects/"></span></div>
+    <div class="out">
+      <table class="lstable">
+        <tr>
+          <td class="perm">drwxr-x---  2024-26</td>
+          <td class="file">after-sales-bi/</td>
+          <td class="desc">multi-tenant analytics platform — Airflow · Snowflake · dbt · FastAPI · React</td>
+        </tr>
+        <tr>
+          <td class="perm">drwxr-x---  2026</td>
+          <td class="file">scouting-rag/</td>
+          <td class="desc">controlled retrieval-technique study — Python · embeddings · eval harness</td>
+        </tr>
+        <tr>
+          <td class="perm">drwxr-x---  2025</td>
+          <td class="file">dms-ingestion/</td>
+          <td class="desc">multi-source pipelines (ODBC, REST, file push) — Python · Azure · Polars</td>
+        </tr>
+        <tr>
+          <td class="perm">drwxr-x---  2025</td>
+          <td class="file">serving-layer/</td>
+          <td class="desc">warehouse → Postgres → metric API → dashboard — TypeScript · React</td>
+        </tr>
+      </table>
+      <div class="dim" style="margin-top:8px">4 directories, 0 broken builds</div>
+    </div>
+  </div>
+
+  <!-- stack -->
+  <div class="block" data-type>
+    <div class="promptline"><span class="user">nico@sutheimer:~$</span> <span class="cmd" data-text="cat stack.toml"></span></div>
+    <div class="out">
+<pre><span class="dim">[languages]</span>
+primary   = [<span class="bright">"SQL"</span>, <span class="bright">"Python"</span>, <span class="bright">"TypeScript"</span>]
+
+<span class="dim">[data]</span>
+warehouse = <span class="bright">"Snowflake + dbt (layered, raw → product)"</span>
+orchestr  = <span class="bright">"Airflow"</span>
+serving   = <span class="bright">"Postgres"</span>
+
+<span class="dim">[cloud]</span>
+azure     = [<span class="bright">"Functions"</span>, <span class="bright">"Container Instances"</span>, <span class="bright">"Blob"</span>, <span class="bright">"DevOps"</span>]
+
+<span class="dim">[frontend]</span>
+ui        = [<span class="bright">"React"</span>, <span class="bright">"Vite"</span>, <span class="bright">"Tailwind"</span>]  <span class="dim"># growing edge</span></pre>
+    </div>
+  </div>
+
+  <!-- about -->
+  <div class="block" data-type>
+    <div class="promptline"><span class="user">nico@sutheimer:~$</span> <span class="cmd" data-text="cat about.txt"></span></div>
+    <div class="out prose">
+      <p>I build data platforms end to end: ingestion that survives flaky sources,
+      warehouse models that survive audits, APIs and dashboards that people
+      actually trust.</p>
+      <p>Currently sharpening the front of the stack — React, TypeScript, motion —
+      because a number nobody can read is a number nobody uses.</p>
+    </div>
+  </div>
+
+  <!-- contact -->
+  <div class="block" data-type>
+    <div class="promptline"><span class="user">nico@sutheimer:~$</span> <span class="cmd" data-text="contact --open"></span></div>
+    <div class="out">
+<pre>email    → <a href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a>
+github   → <a href="https://github.com/sutheimernico">github.com/sutheimernico</a>
+linkedin → <a href="#">linkedin.com/in/nicosutheimer</a></pre>
+      <div class="dim" style="margin-top:8px">response time: usually &lt; 24h. <span class="err">spam: piped to /dev/null</span></div>
+    </div>
+  </div>
+
+  <div class="promptline"><span class="user">nico@sutheimer:~$</span> <span class="caret" aria-hidden="true"></span></div>
+</main>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // commands type themselves when scrolled into view; output shows right after
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      const cmd = e.target.querySelector('.cmd');
+      const out = e.target.querySelector('.out');
+      const text = cmd.dataset.text;
+      if (reduced) { cmd.textContent = text; out.classList.add('show'); return; }
+      let i = 0;
+      (function type() {
+        cmd.textContent = text.slice(0, ++i);
+        if (i < text.length) {
+          // ~25ms/char with occasional jitter, like a human on a good day
+          setTimeout(type, 22 + (i % 9 === 0 ? 60 : 0));
+        } else {
+          setTimeout(() => out.classList.add('show'), 120);
+        }
+      })();
+    });
+  }, { rootMargin: '0px 0px -15% 0px' });
+  document.querySelectorAll('[data-type]').forEach(el => io.observe(el));
+
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>

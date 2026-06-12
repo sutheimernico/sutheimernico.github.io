@@ -1,0 +1,235 @@
+<!doctype html>
+<!-- PROTOTYPE variant J — "Riso Zine": risograph overprint. Real riso ink
+     colors (Blue #0078BF × Fluorescent Pink #FF48B0, later Green × Orange),
+     true overprint via mix-blend-mode: multiply, static feTurbulence grain,
+     misregistration hover that jumps in steps(3) like a print shift.
+     Archivo Black, slightly rotated, punk-editorial layout. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nico Sutheimer — a zine about data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF5EB;
+    --ink: #000000;
+    --blue: #0078BF;
+    --pink: #FF48B0;
+    --green: #00A95C;
+    --orange: #FF6C2F;
+    --yellow: #FFE800;
+    --black: "Archivo Black", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 15px/1.7 var(--mono); overflow-x: hidden; }
+  ::selection { background: var(--pink); color: var(--paper); }
+  a { color: inherit; }
+  a:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+
+  /* static grain — animated grain is TV noise, not riso */
+  .grain { position: fixed; inset: 0; pointer-events: none; z-index: 40; opacity: .08; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- overprint headline machinery ---------- */
+  .over { position: relative; display: inline-block; font-family: var(--black); text-transform: uppercase; line-height: .92; letter-spacing: -.01em; }
+  .over .layer { display: block; }
+  .over .layer.c1 { color: var(--c1, var(--blue)); mix-blend-mode: multiply; }
+  .over .layer.c2 {
+    position: absolute; inset: 0; color: var(--c2, var(--pink)); mix-blend-mode: multiply;
+    transform: translate(2px, -2px);
+    transition: transform 150ms steps(3);
+  }
+  .over:hover .layer.c2 { transform: translate(5px, -5px); }
+  @media (prefers-reduced-motion: reduce) { .over .layer.c2 { transition: none; } }
+
+  /* ---------- cover ---------- */
+  .cover { min-height: 96svh; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 40px 0; }
+  .cover .issue { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .14em; margin-bottom: 26px; }
+  .cover .issue b { background: var(--ink); color: var(--paper); padding: 3px 8px; }
+  .cover h1 { margin: 0; font-size: clamp(56px, 12.5vw, 190px); transform: rotate(-2deg); }
+  .cover .strap { margin-top: 34px; max-width: 46ch; font-size: 16px; }
+  .cover .strap mark { background: var(--yellow); padding: 1px 5px; }
+
+  .sticker {
+    position: absolute; font-family: var(--black); text-transform: uppercase;
+    padding: 12px 18px; transform: rotate(-6deg); font-size: 15px; line-height: 1.1;
+    transition: transform 200ms ease-out; cursor: default; user-select: none;
+  }
+  .sticker:hover { transform: rotate(0deg) scale(1.06); }
+  .st-1 { top: 12%; right: 6%; background: var(--pink); color: var(--paper); }
+  .st-2 { bottom: 16%; right: 14%; background: var(--blue); color: var(--paper); transform: rotate(4deg); }
+  .st-2:hover { transform: rotate(0deg) scale(1.06); }
+  .st-3 { bottom: 30%; left: 2%; background: var(--yellow); color: var(--ink); transform: rotate(-3deg); }
+  .st-3:hover { transform: rotate(0deg) scale(1.06); }
+  @media (max-width: 720px) { .st-2, .st-3 { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .sticker { transition: none; } }
+
+  /* ---------- pages (sections) ---------- */
+  .page { padding: 90px 0; border-top: 4px solid var(--ink); }
+  .pagehead { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-bottom: 50px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; }
+  .pagehead h2 { margin: 0; font-size: clamp(34px, 6vw, 76px); }
+
+  /* work spreads */
+  .spread { display: grid; grid-template-columns: 110px 1fr auto; gap: 26px; align-items: start; padding: 30px 0; border-bottom: 2px dashed var(--ink); }
+  .spread:last-child { border-bottom: 0; }
+  .spread .no { font-family: var(--black); font-size: 52px; line-height: 1; transform: rotate(-3deg); }
+  .spread .no .layer.c2 { transform: translate(1.5px, -1.5px); }
+  .spread h3 { margin: 0 0 8px; font-family: var(--black); text-transform: uppercase; font-size: clamp(19px, 2.6vw, 30px); line-height: 1.1; }
+  .spread p { margin: 0; max-width: 52ch; font-size: 14px; }
+  .spread .yr {
+    font-family: var(--black); font-size: 14px; background: var(--ink); color: var(--paper);
+    padding: 6px 10px; transform: rotate(3deg); white-space: nowrap;
+  }
+  .spread:hover h3 { color: var(--c1, var(--blue)); }
+  @media (max-width: 700px) { .spread { grid-template-columns: 1fr; gap: 10px; } .spread .no { font-size: 38px; } }
+
+  /* second page swaps the ink duo: blue/pink → green/orange */
+  .page.duo2 { --c1: var(--green); --c2: var(--orange); }
+  .page.duo2 ::selection { background: var(--orange); }
+
+  .stack-tags { display: flex; flex-wrap: wrap; gap: 14px; }
+  .tag {
+    font-family: var(--black); text-transform: uppercase; font-size: clamp(16px, 2.4vw, 26px);
+    border: 3px solid var(--ink); padding: 10px 18px; background: var(--paper);
+    transform: rotate(var(--r, -1deg)); transition: transform 200ms ease-out, background 120ms linear, color 120ms linear;
+  }
+  .tag:nth-child(2n) { --r: 1.5deg; }
+  .tag:nth-child(3n) { --r: -2deg; }
+  .tag:hover { transform: rotate(0) scale(1.04); background: var(--c1, var(--blue)); color: var(--paper); border-color: var(--c1, var(--blue)); }
+  @media (prefers-reduced-motion: reduce) { .tag { transition: none; } }
+
+  .manifesto { font-size: 15px; max-width: 56ch; }
+  .manifesto p { margin: 0 0 1em; }
+  .manifesto .x { background: var(--c1, var(--blue)); color: var(--paper); padding: 1px 5px; }
+
+  /* contact page */
+  .shout { margin: 0 0 40px; font-size: clamp(44px, 9vw, 130px); transform: rotate(-2deg); }
+  .mailrow { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+  .mailbtn {
+    font-family: var(--black); text-transform: uppercase; font-size: clamp(15px, 2vw, 22px);
+    text-decoration: none; background: var(--pink); color: var(--paper); padding: 16px 26px;
+    transform: rotate(-1.5deg); transition: transform 200ms ease-out, background 120ms linear;
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .mailbtn:hover { transform: rotate(0) scale(1.03); background: var(--blue); }
+  .mailbtn:active { transform: translate(3px,3px); box-shadow: 2px 2px 0 var(--ink); }
+  .mailrow .alt { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; display: flex; gap: 22px; }
+  .mailrow .alt a:hover { background: var(--yellow); }
+
+  footer { border-top: 4px solid var(--ink); padding: 20px 0 90px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; }
+</style>
+</head>
+<body>
+
+<svg class="grain" aria-hidden="true"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+
+<div class="wrap">
+
+  <header class="cover">
+    <div class="issue"><b>Issue #01</b> · Summer 2026 · printed in two inks, served in one request</div>
+    <h1 class="over" aria-label="Nico Sutheimer">
+      <span class="layer c1" aria-hidden="true">Nico<br>Sutheimer</span>
+      <span class="layer c2" aria-hidden="true">Nico<br>Sutheimer</span>
+    </h1>
+    <p class="strap">A zine about <mark>data that ships</mark> — pipelines, warehouses,
+    APIs &amp; the dashboards on top. Made by one fullstack engineer with a BI habit.</p>
+    <span class="sticker st-1" aria-hidden="true">Fullstack!</span>
+    <span class="sticker st-2" aria-hidden="true">Data &amp; BI</span>
+    <span class="sticker st-3" aria-hidden="true">No template ★</span>
+  </header>
+
+  <section class="page" id="work">
+    <div class="pagehead">
+      <h2 class="over"><span class="layer c1" aria-hidden="true">The Work</span><span class="layer c2" aria-hidden="true">The Work</span></h2>
+      <span>p. 2–3 / overprint: blue × pink</span>
+    </div>
+
+    <article class="spread">
+      <div class="no over"><span class="layer c1" aria-hidden="true">01</span><span class="layer c2" aria-hidden="true">01</span></div>
+      <div>
+        <h3>After-Sales BI Platform</h3>
+        <p>Multi-tenant analytics for automotive after-sales. Airflow-orchestrated ingestion,
+        layered Snowflake/dbt warehouse, row-level-secured APIs, React dashboards.</p>
+      </div>
+      <span class="yr">2024–26</span>
+    </article>
+
+    <article class="spread">
+      <div class="no over"><span class="layer c1" aria-hidden="true">02</span><span class="layer c2" aria-hidden="true">02</span></div>
+      <div>
+        <h3>Scouting RAG Study</h3>
+        <p>Controlled retrieval comparison: one technique per cycle, fixed eval harness,
+        zero vibes-based conclusions.</p>
+      </div>
+      <span class="yr">2026</span>
+    </article>
+
+    <article class="spread">
+      <div class="no over"><span class="layer c1" aria-hidden="true">03</span><span class="layer c2" aria-hidden="true">03</span></div>
+      <div>
+        <h3>Multi-Source Ingestion</h3>
+        <p>ODBC pulls, REST cursors, push-uploaded CSVs — every way data escapes a
+        dealership, normalized into one lake.</p>
+      </div>
+      <span class="yr">2025</span>
+    </article>
+
+    <article class="spread">
+      <div class="no over"><span class="layer c1" aria-hidden="true">04</span><span class="layer c2" aria-hidden="true">04</span></div>
+      <div>
+        <h3>Serving Layer &amp; Dashboard</h3>
+        <p>Warehouse data products to Postgres, a metric API in front, and a React
+        dashboard that answers before anyone asks.</p>
+      </div>
+      <span class="yr">2025</span>
+    </article>
+  </section>
+
+  <section class="page duo2">
+    <div class="pagehead">
+      <h2 class="over"><span class="layer c1" aria-hidden="true">The Tools</span><span class="layer c2" aria-hidden="true">The Tools</span></h2>
+      <span>p. 4 / ink swap: green × orange</span>
+    </div>
+    <div class="stack-tags">
+      <span class="tag">SQL</span><span class="tag">Python</span><span class="tag">TypeScript</span>
+      <span class="tag">dbt</span><span class="tag">Snowflake</span><span class="tag">Airflow</span>
+      <span class="tag">Azure</span><span class="tag">Postgres</span><span class="tag">React</span>
+    </div>
+    <div class="manifesto" style="margin-top:50px">
+      <p><span class="x">The manifesto:</span> data work earns trust in the pipeline and
+      loses it on the screen. So I do both — modelling the warehouse AND sweating the
+      interface. This zine look? Same idea: two inks, honestly overprinted, no fake
+      gradients pretending to be depth.</p>
+    </div>
+  </section>
+
+  <section class="page" id="contact">
+    <h2 class="shout over"><span class="layer c1" aria-hidden="true">Write me!</span><span class="layer c2" aria-hidden="true">Write me!</span></h2>
+    <div class="mailrow">
+      <a class="mailbtn" href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a>
+      <span class="alt">
+        <a href="https://github.com/sutheimernico">GitHub</a>
+        <a href="#">LinkedIn</a>
+      </span>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 N. Sutheimer · riso inks: blue 0078BF × fluo pink FF48B0</span>
+    <span>Archivo Black / IBM Plex Mono</span>
+  </footer>
+</div>
+
+<script>
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>

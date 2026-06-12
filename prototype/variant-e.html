@@ -1,0 +1,251 @@
+<!doctype html>
+<!-- PROTOTYPE variant E — "Engineering Paper": Berkeley-Graphics-style spec
+     sheet. Warm paper, dense bordered tables, registration marks, dimension
+     lines, an APPROVED stamp, signal red. Paper doesn't move: motion is
+     near zero by design. Martian Mono + IBM Plex Sans. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NS-2026-001 — Nico Sutheimer, Fullstack Engineering Unit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;600;800&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F1EEE6;
+    --ink: #141414;
+    --line: #C9C5B9;
+    --hover: #E8E4D8;
+    --red: #FF2D00;
+    --blue: #2B58A8;
+    --mono: "Martian Mono", ui-monospace, monospace;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 400 13px/1.7 var(--mono); font-variant-numeric: tabular-nums;
+  }
+  ::selection { background: var(--ink); color: var(--paper); }
+  a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); }
+  a:hover { color: var(--red); border-color: var(--red); transition: color 120ms linear, border-color 120ms linear; }
+  a:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+  .sheet { max-width: 1040px; margin: 40px auto 80px; padding: 0 20px; position: relative; }
+
+  /* registration marks */
+  .reg { position: absolute; width: 18px; height: 18px; color: var(--ink); opacity: .7; }
+  .reg svg { display: block; }
+  .reg.tl { top: -26px; left: -2px; } .reg.tr { top: -26px; right: -2px; }
+  .reg.bl { bottom: -26px; left: -2px; } .reg.br { bottom: -26px; right: -2px; }
+
+  /* ---------- doc header ---------- */
+  .dochead { border: 2px solid var(--ink); display: grid; grid-template-columns: 1fr auto; }
+  .dochead .title { padding: 22px 24px; border-right: 2px solid var(--ink); }
+  .dochead h1 {
+    margin: 0; font: 800 clamp(20px, 3.4vw, 38px)/1.15 var(--mono);
+    text-transform: uppercase; letter-spacing: -.01em;
+  }
+  .dochead .sub { margin-top: 8px; color: #555; font-size: 12px; }
+  .dochead .docmeta { display: grid; grid-auto-rows: 1fr; min-width: 230px; }
+  .dochead .docmeta div { padding: 8px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 18px; align-items: center; font-size: 11px; }
+  .dochead .docmeta div:last-child { border-bottom: 0; }
+  .dochead .docmeta .v { font-weight: 600; }
+  .dochead .docmeta .red { color: var(--red); }
+  @media (max-width: 700px) { .dochead { grid-template-columns: 1fr; } .dochead .title { border-right: 0; border-bottom: 2px solid var(--ink); } }
+
+  /* ---------- section scaffolding ---------- */
+  section { margin-top: 56px; position: relative; }
+  .sechead {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
+  }
+  .sechead .no { background: var(--ink); color: var(--paper); padding: 3px 8px; }
+  .sechead .rule { flex: 1; border-top: 1px solid var(--line); }
+
+  /* dimension line between sections */
+  .dimline { margin: 56px 0 0; display: flex; align-items: center; gap: 10px; color: #777; font-size: 10px; }
+  .dimline .arrow { flex: 1; height: 9px; position: relative; border-bottom: 1px solid #999; }
+  .dimline .arrow::before, .dimline .arrow::after {
+    content: ""; position: absolute; bottom: -3.5px; border: 3.5px solid transparent;
+  }
+  .dimline .arrow::before { left: 0; border-right: 6px solid #999; }
+  .dimline .arrow::after { right: 0; border-left: 6px solid #999; }
+
+  /* ---------- spec tables ---------- */
+  table { width: 100%; border-collapse: collapse; border: 2px solid var(--ink); font-size: 12px; }
+  th {
+    text-align: left; font-weight: 600; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .1em; padding: 8px 12px; border: 1px solid var(--ink);
+    background: var(--ink); color: var(--paper);
+  }
+  td { padding: 10px 12px; border: 1px solid var(--line); vertical-align: top; }
+  tbody tr { transition: background 150ms ease-out; }
+  tbody tr:hover { background: var(--hover); transition: none; }
+  td.num { font-weight: 800; white-space: nowrap; }
+  td .name { font-weight: 600; display: block; }
+  td .desc { font-family: var(--sans); font-size: 13px; color: #444; display: block; margin-top: 3px; max-width: 52ch; }
+  td.year { white-space: nowrap; }
+  td.status { color: var(--blue); font-weight: 600; white-space: nowrap; }
+  td.status.live { color: var(--red); }
+  @media (max-width: 700px) { .hide-sm { display: none; } }
+
+  /* ---------- stamp ---------- */
+  .stamp {
+    position: absolute; right: 8px; top: -14px; z-index: 2;
+    border: 3px double var(--red); color: var(--red); padding: 8px 16px;
+    font: 800 15px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em;
+    transform: rotate(-3deg); opacity: .9; pointer-events: none;
+    background: rgba(241,238,230,.6);
+  }
+  .stamp small { display: block; font-size: 8px; font-weight: 400; letter-spacing: .14em; }
+  .stamp.pop { opacity: 0; transform: rotate(-3deg) scale(1.5); }
+  .stamp.pop.on { opacity: .9; transform: rotate(-3deg) scale(1); transition: opacity 250ms linear, transform 250ms cubic-bezier(0.34,1.56,0.64,1); }
+  @media (prefers-reduced-motion: reduce) { .stamp.pop { opacity: .9; transform: rotate(-3deg) scale(1); } }
+
+  /* ---------- prose / about ---------- */
+  .notice { border: 2px solid var(--ink); padding: 22px 24px; display: grid; grid-template-columns: auto 1fr; gap: 20px; }
+  .notice .mark { font-weight: 800; font-size: 22px; color: var(--red); }
+  .notice .body { font-family: var(--sans); font-size: 14px; max-width: 64ch; }
+  .notice .body p { margin: 0 0 .9em; } .notice .body p:last-child { margin: 0; }
+
+  /* ---------- footer ---------- */
+  .docfoot {
+    margin-top: 64px; border-top: 2px solid var(--ink); padding-top: 14px;
+    display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #555;
+  }
+  .barcode {
+    height: 30px; width: 180px;
+    background: repeating-linear-gradient(to right, var(--ink) 0 2px, transparent 2px 5px, var(--ink) 5px 9px, transparent 9px 11px);
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <span class="reg tl" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="none" stroke="currentColor"/><path d="M9 0v18M0 9h18" stroke="currentColor" stroke-width="1"/></svg></span>
+  <span class="reg tr" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="none" stroke="currentColor"/><path d="M9 0v18M0 9h18" stroke="currentColor" stroke-width="1"/></svg></span>
+
+  <header class="dochead">
+    <div class="title">
+      <h1>Nico Sutheimer<br>Fullstack Engineering Unit</h1>
+      <div class="sub">Data platforms · business intelligence · web interfaces</div>
+    </div>
+    <div class="docmeta">
+      <div><span>Doc. no.</span><span class="v">NS-2026-001</span></div>
+      <div><span>Revision</span><span class="v">REV A</span></div>
+      <div><span>Issued</span><span class="v">2026-06</span></div>
+      <div><span>Status</span><span class="v red">ACTIVE / AVAILABLE</span></div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sechead"><span class="no">1.0</span><span>Deployed systems</span><span class="rule"></span></div>
+    <div class="stamp pop" aria-hidden="true">Approved<small>QA · NS · 2026</small></div>
+    <table>
+      <thead>
+        <tr><th>Ref.</th><th>System</th><th class="hide-sm">Stack</th><th>Period</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num">1.1</td>
+          <td><span class="name">After-Sales BI Platform</span><span class="desc">Multi-tenant analytics: orchestrated ingestion, layered warehouse, row-level-secured APIs, dashboards.</span></td>
+          <td class="hide-sm">Airflow · Snowflake · dbt · FastAPI · React</td>
+          <td class="year">2024–26</td>
+          <td class="status live">IN PRODUCTION</td>
+        </tr>
+        <tr>
+          <td class="num">1.2</td>
+          <td><span class="name">Scouting RAG Study</span><span class="desc">Controlled comparison of retrieval techniques; strict eval harness, one variable per cycle.</span></td>
+          <td class="hide-sm">Python · Embeddings · Eval</td>
+          <td class="year">2026</td>
+          <td class="status">RESEARCH</td>
+        </tr>
+        <tr>
+          <td class="num">1.3</td>
+          <td><span class="name">Multi-Source DMS Ingestion</span><span class="desc">Pull/push pipelines: on-prem ODBC, REST APIs, file drops — normalized into one lake.</span></td>
+          <td class="hide-sm">Python · Azure · Polars</td>
+          <td class="year">2025</td>
+          <td class="status live">IN PRODUCTION</td>
+        </tr>
+        <tr>
+          <td class="num">1.4</td>
+          <td><span class="name">Serving Layer &amp; Dashboard</span><span class="desc">Warehouse data products → Postgres → metric API → React dashboard.</span></td>
+          <td class="hide-sm">Postgres · TypeScript · React</td>
+          <td class="year">2025</td>
+          <td class="status live">IN PRODUCTION</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="dimline" aria-hidden="true"><span>section</span><span class="arrow"></span><span>2.0</span></div>
+
+  <section>
+    <div class="sechead"><span class="no">2.0</span><span>Technical specification</span><span class="rule"></span></div>
+    <table>
+      <thead><tr><th>Ref.</th><th>Domain</th><th>Components</th><th class="hide-sm">Note</th></tr></thead>
+      <tbody>
+        <tr><td class="num">2.1</td><td>Languages</td><td>SQL · Python · TypeScript</td><td class="hide-sm">daily drivers</td></tr>
+        <tr><td class="num">2.2</td><td>Warehouse</td><td>Snowflake · dbt</td><td class="hide-sm">layered, raw → data product</td></tr>
+        <tr><td class="num">2.3</td><td>Orchestration</td><td>Airflow</td><td class="hide-sm">config-driven fanout</td></tr>
+        <tr><td class="num">2.4</td><td>Cloud</td><td>Azure — Functions, ACI, Blob, DevOps</td><td class="hide-sm">production workloads</td></tr>
+        <tr><td class="num">2.5</td><td>Frontend</td><td>React · Vite · Tailwind</td><td class="hide-sm">growing edge — this site is the practice</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="dimline" aria-hidden="true"><span>section</span><span class="arrow"></span><span>3.0</span></div>
+
+  <section>
+    <div class="sechead"><span class="no">3.0</span><span>Operator's note</span><span class="rule"></span></div>
+    <div class="notice">
+      <div class="mark" aria-hidden="true">!</div>
+      <div class="body">
+        <p>I came to software through data — SQL first, then Python, then the platform
+        around it. My standard: pipelines that don't page anyone at night, models that
+        survive an audit, interfaces that make the numbers legible.</p>
+        <p>This document is set the way I like systems: dense, inspectable, no decoration
+        without information.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="dimline" aria-hidden="true"><span>section</span><span class="arrow"></span><span>4.0</span></div>
+
+  <section>
+    <div class="sechead"><span class="no">4.0</span><span>Points of contact</span><span class="rule"></span></div>
+    <table>
+      <tbody>
+        <tr><td class="num">4.1</td><td>Email</td><td><a href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a></td></tr>
+        <tr><td class="num">4.2</td><td>GitHub</td><td><a href="https://github.com/sutheimernico">github.com/sutheimernico</a></td></tr>
+        <tr><td class="num">4.3</td><td>LinkedIn</td><td><a href="#">linkedin.com/in/nicosutheimer</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="docfoot">
+    <span>© 2026 N. Sutheimer · uncontrolled when printed</span>
+    <div class="barcode" aria-hidden="true"></div>
+    <span>NS-2026-001 · REV A · sheet 1/1</span>
+  </footer>
+
+  <span class="reg bl" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="none" stroke="currentColor"/><path d="M9 0v18M0 9h18" stroke="currentColor" stroke-width="1"/></svg></span>
+  <span class="reg br" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="none" stroke="currentColor"/><path d="M9 0v18M0 9h18" stroke="currentColor" stroke-width="1"/></svg></span>
+</div>
+
+<script>
+  // stamp pops once when its section scrolls into view
+  const stamp = document.querySelector('.stamp');
+  new IntersectionObserver((entries, io) => {
+    entries.forEach(e => { if (e.isIntersecting) { stamp.classList.add('on'); io.disconnect(); } });
+  }, { threshold: .4 }).observe(stamp.parentElement);
+
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>

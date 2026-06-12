@@ -1,0 +1,206 @@
+<!doctype html>
+<!-- PROTOTYPE variant G — "Kinetic Type": type IS the interface. One variable
+     font (Anybody, wght 100-900 / wdth 50-150) on near-white. The name's
+     letters swell toward the cursor; section headlines stretch with scroll;
+     project titles pulse on hover. Almost no other decoration. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nico Sutheimer — Fullstack Engineer, Data &amp; BI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Archivo:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F4F0;
+    --ink: #0E0E0E;
+    --soft: #7A776F;
+    --accent: #FF4400;
+    --display: "Anybody", system-ui, sans-serif;
+    --body: "Archivo", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.7 var(--body); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- hero: letters swell toward the cursor ---------- */
+  .hero { min-height: 92svh; display: flex; flex-direction: column; justify-content: center; }
+  .hero .meta { display: flex; justify-content: space-between; gap: 16px; color: var(--soft); font-size: 13px; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 32px; }
+  .kinetic {
+    font-family: var(--display); text-transform: uppercase; line-height: .95;
+    font-size: clamp(48px, 10.5vw, 170px); letter-spacing: -.01em; margin: 0;
+    font-variation-settings: "wght" 300, "wdth" 90;
+    word-break: keep-all;
+  }
+  .kinetic .ch { display: inline-block; font-variation-settings: inherit; will-change: font-variation-settings; }
+  .kinetic .sp { display: inline-block; width: .35em; }
+  .hero .tag { margin-top: 36px; max-width: 44ch; color: var(--soft); font-size: 18px; }
+  .hero .tag b { color: var(--ink); font-weight: 500; }
+  .hint { margin-top: 18px; color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: .12em; }
+  @media (hover: none) { .hint { display: none; } }
+
+  /* ---------- section headlines stretch with scroll ---------- */
+  section { padding: 110px 0; border-top: 1px solid #DDDAD2; }
+  .stretch {
+    font-family: var(--display); text-transform: uppercase; margin: 0 0 56px;
+    font-size: clamp(34px, 6vw, 92px); line-height: 1;
+    font-variation-settings: "wght" 800, "wdth" 50;
+  }
+
+  /* ---------- work: titles pulse on hover ---------- */
+  .work { list-style: none; margin: 0; padding: 0; counter-reset: w; }
+  .work li { border-bottom: 1px solid #DDDAD2; }
+  .work a { display: flex; align-items: baseline; gap: 24px; padding: 26px 0; }
+  .work a::before {
+    counter-increment: w; content: "0" counter(w);
+    font-family: var(--display); font-variation-settings: "wght" 300, "wdth" 75;
+    color: var(--soft); font-size: 15px;
+  }
+  .work .t {
+    font-family: var(--display); text-transform: uppercase;
+    font-size: clamp(22px, 3.6vw, 48px); line-height: 1.05;
+    font-variation-settings: "wght" 350, "wdth" 95;
+    /* asymmetric pulse: fast in, slow settle */
+    transition: font-variation-settings 450ms cubic-bezier(0.23,1,0.32,1), color 200ms;
+  }
+  .work a:hover .t { font-variation-settings: "wght" 900, "wdth" 120; transition-duration: 250ms; color: var(--accent); }
+  .work .m { margin-left: auto; color: var(--soft); font-size: 13px; white-space: nowrap; }
+  @media (max-width: 700px) { .work .m { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .work .t { transition: color 200ms; } }
+
+  /* ---------- about / stack ---------- */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; max-width: 980px; }
+  .cols p { margin: 0 0 1.2em; }
+  .cols .lbl { color: var(--soft); font-size: 13px; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 14px; }
+  .cols ul { list-style: none; margin: 0; padding: 0; }
+  .cols li { padding: 6px 0; border-bottom: 1px solid #DDDAD2; display: flex; justify-content: space-between; gap: 12px; }
+  .cols li span:last-child { color: var(--soft); }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* ---------- contact ---------- */
+  .say {
+    display: block; font-family: var(--display); text-transform: uppercase;
+    font-size: clamp(56px, 13vw, 210px); line-height: .95; text-align: center;
+    font-variation-settings: "wght" 200, "wdth" 80;
+    transition: font-variation-settings 500ms cubic-bezier(0.23,1,0.32,1), color 200ms;
+    padding: 40px 0;
+  }
+  .say:hover { font-variation-settings: "wght" 900, "wdth" 150; color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .say { transition: color 200ms; } }
+  .say-sub { text-align: center; color: var(--soft); margin-bottom: 80px; }
+  .say-sub a { border-bottom: 1px solid var(--soft); padding-bottom: 2px; }
+  .say-sub a:hover { color: var(--accent); border-color: var(--accent); }
+
+  footer { border-top: 1px solid #DDDAD2; padding: 24px 0 90px; display: flex; justify-content: space-between; gap: 12px; color: var(--soft); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="meta"><span>Portfolio 2026</span><span>Fullstack — Data / BI</span><span>DE</span></div>
+    <h1 class="kinetic" id="name" aria-label="Nico Sutheimer">NICO SUTHEIMER</h1>
+    <p class="tag">Fullstack engineer with a data spine — pipelines, warehouses,
+    APIs and the interfaces that make them <b>legible</b>.</p>
+    <div class="hint" aria-hidden="true">→ move your cursor through the name</div>
+  </header>
+
+  <section id="work">
+    <h2 class="stretch" data-stretch>Selected Work</h2>
+    <ul class="work">
+      <li><a href="#"><span class="t">After-Sales BI Platform</span><span class="m">Airflow · Snowflake · dbt · React — 2024–26</span></a></li>
+      <li><a href="#"><span class="t">Scouting RAG Study</span><span class="m">Python · Embeddings · Eval — 2026</span></a></li>
+      <li><a href="#"><span class="t">Multi-Source Ingestion</span><span class="m">Python · Azure · Polars — 2025</span></a></li>
+      <li><a href="#"><span class="t">Serving Layer &amp; Dashboard</span><span class="m">Postgres · TypeScript · React — 2025</span></a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="stretch" data-stretch>About</h2>
+    <div class="cols">
+      <div>
+        <p>I came to software through SQL and never quite left the data behind.
+        Today I build production analytics platforms end to end — and I'm
+        deepening the frontend half of the craft, one interface at a time.</p>
+        <p>Type responds to you on this page for the same reason a good chart does:
+        feedback builds trust.</p>
+      </div>
+      <div>
+        <div class="lbl">Stack</div>
+        <ul>
+          <li><span>SQL · Python · TypeScript</span><span>languages</span></li>
+          <li><span>dbt · Snowflake · Airflow</span><span>data</span></li>
+          <li><span>Azure</span><span>cloud</span></li>
+          <li><span>React · Vite · Tailwind</span><span>frontend</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="border-bottom: 0">
+    <a class="say" href="mailto:hello@nicosutheimer.dev">Say hi</a>
+    <p class="say-sub"><a href="mailto:hello@nicosutheimer.dev">hello@nicosutheimer.dev</a> ·
+    <a href="https://github.com/sutheimernico">GitHub</a></p>
+  </section>
+
+  <footer><span>© 2026 Nico Sutheimer</span><span>One font, all axes: Anybody</span></footer>
+</div>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // split the name into letter spans for per-glyph variation
+  const name = document.getElementById('name');
+  name.innerHTML = name.textContent.split('').map(c =>
+    c === ' ' ? '<span class="sp"></span>' : `<span class="ch">${c}</span>`
+  ).join('');
+  const chars = [...name.querySelectorAll('.ch')];
+  const state = chars.map(() => ({ w: 300, d: 90 }));
+
+  if (!reduced && fine) {
+    let mx = -9999, my = -9999;
+    addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    const RADIUS = 220;
+    (function frame() {
+      chars.forEach((ch, i) => {
+        const r = ch.getBoundingClientRect();
+        const dist = Math.hypot(mx - (r.left + r.width / 2), my - (r.top + r.height / 2));
+        const t = Math.max(0, 1 - dist / RADIUS);          // 0..1 proximity
+        const target = { w: 300 + t * 600, d: 90 + t * 60 };
+        // lerp toward target so the weight "springs" after the cursor
+        state[i].w += (target.w - state[i].w) * 0.12;
+        state[i].d += (target.d - state[i].d) * 0.12;
+        ch.style.fontVariationSettings = `"wght" ${state[i].w.toFixed(0)}, "wdth" ${state[i].d.toFixed(1)}`;
+      });
+      requestAnimationFrame(frame);
+    })();
+  }
+
+  // section headlines stretch from condensed to wide while crossing the viewport
+  if (!reduced) {
+    const stretches = [...document.querySelectorAll('[data-stretch]')];
+    function onScroll() {
+      stretches.forEach(h => {
+        const r = h.getBoundingClientRect();
+        const p = Math.min(Math.max(1 - r.top / innerHeight, 0), 1); // 0 at bottom edge, 1 at top
+        const wdth = 50 + p * 75;                                     // 50 → 125
+        h.style.fontVariationSettings = `"wght" 800, "wdth" ${wdth.toFixed(1)}`;
+      });
+    }
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  addEventListener('keydown', e => {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, [contenteditable]'))
+      parent.postMessage({ protoKey: e.key }, '*');
+  });
+</script>
+</body>
+</html>
