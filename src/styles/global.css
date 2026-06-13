@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
+/*
+  @theme inline: utilities emit var(--font-*) references instead of inlining the
+  stack. This means the actual stack is defined once in :root (below) and both
+  Tailwind utilities and scoped component <style> blocks read from the same token.
+  - font-mono  → IBM Plex Mono (body / code)
+  - font-display → Martian Mono Variable (headings / UI chrome)
+*/
+@theme inline {
+  --font-mono: var(--mono);
+  --font-display: var(--disp);
+}
+
 :root {
+  /* colours */
   --bg: #0B0A08; --surface: #14120E; --rule: #2A2722;
   --text: #EDEAE2; --muted: #97917F;
   /* default = phosphor (refined), not the prototype's amber */
@@ -8,7 +21,15 @@
   --amber: var(--accent); --green: var(--accent-2);
   --ease-hard: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* typography — single source of truth; @theme inline references these */
+  --disp: "Martian Mono Variable", ui-monospace, monospace;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
+
+/*
+  phosphor is the default theme and lives in bare :root above.
+  There is intentionally no html[data-theme="phosphor"] block — do not add one.
+*/
 html[data-theme="amber"]  { --accent:#FFB000; --accent-rgb:255,176,0;   --accent-2:#33FF66; }
 html[data-theme="violet"] { --accent:#BD93F9; --accent-rgb:189,147,249; --accent-2:#50FA7B; }
 html[data-theme="cyan"]   { --accent:#4FD8FF; --accent-rgb:79,216,255;  --accent-2:#B8F1FF; }
@@ -16,13 +37,7 @@ html[data-theme="red"]    { --accent:#FF4538; --accent-rgb:255,69,56;   --accent
 html[data-theme="mono"]   { --accent:#F5F2EA; --accent-rgb:245,242,234; --accent-2:#97917F; }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--mono); font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
-
-:root {
-  --disp: "Martian Mono Variable", ui-monospace, monospace;
-  --mono: "IBM Plex Mono", ui-monospace, monospace;
-}
-body { font-family: var(--mono); font-variant-numeric: tabular-nums; }
