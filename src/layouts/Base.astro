@@ -1,0 +1,32 @@
+---
+import '@fontsource-variable/martian-mono';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import { DEFAULT_THEME } from '../lib/themes';
+const {
+  title = 'Nico Sutheimer — Fullstack Engineer, Data & BI',
+  description = 'Fullstack engineer building data platforms end to end — pipeline to pixel.',
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme={DEFAULT_THEME}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <script is:inline>
+    // apply saved accent theme before first paint — prevents theme flash
+    try {
+      const valid = ['phosphor','amber','violet','cyan','red','mono'];
+      const t = sessionStorage.getItem('k-theme');
+      if (valid.includes(t)) document.documentElement.dataset.theme = t;
+    } catch (_) {}
+  </script>
+</head>
+<body><slot /></body>
+</html>

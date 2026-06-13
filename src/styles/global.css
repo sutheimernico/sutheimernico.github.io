@@ -20,3 +20,9 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+:root {
+  --disp: "Martian Mono Variable", ui-monospace, monospace;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+body { font-family: var(--mono); font-variant-numeric: tabular-nums; }
