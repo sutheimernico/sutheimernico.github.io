@@ -1,0 +1,122 @@
+---
+// ContactSection.astro
+// linkedin handle is a placeholder — Nico to confirm real handle later
+---
+
+<section id="contact" class="contact-sec">
+  <div class="wrap">
+    <div class="contact-header reveal">
+      <div class="eyebrow contact-eyebrow">Get in touch</div>
+      <h2 class="sec-title">Let's build something that reads the data right.</h2>
+    </div>
+    <div class="term reveal">
+      <div class="term-bar">
+        <span class="d g"></span>
+        <span class="d"></span>
+        <span class="d"></span>
+        <span class="t">nico@portfolio: ~/contact</span>
+      </div>
+      <div class="term-body">
+        <div><span class="cm"># reach out — pick a channel</span></div>
+        <div><span class="pr">&gt;</span> mail&nbsp;&nbsp;&nbsp;<a href="mailto:nico.sutheimer@bekumoo.de">nico.sutheimer@bekumoo.de</a></div>
+        <div><span class="pr">&gt;</span> github&nbsp;<a href="https://github.com/sutheimernico">github.com/sutheimernico</a></div>
+        <!-- TODO: replace href="#" with real LinkedIn URL once Nico confirms the handle -->
+        <div><span class="pr">&gt;</span> linkedin&nbsp;<a href="#">in/nico-sutheimer</a></div>
+        <div><span class="pr">&gt;</span> <span class="cur">_</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-sec {
+    padding: 16vh 0 10vh;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .contact-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .contact-eyebrow {
+    justify-content: center;
+  }
+
+  .term {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: linear-gradient(180deg, var(--surface), var(--bg-warm));
+    overflow: hidden;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .d {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+
+  .d.g {
+    background: var(--accent-soft);
+  }
+
+  .t {
+    margin-left: 10px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    font-family: var(--mono);
+  }
+
+  .term-body {
+    padding: 28px 26px;
+    font-size: 14.5px;
+    line-height: 2;
+    font-family: var(--mono);
+  }
+
+  .pr {
+    color: var(--accent);
+  }
+
+  .cm {
+    color: var(--ink-faint);
+  }
+
+  .term-body a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .term-body a:hover {
+    border-bottom-color: var(--accent);
+  }
+
+  .cur {
+    color: var(--accent);
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cur {
+      animation: none;
+    }
+  }
+</style>
