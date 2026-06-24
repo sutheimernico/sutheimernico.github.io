@@ -86,6 +86,112 @@ html[data-theme="daylight"] {
   --wip: #8A5F00;
 }
 
+/* === theme switcher === */
+
+.theme-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 170;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.theme-bar .theme-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  padding-right: 4px;
+}
+
+.sw {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  /* individual button sets --sw to its swatch colour */
+  background: var(--sw, var(--accent));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.28);
+  transition: transform 0.15s, border-color 0.2s;
+  outline: none;
+}
+
+.sw:hover {
+  transform: scale(1.18);
+}
+
+.sw:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+.sw:focus-visible .sw-tip {
+  opacity: 1;
+}
+
+.sw[aria-pressed="true"] {
+  border-color: var(--ink);
+  transform: scale(1.12);
+}
+
+.sw[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-faint);
+}
+
+.sw.shift {
+  background: conic-gradient(
+    from 0deg,
+    #45E08A, #2BB3A3, #7B5CFF, #C96BD8, #FF8A3D, #FFC745, #45E08A
+  );
+  display: grid;
+  place-items: center;
+  color: #0E0F0D;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sw-tip {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.sw:hover .sw-tip {
+  opacity: 1;
+}
+
+@media (max-width: 520px) {
+  .theme-bar .theme-label { display: none; }
+}
+
 /* smooth all surfaces during a theme switch (added briefly via JS) */
 html.theming,
 html.theming * {

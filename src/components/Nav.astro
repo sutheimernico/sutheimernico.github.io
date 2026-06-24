@@ -1,0 +1,95 @@
+---
+import NsMonogram from './NsMonogram.astro';
+---
+
+<nav id="nav" aria-label="Site navigation">
+  <a class="nav-mark" href="#top" aria-label="Nico Sutheimer — home">
+    <NsMonogram combined />
+    <span>NS</span>
+  </a>
+
+  <div class="nav-links" aria-label="Page sections">
+    <a href="#work">Work</a>
+    <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+{/* Inline script: add .solid when user scrolls past 60 px. */}
+<script is:inline>
+  (function () {
+    var nav = document.getElementById('nav');
+    if (!nav) return;
+    function tick() {
+      nav.classList.toggle('solid', (window.pageYOffset || document.documentElement.scrollTop) > 60);
+    }
+    window.addEventListener('scroll', tick, { passive: true });
+    tick();
+  })();
+</script>
+
+<style>
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+  }
+
+  nav.solid {
+    background-color: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom-color: var(--line-soft);
+  }
+
+  .nav-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* The SVG inherits currentColor from parent — accent via global `a` colour */
+  .nav-mark :global(svg) {
+    color: var(--accent);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 26px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--accent);
+  }
+
+  .nav-links a:focus-visible,
+  .nav-mark:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+  }
+</style>

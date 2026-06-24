@@ -1,0 +1,92 @@
+---
+/**
+ * NS monogram component.
+ *
+ * combined=false (default): two-tone hero version.
+ *   N path stroked with the #chrome linearGradient (metallic).
+ *   S path stroked with var(--accent) + accent glow.
+ *   Includes a ring and the <defs> gradient.
+ *
+ * combined=true: single monochrome path for nav/favicon use.
+ *   Both glyphs fused into one <path>, stroked in currentColor (inherits from
+ *   parent color, typically var(--accent) via .nav-mark).
+ *   No gradient, no ring, no glow — keeps it crisp at small sizes.
+ *
+ * Props:
+ *   combined?: boolean
+ *   size?:     string  CSS width+height value (default: '100%' / '28px' for combined)
+ *   class?:    string  extra classes forwarded to <svg>
+ */
+interface Props {
+  combined?: boolean;
+  size?: string;
+  class?: string;
+}
+const { combined = false, size, class: cls = '' } = Astro.props;
+---
+
+{combined ? (
+  <svg
+    viewBox="0 0 100 100"
+    aria-hidden="true"
+    style={size ? `width:${size};height:${size}` : 'width:28px;height:28px'}
+    class={cls}
+  >
+    <path
+      d="M20 72 V26 L52 72 V26 M82 44 C82 34 48 34 48 48 C48 62 82 58 82 74 C82 88 46 88 44 76"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="7.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+) : (
+  <svg
+    viewBox="0 0 100 100"
+    aria-hidden="true"
+    style={size ? `width:${size};height:${size}` : 'width:100%'}
+    class={cls}
+    overflow="visible"
+  >
+    <defs>
+      <linearGradient id="chrome" x1="0" y1="0" x2="0.3" y2="1">
+        <stop offset="0"    stop-color="#7c8884" />
+        <stop offset="0.22" stop-color="#eef2ee" />
+        <stop offset="0.55" stop-color="var(--chrome-mid)" />
+        <stop offset="0.78" stop-color="#cfd6d1" />
+        <stop offset="1"    stop-color="#566059" />
+      </linearGradient>
+    </defs>
+
+    {/* decorative ring */}
+    <circle
+      cx="50" cy="50" r="47"
+      fill="none"
+      stroke="rgba(var(--accent-rgb), 0.14)"
+      stroke-width="0.8"
+    />
+
+    {/* N — metallic chrome gradient */}
+    <path
+      d="M20 72 V26 L52 72 V26"
+      fill="none"
+      stroke="url(#chrome)"
+      stroke-width="8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      style="filter:drop-shadow(0 6px 16px rgba(0,0,0,0.55))"
+    />
+
+    {/* S — accent colour with glow, slightly forward via transform */}
+    <path
+      d="M82 44 C82 34 48 34 48 48 C48 62 82 58 82 74 C82 88 46 88 44 76"
+      fill="none"
+      stroke="var(--accent)"
+      stroke-width="8.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      style="filter:drop-shadow(0 0 12px rgba(var(--accent-rgb),0.55));transform:translateZ(26px)"
+    />
+  </svg>
+)}
