@@ -375,3 +375,67 @@ html[data-theme="daylight"] .mercury-spec {
 }
 
 /* === end hero mercury === */
+
+/* === data spine === */
+/*
+  This island is React-mounted, so it can't use Astro-scoped styles — its
+  selectors live here. `.eyebrow`, `.sec-title` and `.chip` are shared shells
+  (also styled scoped inside HeroSection.astro); defined here so the spine
+  renders correctly. `--serif` is not a :root token, so it carries a fallback.
+*/
+.spine-sec { height: 360vh; position: relative; }
+.spine-sticky {
+  position: sticky; top: 0; height: 100vh;
+  display: grid; grid-template-columns: 1fr 1fr; align-items: center; overflow: hidden;
+}
+.spine-stage { perspective: 1100px; height: 100%; display: grid; place-items: center; }
+.spine { position: relative; width: 300px; height: 60vh; transform-style: preserve-3d; will-change: transform; }
+
+.vertebra {
+  position: absolute; left: 50%; top: 50%; width: 300px; height: 46px; margin: -23px 0 0 -150px;
+  transform-style: preserve-3d;
+  border: 1px solid var(--line); border-left: 3px solid var(--accent-soft); border-radius: 5px;
+  background: linear-gradient(98deg, rgba(var(--accent-2-rgb), 0.10), rgba(20, 22, 20, 0.22) 60%, rgba(var(--accent-rgb), 0.05));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -2px 6px rgba(0, 0, 0, 0.45);
+  display: flex; align-items: center; gap: 12px; padding: 0 16px;
+  font-size: 12px; letter-spacing: 0.06em; color: var(--ink-dim);
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.3s, color 0.3s;
+}
+.vertebra .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-soft); transition: background 0.3s, box-shadow 0.3s; flex: 0 0 auto; }
+.vertebra .vlabel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vertebra .vidx { margin-left: auto; font-size: 10px; color: var(--ink-faint); }
+.vertebra.active {
+  border-left-color: var(--accent); color: var(--ink);
+  background: linear-gradient(98deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-2-rgb), 0.08) 55%, rgba(var(--accent-3-rgb), 0.10));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 28px rgba(var(--accent-rgb), 0.25);
+}
+.vertebra.active .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+.spine-panel { padding: 0 8% 0 4%; }
+.spine-panel .eyebrow { margin-bottom: 18px; }
+.spine-panel .p-count { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.18em; }
+.spine-panel h3 { font-size: clamp(24px, 3.4vw, 38px); font-weight: 600; letter-spacing: -0.01em; margin: 10px 0 14px; min-height: 1.2em; }
+.spine-panel .p-tag { font-family: var(--serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif); font-style: italic; color: var(--ink-dim); font-size: 18px; }
+.spine-panel p.p-desc { color: var(--ink-dim); font-size: 15px; margin-top: 14px; max-width: 42ch; }
+.spine-panel .p-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+
+.spine-intro { position: absolute; top: 11vh; left: 0; right: 0; text-align: center; z-index: 3; pointer-events: none; padding: 0 24px; }
+.spine-intro .eyebrow { justify-content: center; }
+
+/* shared shells the spine relies on (also styled scoped in HeroSection.astro) */
+.eyebrow { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-soft); display: flex; align-items: center; gap: 12px; }
+.eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent-soft); }
+.sec-title { font-size: clamp(26px, 4vw, 44px); font-weight: 600; letter-spacing: -0.02em; margin-top: 14px; text-wrap: balance; }
+.chip { font-size: 11px; letter-spacing: 0.05em; padding: 4px 11px; border: 1px solid var(--line); border-radius: 100px; color: var(--ink-dim); }
+
+@media (max-width: 840px) {
+  .spine-sec { height: 180vh; }
+  .spine-sticky { grid-template-columns: 1fr; }
+  .spine-panel { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spine { transform: rotateX(-6deg) rotateY(-18deg) !important; }
+}
+
+/* === end data spine === */

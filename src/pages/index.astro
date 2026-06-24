@@ -1,15 +1,27 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import ColdBoot from '../components/ColdBoot';
 import HeroSection from '../components/HeroSection.astro';
+import DataSpine from '../components/DataSpine';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const spineProjects = projects.map((p) => ({
+  title: p.data.title,
+  role: p.data.role,
+  summary: p.data.summary,
+  stack: p.data.stack,
+}));
 ---
 <Base>
   <ColdBoot client:load />
   <Nav />
 
   <HeroSection />
+
+  <DataSpine client:visible projects={spineProjects} />
 
   <ThemeSwitcher client:idle />
 </Base>
