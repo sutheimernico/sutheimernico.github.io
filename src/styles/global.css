@@ -308,6 +308,92 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--m
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
+/* === global page chrome (grain, scanlines, aurora, cursor glow, progress) === */
+
+/* film grain — fixed SVG turbulence overlay; multiply + higher opacity on daylight */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html[data-theme="daylight"] body::after { opacity: 0.06; mix-blend-mode: multiply; }
+
+/* scanlines — fixed repeating veil; lower opacity on daylight */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 199;
+  opacity: 0.35;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0.04) 3px);
+}
+html[data-theme="daylight"] body::before { opacity: 0.15; }
+
+/* ambient aurora — drifting radial-gradient field behind content; follows theme/shift */
+.ambient {
+  position: fixed;
+  inset: -25vh -25vw;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(10px);
+  background:
+    radial-gradient(42vw 42vw at 16% 10%, rgba(var(--accent-rgb), 0.10), transparent 60%),
+    radial-gradient(48vw 48vw at 86% 26%, rgba(var(--accent-2-rgb), 0.08), transparent 62%),
+    radial-gradient(52vw 52vw at 62% 96%, rgba(var(--accent-3-rgb), 0.07), transparent 60%);
+  animation: drift 28s ease-in-out infinite alternate;
+}
+html[data-theme="daylight"] .ambient { opacity: 0.6; }
+@keyframes drift {
+  to { transform: translate3d(2.5%, -2.5%, 0) scale(1.08); }
+}
+
+/* cursor glow — lerp-follows pointer via rAF (see Base.astro); screen blend, multiply on daylight */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 380px;
+  height: 380px;
+  margin: -190px 0 0 -190px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 150;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.10), rgba(var(--accent-2-rgb), 0.04) 40%, transparent 65%);
+}
+html[data-theme="daylight"] .cursor-glow {
+  mix-blend-mode: multiply;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.12), transparent 60%);
+}
+
+/* scroll progress bar — width driven by scroll position (see Base.astro) */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  z-index: 160;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient { animation: none !important; }
+  .cursor-glow { display: none; }
+}
+
+/* === end global page chrome === */
+
 /* === hero mercury === */
 
 .mercury {
@@ -379,9 +465,10 @@ html[data-theme="daylight"] .mercury-spec {
 /* === data spine === */
 /*
   This island is React-mounted, so it can't use Astro-scoped styles — its
-  selectors live here. `.eyebrow`, `.sec-title` and `.chip` are shared shells
-  (also styled scoped inside HeroSection.astro); defined here so the spine
-  renders correctly. `--serif` is not a :root token, so it carries a fallback.
+  selectors live here. `.eyebrow`, `.sec-title`, `.wrap`, `.chip` and `.reveal`
+  are shared shells used across every section; their single definition lives in
+  the "shared shells" block below. The italic `.p-tag` accent uses mono italic —
+  the site is mono-led (Kinetic Terminal), no serif typeface.
 */
 .spine-sec { height: 360vh; position: relative; }
 .spine-sticky {
@@ -415,7 +502,7 @@ html[data-theme="daylight"] .mercury-spec {
 .spine-panel .eyebrow { margin-bottom: 18px; }
 .spine-panel .p-count { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.18em; }
 .spine-panel h3 { font-size: clamp(24px, 3.4vw, 38px); font-weight: 600; letter-spacing: -0.01em; margin: 10px 0 14px; min-height: 1.2em; }
-.spine-panel .p-tag { font-family: var(--serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif); font-style: italic; color: var(--ink-dim); font-size: 18px; }
+.spine-panel .p-tag { font-family: var(--mono); font-style: italic; color: var(--ink-dim); font-size: 18px; }
 .spine-panel p.p-desc { color: var(--ink-dim); font-size: 15px; margin-top: 14px; max-width: 42ch; }
 .spine-panel .p-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 
