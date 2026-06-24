@@ -447,4 +447,26 @@ git commit -m "feat: NS monogram, nav, and theme switcher with animated shift mo
 - **`astro:content` under Vitest** (Task 3 Step 4): if importing `projectSchema` from `content.config.ts` fails in the test runner, move the schema to `src/lib/projectSchema.ts` and re-export. Pick whichever keeps the test green.
 - **LinkedIn URL** (Task 10): placeholder until Nico confirms the handle.
 - **Project bodies** (Task 3): drafted by Claude, grounded in bekumoo/scouting-rag; Nico edits the prose later (separate pass).
+
+---
+
+## Implementation Notes (2026-06-24)
+
+**Built:** all 13 tasks, committed task-by-task on `feat/build-site` (commits `d2d2cd1` → `99da1f4`), executed via subagent-driven-development (fresh subagent per task + design/frontend review gates at the end). The standalone shift-prototype is now a real Astro site: theme palettes (phosphor + petrol/amethyst/solar/molten/daylight) + animated **Shift** mode (default on first load), projects as an `astro:content` collection (one `.md` = one project, drives both Data Spine and Project Deck), and the ported sections — Cold Boot, Hero (forged type + liquid-mercury NS + aurora), Data Spine, Exploded Deck, Constellation, About, Contact, Footer — plus global chrome (grain, scanlines, ambient aurora, cursor glow, scroll progress).
+
+**Deviations from plan (deliberate):**
+- **No serif font.** Prototype used a system serif for accent lines; to stay mono-led (Kinetic Terminal) the `.hero-role` / spine `.p-tag` use Martian/IBM-Plex mono made distinctive via size, tracking and color instead. Open to revisiting if a self-hosted serif is wanted later.
+- **Schema lives in `src/lib/projectSchema.ts`** (re-exported into `src/content.config.ts`) so it's unit-testable under Vitest (importing `astro:content` in vitest is unreliable). zod imported from `'zod'`.
+- **Reveal-on-scroll for island-internal elements:** `DataSpine` runs its own IntersectionObserver for `.spine-intro` (the global observer in `Base.astro` can't reliably see elements rendered inside a `client:visible` island).
+- `Base.astro` carries one `is:inline` script: reveal observer + cursor-glow rAF (visibilitychange-paused) + scroll-progress.
+- `--wip` status color is global (root + daylight), not per-theme — `#D9A441` reads on all dark grounds.
+- Constellation canvas uses a React `ref` (not the prototype's `#constCanvas` id).
+- The pre-existing untracked `docs/sessions/2026-06-13_…md` got swept into commit `99da1f4` by a `git add -A`; harmless (it belongs in the repo).
+
+**Verification evidence:** `npm run test` 19/19 green (themes, shift, projectSchema, kinetic, scroll, format); `npx tsc --noEmit` exit 0; `npm run build` clean, no hydration warnings; built `dist/index.html` contains all sections, the 4 seed projects, contact handles, and all 6 islands hydrate. design-reviewer + frontend-reviewer ran on the full diff; all Critical/Should findings fixed in `99da1f4`.
+
+**NOT done / open:**
+- **Visual/motion browser verification** — not performed (no browser tool in this run). Needs a human pass via `npm run dev`: cold-boot, theme keys 1–7, shift animation, scroll choreography, `prefers-reduced-motion`, mobile widths.
+- **Deploy** (Task 13 of the original plan / Cloudflare Pages) — NOT done; nothing pushed. Awaiting Nico's go.
+- LinkedIn handle (placeholder), project prose refinement (Nico edits), possible serif reconsideration.
 ```
