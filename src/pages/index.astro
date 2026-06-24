@@ -7,6 +7,7 @@ import ColdBoot from '../components/ColdBoot';
 import HeroSection from '../components/HeroSection.astro';
 import DataSpine from '../components/DataSpine';
 import ProjectDeck from '../components/ProjectDeck';
+import Constellation from '../components/Constellation';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const spineProjects = projects.map((p) => ({
@@ -38,6 +39,16 @@ const deckProjects = projects.map((p) => ({
         <h2 class="sec-title">Things that shipped — and things in flight.</h2>
       </div>
       <ProjectDeck client:visible projects={deckProjects} />
+    </div>
+  </section>
+
+  <section class="skills-sec" id="skills">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">The Stack, Alive</div>
+        <h2 class="sec-title">A living graph of how I work.</h2>
+      </div>
+      <Constellation client:visible />
     </div>
   </section>
 

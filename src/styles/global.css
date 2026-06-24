@@ -552,3 +552,38 @@ html[data-theme="daylight"] .mercury-spec {
 }
 
 /* === end project deck === */
+
+/* === constellation === */
+
+.skills-sec { padding: 14vh 0 16vh; }
+
+.const-wrap {
+  position: relative;
+  height: 480px;
+  margin-top: 46px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, 0.02), transparent 55%),
+    var(--canvas-bg);
+}
+
+.const-wrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.const-hint {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+/* === end constellation === */
