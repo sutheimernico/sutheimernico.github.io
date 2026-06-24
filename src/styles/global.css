@@ -4,7 +4,7 @@
   @theme inline: utilities emit var(--font-*) references instead of inlining the
   stack. This means the actual stack is defined once in :root (below) and both
   Tailwind utilities and scoped component <style> blocks read from the same token.
-  - font-mono  → IBM Plex Mono (body / code)
+  - font-mono    → IBM Plex Mono (body / code)
   - font-display → Martian Mono Variable (headings / UI chrome)
 */
 @theme inline {
@@ -12,32 +12,91 @@
   --font-display: var(--disp);
 }
 
+/* ============ theme tokens ============ */
+
+/*
+  phosphor is the default theme and lives in bare :root.
+  There is intentionally no html[data-theme="phosphor"] block — do not add one.
+*/
 :root {
-  /* colours */
-  --bg: #0B0A08; --surface: #14120E; --rule: #2A2722;
-  --text: #EDEAE2; --muted: #97917F;
-  /* default = phosphor (refined), not the prototype's amber */
-  --accent: #45E08A; --accent-rgb: 69, 224, 138; --accent-2: #B6FFC9;
-  --amber: var(--accent); --green: var(--accent-2);
+  --bg: #0E0F0D; --bg-warm: #131210; --surface: #181B17; --surface-2: #1E221D;
+  --line: #2A2F29; --line-soft: #21251F; --canvas-bg: #0B0C0A;
+  --ink: #E9E7DE; --ink-dim: #9DA69C; --ink-faint: #5E655D;
+  --accent: #45E08A; --accent-soft: #2C925B; --accent-rgb: 69, 224, 138;
+  --accent-2: #2BB3A3; --accent-2-rgb: 43, 179, 163;
+  --accent-3: #7B5CFF; --accent-3-rgb: 123, 92, 255;
+  --chrome-mid: #45E08A;
+  --wip: #D9A441;
   --ease-hard: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 180ms; --dur-mid: 320ms; --dur-slow: 650ms;
   /* typography — single source of truth; @theme inline references these */
   --disp: "Martian Mono Variable", ui-monospace, monospace;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
-/*
-  phosphor is the default theme and lives in bare :root above.
-  There is intentionally no html[data-theme="phosphor"] block — do not add one.
-*/
-html[data-theme="amber"]  { --accent:#FFB000; --accent-rgb:255,176,0;   --accent-2:#33FF66; }
-html[data-theme="violet"] { --accent:#BD93F9; --accent-rgb:189,147,249; --accent-2:#50FA7B; }
-html[data-theme="cyan"]   { --accent:#4FD8FF; --accent-rgb:79,216,255;  --accent-2:#B8F1FF; }
-html[data-theme="red"]    { --accent:#FF4538; --accent-rgb:255,69,56;   --accent-2:#FFB000; }
-html[data-theme="mono"]   { --accent:#F5F2EA; --accent-rgb:245,242,234; --accent-2:#97917F; }
+html[data-theme="petrol"] {
+  --bg: #070D0E; --bg-warm: #0B1113; --surface: #101A1A; --surface-2: #16201F;
+  --line: #25302F; --line-soft: #1A2322; --canvas-bg: #06100F;
+  --ink: #E2EAE7; --ink-dim: #93A6A1; --ink-faint: #56635F;
+  --accent: #2BD4C0; --accent-soft: #1C887C; --accent-rgb: 43, 212, 192;
+  --accent-2: #1E7A6E; --accent-2-rgb: 30, 122, 110;
+  --accent-3: #54E0A0; --accent-3-rgb: 84, 224, 160;
+  --chrome-mid: #2BD4C0;
+}
+
+html[data-theme="amethyst"] {
+  --bg: #0A0A0E; --bg-warm: #0E0D14; --surface: #15131C; --surface-2: #1B1825;
+  --line: #2C2738; --line-soft: #201C2C; --canvas-bg: #08070C;
+  --ink: #E8E5F0; --ink-dim: #A39CB6; --ink-faint: #6A6478;
+  --accent: #A98BE6; --accent-soft: #6E5AB8; --accent-rgb: 169, 139, 230;
+  --accent-2: #7E73C8; --accent-2-rgb: 126, 115, 200;
+  --accent-3: #5FA8C9; --accent-3-rgb: 95, 168, 201;
+  --chrome-mid: #A98BE6;
+}
+
+html[data-theme="solar"] {
+  --bg: #100B07; --bg-warm: #15100A; --surface: #1B140D; --surface-2: #221A11;
+  --line: #352A1E; --line-soft: #271E15; --canvas-bg: #0E0905;
+  --ink: #F2E9DE; --ink-dim: #BCA792; --ink-faint: #74634F;
+  --accent: #FF8A3D; --accent-soft: #BE5F29; --accent-rgb: 255, 138, 61;
+  --accent-2: #FFC745; --accent-2-rgb: 255, 199, 69;
+  --accent-3: #FF5E7A; --accent-3-rgb: 255, 94, 122;
+  --chrome-mid: #FFB347;
+}
+
+html[data-theme="molten"] {
+  --bg: #0C0D0E; --bg-warm: #101214; --surface: #171A1C; --surface-2: #1D2124;
+  --line: #2D3338; --line-soft: #22272B; --canvas-bg: #090A0B;
+  --ink: #E8ECEF; --ink-dim: #99A4AC; --ink-faint: #5C656B;
+  --accent: #BFD0D8; --accent-soft: #7E8C95; --accent-rgb: 191, 208, 216;
+  --accent-2: #8A9690; --accent-2-rgb: 138, 150, 144;
+  --accent-3: #6BA8FF; --accent-3-rgb: 107, 168, 255;
+  --chrome-mid: #DDE6EB;
+}
+
+html[data-theme="daylight"] {
+  --bg: #ECEAE1; --bg-warm: #F3F1E9; --surface: #F6F4EC; --surface-2: #FBF9F3;
+  --line: #D6D2C6; --line-soft: #E2DED3; --canvas-bg: #E8E5DB;
+  --ink: #1A1C17; --ink-dim: #565B4F; --ink-faint: #6A6E63;
+  --accent: #116E3E; --accent-soft: #0F6B3D; --accent-rgb: 17, 110, 62;
+  --accent-2: #1E7A6E; --accent-2-rgb: 30, 122, 110;
+  --accent-3: #6B4FD8; --accent-3-rgb: 107, 79, 216;
+  --chrome-mid: #178A50;
+  --wip: #8A5F00;
+}
+
+/* smooth all surfaces during a theme switch (added briefly via JS) */
+html.theming,
+html.theming * {
+  transition:
+    background-color var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) var(--ease-out),
+    color var(--dur-slow) var(--ease-out) !important;
+}
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
