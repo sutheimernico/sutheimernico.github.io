@@ -102,6 +102,9 @@ export default function ProjectDeck({ projects }: Props) {
     };
     window.addEventListener('resize', onResize);
 
+    // Track the scatter→fan stagger timers so cleanup can cancel pending ones.
+    const staggerTimers: ReturnType<typeof setTimeout>[] = [];
+
     // IntersectionObserver: scatter → fan stagger on enter-view
     const io = new IntersectionObserver(
       (entries) => {
@@ -113,10 +116,12 @@ export default function ProjectDeck({ projects }: Props) {
           const { fan } = geom(newW, projects.length);
           cardRefs.current.forEach((card, k) => {
             if (!card) return;
-            setTimeout(() => {
-              card.style.opacity = '1';
-              card.style.transform = fan[k];
-            }, k * 120);
+            staggerTimers.push(
+              setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = fan[k];
+              }, k * 120),
+            );
           });
           io.disconnect();
         });
@@ -128,6 +133,7 @@ export default function ProjectDeck({ projects }: Props) {
     return () => {
       io.disconnect();
       window.removeEventListener('resize', onResize);
+      staggerTimers.forEach(clearTimeout);
     };
   }, [projects.length]);
 

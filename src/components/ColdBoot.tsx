@@ -29,6 +29,10 @@ export default function ColdBoot() {
   const doneRef = useRef(false);
   const scrambleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoDismissRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Self-rescheduling setTimeout(addLine, 130) — tracked so cleanup can cancel it.
+  const nextLineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Fade-out timer that flips `visible` false — tracked so cleanup can cancel it.
+  const fadeOutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function dismiss() {
     if (doneRef.current) return;
@@ -38,6 +42,10 @@ export default function ColdBoot() {
       clearInterval(scrambleTimerRef.current);
       scrambleTimerRef.current = null;
     }
+    if (nextLineRef.current !== null) {
+      clearTimeout(nextLineRef.current);
+      nextLineRef.current = null;
+    }
     if (autoDismissRef.current !== null) {
       clearTimeout(autoDismissRef.current);
       autoDismissRef.current = null;
@@ -45,7 +53,7 @@ export default function ColdBoot() {
 
     setFading(true);
     // Wait for the CSS fade-out (0.45s skip, 0.8s auto), then unmount
-    setTimeout(() => setVisible(false), 500);
+    fadeOutRef.current = setTimeout(() => setVisible(false), 500);
   }
 
   useEffect(() => {
@@ -64,13 +72,21 @@ export default function ColdBoot() {
     }
     window.addEventListener('wheel', onWheel, { passive: true });
 
-    // Keydown listener
+    // Click listener — the overlay div is `inert`, so its onClick won't fire;
+    // dismiss on any pointer interaction while the boot is up.
+    function onClick() {
+      dismiss();
+      window.removeEventListener('click', onClick);
+    }
+    window.addEventListener('click', onClick);
+
+    // Keydown listener — any key dismisses (ignore lone modifier presses).
+    const MODIFIER_KEYS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']);
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
-        dismiss();
-        // listener removed inside dismiss via the done guard; clean up here too
-        window.removeEventListener('keydown', onKey);
-      }
+      if (MODIFIER_KEYS.has(e.key)) return;
+      dismiss();
+      // listener removed inside dismiss via the done guard; clean up here too
+      window.removeEventListener('keydown', onKey);
     }
     window.addEventListener('keydown', onKey);
 
@@ -104,7 +120,7 @@ export default function ColdBoot() {
               return next;
             });
             idx++;
-            setTimeout(addLine, 130);
+            nextLineRef.current = setTimeout(addLine, 130);
           } else {
             // Scramble this line's slot
             setLogLines((prev) => {
@@ -122,9 +138,12 @@ export default function ColdBoot() {
     return () => {
       // Cleanup on unmount
       window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('click', onClick);
       window.removeEventListener('keydown', onKey);
       if (scrambleTimerRef.current !== null) clearInterval(scrambleTimerRef.current);
+      if (nextLineRef.current !== null) clearTimeout(nextLineRef.current);
       if (autoDismissRef.current !== null) clearTimeout(autoDismissRef.current);
+      if (fadeOutRef.current !== null) clearTimeout(fadeOutRef.current);
     };
     // dismiss is stable (uses ref), safe to omit from deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,8 +154,9 @@ export default function ColdBoot() {
   return (
     <div
       className={`boot${fading ? ' boot-skip' : ''}`}
-      onClick={dismiss}
       aria-hidden="true"
+      // `inert` while covering the page so focus can't land on it; dropped on dismiss.
+      inert={!fading}
     >
       {/* Inline NS monogram SVG — cannot use NsMonogram.astro inside React */}
       <svg className="boot-mark" viewBox="0 0 100 100">
@@ -155,7 +175,7 @@ export default function ColdBoot() {
         ))}
       </div>
 
-      <div className="boot-skip-hint">click / scroll to enter</div>
+      <div className="boot-skip-hint">click, scroll, or press a key to enter</div>
     </div>
   );
 }

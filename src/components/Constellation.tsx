@@ -66,18 +66,33 @@ export default function Constellation({ skills = DEFAULT_SKILLS }: Props) {
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // dpr is re-read inside size() so a display/zoom change (which fires resize)
+    // is picked up instead of being frozen at mount.
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
     let colors = readColors();
     let nodes: Node[] = [];
     let mouse = { x: -9999, y: -9999 };
     let rafId: number | null = null;
     let running = false;
+    // Pending rAF for debounced static redraws (reduced-motion / out-of-view).
+    let staticRafId: number | null = null;
 
     // --- canvas sizing ---
     function size(): void {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = cv!.getBoundingClientRect();
       cv!.width = Math.max(1, rect.width * dpr);
       cv!.height = Math.max(1, rect.height * dpr);
+    }
+
+    // Coalesce bursts of static redraws into a single rAF — ThemeSwitcher fires
+    // ns-accent ~20x/s during Shift, which would otherwise loop for reduced-motion users.
+    function scheduleStaticDraw(): void {
+      if (staticRafId !== null) cancelAnimationFrame(staticRafId);
+      staticRafId = requestAnimationFrame(() => {
+        staticRafId = null;
+        staticDraw();
+      });
     }
 
     function initNodes(): void {
@@ -137,7 +152,7 @@ export default function Constellation({ skills = DEFAULT_SKILLS }: Props) {
       }
 
       // draw nodes + labels
-      ctx!.font = `${11 * dpr}px ui-monospace, monospace`;
+      ctx!.font = `${11 * dpr}px "IBM Plex Mono", ui-monospace, monospace`;
       ctx!.textBaseline = 'middle';
       for (const n of nodes) {
         ctx!.beginPath();
@@ -154,7 +169,7 @@ export default function Constellation({ skills = DEFAULT_SKILLS }: Props) {
 
     function staticDraw(): void {
       ctx!.clearRect(0, 0, cv!.width, cv!.height);
-      ctx!.font = `${11 * dpr}px ui-monospace, monospace`;
+      ctx!.font = `${11 * dpr}px "IBM Plex Mono", ui-monospace, monospace`;
       ctx!.textBaseline = 'middle';
       for (const n of nodes) {
         ctx!.beginPath();
@@ -185,14 +200,16 @@ export default function Constellation({ skills = DEFAULT_SKILLS }: Props) {
     // --- theme recolor ---
     function onAccent(): void {
       colors = readColors();
-      if (reduce || !running) staticDraw();
+      // Debounce: ns-accent bursts during Shift mode must not animate for users
+      // who opted out of motion. A single coalesced rAF redraws the static frame.
+      if (reduce || !running) scheduleStaticDraw();
       // if running, next drawFrame() picks up the refreshed colors automatically
     }
 
     // --- resize ---
     function onResize(): void {
       initNodes();
-      if (reduce || !running) staticDraw();
+      if (reduce || !running) scheduleStaticDraw();
     }
 
     // --- IO for in-view gating ---
@@ -230,6 +247,7 @@ export default function Constellation({ skills = DEFAULT_SKILLS }: Props) {
 
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (staticRafId !== null) cancelAnimationFrame(staticRafId);
       io?.disconnect();
       cv.removeEventListener('mousemove', onMouseMove);
       cv.removeEventListener('mouseleave', onMouseLeave);

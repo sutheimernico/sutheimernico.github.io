@@ -23,7 +23,7 @@ import NsMonogram from './NsMonogram.astro';
     var nav = document.getElementById('nav');
     if (!nav) return;
     function tick() {
-      nav.classList.toggle('solid', (window.pageYOffset || document.documentElement.scrollTop) > 60);
+      nav.classList.toggle('solid', window.scrollY > 60);
     }
     window.addEventListener('scroll', tick, { passive: true });
     tick();

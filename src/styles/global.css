@@ -136,6 +136,11 @@ html[data-theme="daylight"] {
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
+/* box-shadow is dropped in forced-colors mode — give the focus ring a real outline. */
+@media (forced-colors: active) {
+  .sw:focus-visible { outline: 2px solid ButtonText; }
+}
+
 .sw:focus-visible .sw-tip {
   opacity: 1;
 }
@@ -303,8 +308,11 @@ html.theming * {
 /* === end cold boot === */
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; overflow-x: hidden; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; line-height: 1.6; overflow-x: hidden; }
+::selection { background: rgba(var(--accent-rgb), 0.30); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
@@ -502,7 +510,7 @@ html[data-theme="daylight"] .mercury-spec {
 .spine-panel .eyebrow { margin-bottom: 18px; }
 .spine-panel .p-count { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.18em; }
 .spine-panel h3 { font-size: clamp(24px, 3.4vw, 38px); font-weight: 600; letter-spacing: -0.01em; margin: 10px 0 14px; min-height: 1.2em; }
-.spine-panel .p-tag { font-family: var(--mono); font-style: italic; color: var(--ink-dim); font-size: 18px; }
+.spine-panel .p-tag { font-family: var(--mono); font-style: italic; color: var(--accent); letter-spacing: 0.04em; font-size: 20px; }
 .spine-panel p.p-desc { color: var(--ink-dim); font-size: 15px; margin-top: 14px; max-width: 42ch; }
 .spine-panel .p-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 
