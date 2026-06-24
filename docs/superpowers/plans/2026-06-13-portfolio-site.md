@@ -2,6 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **STATUS (2026-06-24):** The foundation tasks (scaffold, theme token system, `src/lib` logic, base
+> layout, font wiring) are DONE and reused. The **section/UI tasks below are SUPERSEDED** — the design
+> direction moved from variant-K to the approved `prototype/variant-shift.html`. The site as actually
+> built (sections, islands, themes+shift, content collection, detail pages) lives in
+> `2026-06-24-portfolio-prototype-integration.md`; see its `## Implementation Notes`. Keep this doc as
+> foundation history; build new work against the 2026-06-24 plan.
+
 **Goal:** Turn winning prototype K ("Kinetic Terminal") into a real, maintainable, content-driven Astro site and deploy it free from the private GitHub repo.
 
 **Architecture:** Astro (static output) with React islands only for the interactive pieces (theme switcher, kinetic name, scroll-pinned job queue, counters, typed boot line). All pure logic (kinetic-font math, theme resolution, scroll progress, counter formatting) lives in `src/lib/*.ts`, is framework-agnostic, and is unit-tested with Vitest. Visual fidelity is ported section-by-section from `prototype/variant-k.html` (the complete reference implementation) and verified in the browser, not unit-tested. Projects are an Astro **content collection** so new ML/RAG projects are added as Markdown files, never code edits.
