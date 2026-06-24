@@ -3,17 +3,13 @@ import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import ColdBoot from '../components/ColdBoot';
+import HeroSection from '../components/HeroSection.astro';
 ---
 <Base>
   <ColdBoot client:load />
   <Nav />
 
-  {/* Tall spacer — lets us verify nav scroll-solidify behaviour */}
-  <main id="top" style="min-height:200vh;padding:120px 28px 80px;font-family:var(--mono);color:var(--ink-dim);">
-    <p style="font-size:14px;letter-spacing:0.04em;">
-      scaffold · scroll down to test nav solidify · use keys 1–7 or swatches below to switch theme
-    </p>
-  </main>
+  <HeroSection />
 
   <ThemeSwitcher client:idle />
 </Base>
