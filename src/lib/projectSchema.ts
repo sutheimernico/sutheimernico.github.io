@@ -9,7 +9,7 @@ export const projectSchema = z.object({
   summary: z.string(),
   role: z.string(),
   featured: z.boolean().default(true),
-  github: z.string().url().optional(),
+  github: z.url().optional(),
 });
 
 export type Project = z.infer<typeof projectSchema>;
