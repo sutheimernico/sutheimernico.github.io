@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Nico Sutheimer — Fullstack Engineer, Data &amp; BI">
+  <!--
+    OG / social-share card. 1200x630. Kinetic Terminal direction.
+    Self-contained: hex values inlined (CSS vars don't resolve in OG renderers),
+    monospace system stack (no external font fetch). Mirrors the site:
+    warm-black bg #0E0F0D, phosphor accent #45E08A, NS monogram.
+  -->
+  <defs>
+    <!-- chrome gradient for the N — same stops as NsMonogram.astro -->
+    <linearGradient id="chrome" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0"    stop-color="#7c8884" />
+      <stop offset="0.22" stop-color="#eef2ee" />
+      <stop offset="0.55" stop-color="#45E08A" />
+      <stop offset="0.78" stop-color="#cfd6d1" />
+      <stop offset="1"    stop-color="#566059" />
+    </linearGradient>
+    <!-- ambient accent glow, top-left — echoes the site's aurora -->
+    <radialGradient id="aurora" cx="0.16" cy="0.0" r="0.9">
+      <stop offset="0"   stop-color="#45E08A" stop-opacity="0.16" />
+      <stop offset="0.4" stop-color="#45E08A" stop-opacity="0.04" />
+      <stop offset="1"   stop-color="#45E08A" stop-opacity="0" />
+    </radialGradient>
+    <filter id="sglow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b" />
+      <feMerge>
+        <feMergeNode in="b" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <!-- faint scanline texture, like the site's body::before -->
+    <pattern id="scan" width="3" height="3" patternUnits="userSpaceOnUse">
+      <rect width="3" height="1" fill="#45E08A" fill-opacity="0.022" />
+    </pattern>
+  </defs>
+
+  <!-- warm-black canvas -->
+  <rect width="1200" height="630" fill="#0E0F0D" />
+  <rect width="1200" height="630" fill="url(#aurora)" />
+  <rect width="1200" height="630" fill="url(#scan)" />
+
+  <!-- hairline frame inset -->
+  <rect x="48.5" y="48.5" width="1103" height="533" fill="none" stroke="#2A2F29" stroke-width="1" rx="10" />
+
+  <!-- NS monogram, left. viewBox 0..100 scaled into a 300px box at (96,165). -->
+  <g transform="translate(96 165) scale(3)">
+    <circle cx="50" cy="50" r="47" fill="none" stroke="#45E08A" stroke-opacity="0.14" stroke-width="0.8" />
+    <!-- N — metallic chrome -->
+    <path d="M20 72 V26 L52 72 V26" fill="none" stroke="url(#chrome)" stroke-width="8"
+          stroke-linecap="round" stroke-linejoin="round" />
+    <!-- S — phosphor accent with glow -->
+    <path d="M82 44 C82 34 48 34 48 48 C48 62 82 58 82 74 C82 88 46 88 44 76" fill="none"
+          stroke="#45E08A" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"
+          filter="url(#sglow)" />
+  </g>
+
+  <!-- text column, right of the monogram -->
+  <g font-family="'Martian Mono','IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace">
+    <!-- terminal-prompt eyebrow -->
+    <text x="470" y="238" font-size="22" letter-spacing="3" fill="#5E655D">
+      <tspan fill="#45E08A">~</tspan>/portfolio
+    </text>
+
+    <!-- name — the display line -->
+    <text x="468" y="318" font-size="76" font-weight="600" letter-spacing="-1" fill="#E9E7DE">Nico Sutheimer</text>
+
+    <!-- role — accent mono italic, matches .detail-role -->
+    <text x="470" y="372" font-size="30" font-style="italic" letter-spacing="1" fill="#45E08A">Fullstack Engineer &#183; Data &amp; BI</text>
+
+    <!-- accent hairline rule -->
+    <rect x="470" y="408" width="64" height="3" fill="#45E08A" />
+
+    <!-- one-line positioning, dim ink -->
+    <text x="470" y="466" font-size="24" letter-spacing="0.5" fill="#9DA69C">Building data platforms end to end</text>
+    <text x="470" y="500" font-size="24" letter-spacing="0.5" fill="#9DA69C">— pipeline to pixel.</text>
+  </g>
+</svg>

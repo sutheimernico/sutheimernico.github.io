@@ -5,7 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 
 // Cloudflare Pages serves at the root, so no base path needed.
 export default defineConfig({
-  site: 'https://portfolio.pages.dev', // updated to the real domain after deploy task
+  // Placeholder — UPDATE ON DEPLOY to the real domain. Absolute OG/Twitter
+  // image + canonical/og:url in Base.astro are derived from this via Astro.site,
+  // so social-share previews break until it points at the live host.
+  site: 'https://portfolio.pages.dev',
   integrations: [react()],
   vite: { plugins: [tailwindcss()] },
 });
