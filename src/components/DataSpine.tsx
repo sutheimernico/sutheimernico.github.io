@@ -33,10 +33,34 @@ export default function DataSpine({ projects }: Props) {
     const spine = spineRef.current;
     const section = sectionRef.current;
 
+    // The global reveal observer (Base.astro) runs once at load and may miss
+    // .reveal nodes rendered inside this client:visible island. Drive our own
+    // intro reveal so the eyebrow + heading reliably become visible.
+    let introIo: IntersectionObserver | null = null;
+    const intro = section?.querySelector<HTMLElement>('.spine-intro');
+    if (intro) {
+      if (reduce) {
+        intro.classList.add('in');
+      } else {
+        introIo = new IntersectionObserver(
+          (entries) => {
+            for (const en of entries) {
+              if (en.isIntersecting) {
+                en.target.classList.add('in');
+                introIo?.disconnect();
+              }
+            }
+          },
+          { threshold: 0.18 },
+        );
+        introIo.observe(intro);
+      }
+    }
+
     if (reduce) {
       // static spine, panel locked to project 1, no scroll rotation
       if (spine) spine.style.transform = 'rotateX(-6deg) rotateY(-18deg)';
-      return;
+      return () => introIo?.disconnect();
     }
 
     // setActive only flips React state when the index actually changes, so the
@@ -75,8 +99,11 @@ export default function DataSpine({ projects }: Props) {
     return () => {
       window.removeEventListener('scroll', req);
       window.removeEventListener('resize', req);
+      introIo?.disconnect();
     };
-  }, [N]);
+    // `projects` is read in the closure; props are stable per hydration, so this
+    // adds the dep without re-running the effect in practice.
+  }, [N, projects]);
 
   if (N === 0) return null;
 
@@ -87,7 +114,7 @@ export default function DataSpine({ projects }: Props) {
   return (
     <section className="spine-sec" id="work" ref={sectionRef}>
       <div className="spine-sticky">
-        <div className="spine-intro">
+        <div className="spine-intro reveal">
           <div className="eyebrow">The Spine of the Work</div>
           <h2 className="sec-title">Every vertebra is a piece of what I build.</h2>
         </div>

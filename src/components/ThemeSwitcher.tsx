@@ -58,18 +58,6 @@ function stopShiftVars(): void {
   }
 }
 
-// Throttle the .theming class: add it, auto-remove after dur-slow (650 ms).
-let themingTimeout: ReturnType<typeof setTimeout> | null = null;
-function flashTheming(): void {
-  const root = document.documentElement;
-  root.classList.add('theming');
-  if (themingTimeout) clearTimeout(themingTimeout);
-  themingTimeout = setTimeout(() => {
-    root.classList.remove('theming');
-    themingTimeout = null;
-  }, 680);
-}
-
 export default function ThemeSwitcher() {
   const [active, setActive] = useState<ThemeId>('shift');
 
@@ -78,6 +66,19 @@ export default function ThemeSwitcher() {
   const tRef = useRef(0);
   const frameCountRef = useRef(0);
   const reducedMotion = useRef(false);
+  // .theming-class timeout in a ref — module scope would be shared across instances.
+  const themingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Throttle the .theming class: add it, auto-remove after dur-slow (650 ms).
+  const flashTheming = useCallback(() => {
+    const root = document.documentElement;
+    root.classList.add('theming');
+    if (themingTimeoutRef.current) clearTimeout(themingTimeoutRef.current);
+    themingTimeoutRef.current = setTimeout(() => {
+      root.classList.remove('theming');
+      themingTimeoutRef.current = null;
+    }, 680);
+  }, []);
 
   // Start the shift loop.
   const startShift = useCallback(() => {
@@ -135,7 +136,7 @@ export default function ThemeSwitcher() {
 
       persist(id);
     },
-    [startShift, stopShift],
+    [startShift, stopShift, flashTheming],
   );
 
   // On mount: check reduced-motion preference, read saved preference, register keyboard handler.
@@ -163,6 +164,12 @@ export default function ThemeSwitcher() {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
+      }
+      // Remove inline shift vars so unmount can't leave --var overrides on <html>.
+      stopShiftVars();
+      if (themingTimeoutRef.current) {
+        clearTimeout(themingTimeoutRef.current);
+        themingTimeoutRef.current = null;
       }
     };
   }, [applyTheme]);

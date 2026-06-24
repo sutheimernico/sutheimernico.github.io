@@ -92,7 +92,7 @@ const {
         if (!progress) return;
         var ticking = false;
         function update() {
-          var y = window.pageYOffset || document.documentElement.scrollTop;
+          var y = window.scrollY;
           var h = document.documentElement.scrollHeight - window.innerHeight;
           progress.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
           ticking = false;
