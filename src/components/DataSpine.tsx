@@ -3,6 +3,7 @@ import { pinnedProgress } from '../lib/scroll';
 
 export interface SpineProject {
   title: string;
+  slug: string;
   role: string;
   summary: string;
   stack: string[];
@@ -125,7 +126,7 @@ export default function DataSpine({ projects }: Props) {
               const y = -(N * step) / 2 + i * step + step / 2;
               return (
                 <div
-                  key={p.title}
+                  key={p.slug}
                   ref={(el) => {
                     vertebraRefs.current[i] = el;
                   }}
@@ -156,6 +157,13 @@ export default function DataSpine({ projects }: Props) {
               </span>
             ))}
           </div>
+          <a
+            className="p-open"
+            href={`/projects/${current.slug}`}
+            aria-label={`Open project: ${current.title}`}
+          >
+            <span className="p-open-arrow" aria-hidden="true">→</span> open project
+          </a>
         </aside>
       </div>
     </section>

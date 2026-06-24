@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 
 export interface DeckProject {
   title: string;
+  slug: string;
   status: 'production' | 'in-progress' | 'research' | 'internal';
   year: string;
   stack: string[];
@@ -147,7 +148,7 @@ export default function ProjectDeck({ projects }: Props) {
 
         return (
           <article
-            key={p.title}
+            key={p.slug}
             className="pcard"
             style={{ zIndex }}
             ref={(el: HTMLElement | null) => {
@@ -158,7 +159,14 @@ export default function ProjectDeck({ projects }: Props) {
             <span className={`pc-badge${badge.cls ? ` ${badge.cls}` : ''}`}>
               {badge.label}
             </span>
-            <h4>{p.title}</h4>
+            {/* Stretched link: the title is the link, and .pc-link stretches over
+                the whole card via CSS so the entire card is clickable. Accessible
+                name = project title (no duplicate sr-only label). */}
+            <h4>
+              <a className="pc-link" href={`/projects/${p.slug}`}>
+                {p.title}
+              </a>
+            </h4>
             <div className="pc-meta">{meta}</div>
             <div className="pc-desc">
               <span>{p.summary}</span>

@@ -21,4 +21,13 @@ describe('projectSchema', () => {
     const parsed = projectSchema.parse(rest);
     expect(parsed.featured).toBe(true);
   });
+  it('parses without a github field (optional)', () => {
+    expect(projectSchema.safeParse(valid).success).toBe(true);
+  });
+  it('accepts a valid github URL', () => {
+    expect(projectSchema.safeParse({ ...valid, github: 'https://github.com/x/y' }).success).toBe(true);
+  });
+  it('rejects a github value that is not a URL', () => {
+    expect(projectSchema.safeParse({ ...valid, github: 'not-a-url' }).success).toBe(false);
+  });
 });

@@ -1,0 +1,340 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, status, year, stack, role, summary, github } = entry.data;
+
+// Status → badge label + class, mirroring ProjectDeck's mapping.
+const BADGE: Record<typeof status, { label: string; cls: string }> = {
+  production: { label: 'Production', cls: 'live' },
+  'in-progress': { label: 'In-progress', cls: 'wip' },
+  research: { label: 'Research', cls: 'wip' },
+  internal: { label: 'Internal', cls: '' },
+};
+const badge = BADGE[status];
+
+const pageTitle = `${title} — Nico Sutheimer`;
+---
+
+<Base title={pageTitle} description={summary}>
+  <main class="detail">
+    <div class="detail-wrap">
+      <a class="back" href="/#projects">
+        <span class="back-arrow" aria-hidden="true">←</span> back to work
+      </a>
+
+      <header class="detail-head">
+        <div class="head-meta">
+          <span class={`d-badge${badge.cls ? ` ${badge.cls}` : ''}`}>{badge.label}</span>
+          <span class="head-year">{year}</span>
+        </div>
+        <h1 class="detail-title">{title}</h1>
+        <p class="detail-role">{role}</p>
+
+        <ul class="detail-stack" aria-label="Stack">
+          {stack.map((s) => <li class="chip">{s}</li>)}
+        </ul>
+
+        {github && (
+          <a class="gh-link" href={github} target="_blank" rel="noopener noreferrer">
+            View on GitHub <span class="gh-arrow" aria-hidden="true">↗</span>
+          </a>
+        )}
+      </header>
+
+      <article class="prose">
+        <Content />
+      </article>
+
+      <footer class="detail-foot">
+        <a class="back" href="/#projects">
+          <span class="back-arrow" aria-hidden="true">←</span> back to work
+        </a>
+        <a class="to-top" href="#top">back to top ↑</a>
+      </footer>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .detail {
+    min-height: 100vh;
+    padding: 120px 0 80px;
+  }
+  .detail-wrap {
+    width: 100%;
+    /* Wide enough that the prose column's own 70ch measure is the real
+       constraint (header spans slightly wider than the reading column on
+       purpose — a deliberate hierarchy, not an accidental mismatch). */
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* back link — mono, accent on hover */
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .back .back-arrow {
+    display: inline-block;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .back:hover { color: var(--accent); }
+  .back:hover .back-arrow { transform: translateX(-3px); }
+  .back:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* === header block === */
+  .detail-head {
+    margin-top: 36px;
+    padding-bottom: 34px;
+    border-bottom: 1px solid var(--line);
+  }
+  .head-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .d-badge {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    background: color-mix(in srgb, var(--bg) 60%, transparent);
+  }
+  .d-badge.live { color: var(--accent); border-color: var(--accent-soft); }
+  .d-badge.wip {
+    color: var(--wip);
+    border-color: color-mix(in srgb, var(--wip) 50%, transparent);
+  }
+  .head-year {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+  }
+
+  /* forged display title — large, tight, mono-display */
+  .detail-title {
+    font-family: var(--disp);
+    font-size: clamp(34px, 6vw, 62px);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 18px 0 0;
+    text-wrap: balance;
+  }
+  .detail-role {
+    font-family: var(--mono);
+    font-style: italic;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    font-size: clamp(15px, 2vw, 19px);
+    margin: 14px 0 0;
+  }
+
+  .detail-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* GitHub link — clear button treatment */
+  .gh-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 26px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-soft);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+  .gh-link .gh-arrow { transition: transform var(--dur-fast) var(--ease-out); }
+  .gh-link:hover {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    border-color: var(--accent);
+  }
+  .gh-link:hover .gh-arrow { transform: translate(2px, -2px); }
+  .gh-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* === prose / README body === */
+  .prose {
+    margin-top: 40px;
+    max-width: 70ch;
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+  .prose :global(p) { margin: 0 0 1.25em; }
+  .prose :global(strong) { color: var(--ink); font-weight: 600; }
+  .prose :global(em) { font-style: italic; }
+
+  .prose :global(h2) {
+    font-family: var(--disp);
+    font-size: clamp(20px, 2.6vw, 26px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 2.2em 0 0.2em;
+    padding-bottom: 0.45em;
+    position: relative;
+  }
+  /* accent rule under each H2 */
+  .prose :global(h2)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 38px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .prose :global(h2 + p) { margin-top: 1em; }
+
+  .prose :global(h3) {
+    font-family: var(--disp);
+    font-size: clamp(16px, 2vw, 19px);
+    font-weight: 600;
+    color: var(--ink);
+    margin: 1.8em 0 0.5em;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 1.25em;
+    padding-left: 1.4em;
+  }
+  .prose :global(li) { margin: 0.35em 0; }
+  .prose :global(ul) { list-style: none; padding-left: 1.5em; }
+  .prose :global(ul li) { position: relative; }
+  .prose :global(ul li)::before {
+    content: "▹";
+    position: absolute;
+    left: -1.4em;
+    color: var(--accent);
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--accent-soft);
+    transition: text-decoration-color var(--dur-fast) var(--ease-out);
+  }
+  .prose :global(a:hover) { text-decoration-color: var(--accent); }
+  .prose :global(a:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* inline code + fenced blocks */
+  .prose :global(code) {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    padding: 0.12em 0.4em;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .prose :global(pre) {
+    margin: 0 0 1.5em;
+    padding: 16px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--canvas-bg);
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  .prose :global(pre code) {
+    border: 0;
+    padding: 0;
+    background: none;
+    font-size: 0.85em;
+  }
+
+  .prose :global(blockquote) {
+    margin: 0 0 1.5em;
+    padding: 0.2em 0 0.2em 1.1em;
+    border-left: 2px solid var(--accent-soft);
+    /* --ink-dim (not --ink-faint): faint is sub-AA in the daylight theme. */
+    color: var(--ink-dim);
+    font-style: italic;
+  }
+  .prose :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 2em 0;
+  }
+
+  /* === footer === */
+  .detail-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 64px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .to-top {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .to-top:hover { color: var(--accent); }
+  .to-top:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  /* prefers-reduced-motion is handled globally (global.css neutralizes all
+     transitions/animations under the reduce query) — no scoped override needed. */
+</style>
