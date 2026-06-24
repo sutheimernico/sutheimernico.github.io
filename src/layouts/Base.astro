@@ -31,5 +31,31 @@ const {
     } catch (_) {}
   </script>
 </head>
-<body><slot /></body>
+<body>
+  <slot />
+  <script>
+    // Drives .reveal → .reveal.in for scroll-entrance animations.
+    // Mirrors the prototype's reveals block; respects prefers-reduced-motion.
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const els = document.querySelectorAll('.reveal');
+      if (reduce) {
+        els.forEach((el) => el.classList.add('in'));
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) {
+              en.target.classList.add('in');
+              io.unobserve(en.target);
+            }
+          });
+        },
+        { threshold: 0.18 },
+      );
+      els.forEach((el) => io.observe(el));
+    })();
+  </script>
+</body>
 </html>
