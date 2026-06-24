@@ -6,6 +6,7 @@ import ThemeSwitcher from '../components/ThemeSwitcher';
 import ColdBoot from '../components/ColdBoot';
 import HeroSection from '../components/HeroSection.astro';
 import DataSpine from '../components/DataSpine';
+import ProjectDeck from '../components/ProjectDeck';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const spineProjects = projects.map((p) => ({
@@ -13,6 +14,13 @@ const spineProjects = projects.map((p) => ({
   role: p.data.role,
   summary: p.data.summary,
   stack: p.data.stack,
+}));
+const deckProjects = projects.map((p) => ({
+  title: p.data.title,
+  status: p.data.status,
+  year: p.data.year,
+  stack: p.data.stack,
+  summary: p.data.summary,
 }));
 ---
 <Base>
@@ -22,6 +30,16 @@ const spineProjects = projects.map((p) => ({
   <HeroSection />
 
   <DataSpine client:visible projects={spineProjects} />
+
+  <section class="deck-sec" id="projects">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">Selected Projects</div>
+        <h2 class="sec-title">Things that shipped — and things in flight.</h2>
+      </div>
+      <ProjectDeck client:visible projects={deckProjects} />
+    </div>
+  </section>
 
   <ThemeSwitcher client:idle />
 </Base>

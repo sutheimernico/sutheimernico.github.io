@@ -303,7 +303,7 @@ html.theming * {
 /* === end cold boot === */
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; overflow-x: hidden; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
@@ -423,10 +423,13 @@ html[data-theme="daylight"] .mercury-spec {
 .spine-intro .eyebrow { justify-content: center; }
 
 /* shared shells the spine relies on (also styled scoped in HeroSection.astro) */
+.wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 .eyebrow { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-soft); display: flex; align-items: center; gap: 12px; }
 .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent-soft); }
 .sec-title { font-size: clamp(26px, 4vw, 44px); font-weight: 600; letter-spacing: -0.02em; margin-top: 14px; text-wrap: balance; }
 .chip { font-size: 11px; letter-spacing: 0.05em; padding: 4px 11px; border: 1px solid var(--line); border-radius: 100px; color: var(--ink-dim); }
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.reveal.in { opacity: 1; transform: none; }
 
 @media (max-width: 840px) {
   .spine-sec { height: 180vh; }
@@ -439,3 +442,113 @@ html[data-theme="daylight"] .mercury-spec {
 }
 
 /* === end data spine === */
+
+/* === project deck === */
+
+.deck-sec { padding: 16vh 0; }
+
+.deck-stage {
+  position: relative;
+  height: 460px;
+  margin-top: 50px;
+  perspective: 1300px;
+}
+
+.pcard {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 280px; height: 340px;
+  margin: -170px 0 0 -140px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(165deg, var(--surface-2), var(--bg-warm));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 22px;
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+}
+
+.pcard .pc-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 150px;
+  background: radial-gradient(120% 100% at 30% 0%, rgba(var(--accent-rgb), 0.16), transparent 60%);
+}
+
+.pcard .pc-badge {
+  position: absolute;
+  top: 18px; right: 18px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+}
+
+.pcard .pc-badge.live {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+}
+
+.pcard .pc-badge.wip {
+  color: var(--wip);
+  border-color: color-mix(in srgb, var(--wip) 50%, transparent);
+}
+
+.pcard h4 {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pcard .pc-meta {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+
+.pcard .pc-desc {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--dur-mid) var(--ease-out),
+    opacity var(--dur-mid) var(--ease-out),
+    margin-top var(--dur-mid) var(--ease-out);
+}
+
+.pcard .pc-desc > span {
+  min-height: 0;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+
+.pcard:hover {
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 30px rgba(var(--accent-rgb), 0.14);
+  z-index: 5 !important;
+}
+
+.pcard:hover .pc-desc {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 12px;
+}
+
+/* Cards are invisible until IO fires (.deck-stage gets .in) */
+.deck-stage:not(.in) .pcard { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard { transition: none; }
+}
+
+/* === end project deck === */
