@@ -51,6 +51,59 @@ it before touching code.
 - New logic ships with a Vitest test where testable (utils, transforms); visual work is
   browser-verified, not unit-tested for pixels.
 
+## Adding a project (content collection)
+
+Projects are an Astro **content collection** — the single source of truth for every project.
+**One Markdown file = one project. Never hardcode a project list in a component.** Adding the
+file is all it takes: the same entry automatically powers the scroll **Data Spine** (`#work`),
+the **Project Deck** cards (`#projects`), and its own **detail page** at `/projects/<slug>`.
+The build validates the front-matter against the zod schema in `src/lib/projectSchema.ts`
+(wired into `src/content.config.ts`); a malformed file fails `npm run build` loudly.
+
+**To add a project — create `src/content/projects/<slug>.md`** (the file name is the `<slug>`,
+i.e. the URL and the entry id). Fill the front-matter, then write the body as a README:
+
+```markdown
+---
+title: My New Project              # shown everywhere
+order: 5                           # display order, ascending, across spine + deck
+status: in-progress                # production | in-progress | research | internal
+year: "2026"                       # quoted string
+stack: ["Python", "FastAPI"]       # tech chips
+summary: One line shown on the deck card and the spine panel.
+role: what it is to you            # the italic tag line, e.g. "the backbone — bekumoo"
+featured: true                     # include on the landing page
+# github: https://github.com/sutheimernico/my-repo   # OPTIONAL — uncomment + set a real URL
+                                                      # when the repo is public; the detail
+                                                      # page shows a GitHub button only if present
+---
+
+## What it is
+A sentence or two on the problem and the outcome.
+
+## Architecture
+How it's structured — the moving parts and how they fit.
+
+## Why it's built this way
+The rationale: the decisions and what they buy you.
+
+## Implementation
+How it was actually built.
+
+## Trade-offs & what I considered
+Alternatives weighed, what was deliberately left out, and why.
+```
+
+- **`status`** drives the badge: `production`→"Production" (accent), `in-progress`/`research`→
+  amber "WIP", `internal`→neutral. Stick to the four enum values or the build fails.
+- **`order`** controls position in both spine and deck (lowest first). Renumber siblings if needed.
+- **`github`** is optional; leave it commented out until a real public URL exists — never invent one.
+- The body is rendered as the detail-page README. The `##` sections above are the house style
+  (structure → rationale → implementation → trade-offs), not "how to install".
+- Content is **Claude drafts, Nico corrects** (see Locked decisions). Mark unfinished prose
+  `_(draft — Nico to refine)_`. No invented metrics/KPIs/confidential numbers.
+- No component edits, no route edits, no theme work needed — drop the file in and it's live.
+
 ## Design quality bar (every UI task)
 
 - Use project skills `frontend-design`, `web-design-guidelines`, `emil-design-eng` for any UI
