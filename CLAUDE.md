@@ -9,20 +9,26 @@ Global personal rules (`~/.claude/CLAUDE.md`) apply. This file restates the proj
 the codebase (stack, architecture, how to run/build/add a project) lives in `AGENTS.md` — read
 it before touching code.
 
-## Locked decisions (2026-06-13)
+## Locked decisions (2026-06-13, design refreshed 2026-06-24)
 
-- **Design**: prototype K "Kinetic Terminal" wins — dark warm black + phosphor-green accent
-  (refined `#45E08A`, not stock neon `#33FF66`), six switchable accent themes. Visual source
-  of truth: `prototype/variant-k.html` (throwaway, on branch `feat/design-prototypes`).
-- **Stack**: Astro + React islands + Tailwind v4 + TypeScript. Projects as Astro content
-  collections — adding a project means adding a Markdown file, not editing code.
+- **Design**: "Kinetic Terminal" — dark warm black + a single phosphor-green accent (refined
+  `#45E08A`, not stock neon `#33FF66`). Six switchable accent themes — **phosphor** (default),
+  petrol, amethyst, solar, molten, daylight — plus an animated **"Shift" mode** that cross-fades
+  through the dark palettes (Nico's favorite; the default on first load). Visual source of truth:
+  `prototype/variant-shift.html` (committed on `feat/build-site`; **supersedes** the earlier
+  `variant-k.html`).
+- **Stack**: Astro + React islands + Tailwind v4 + TypeScript. Projects are an Astro content
+  collection — adding a project means adding a Markdown file, not editing code (full how-to:
+  "Adding a project" below). Each project also gets a detail page at `/projects/<slug>`.
 - **Hosting**: repo stays **PRIVATE** → GitHub Pages is NOT free for private repos. Deploy on
   **Cloudflare Pages** (free, private-repo-friendly, no non-commercial clause). Domain path:
   `*.pages.dev` → free `nico.is-a.dev` → optional `.dev` (~10 €/yr, Cloudflare Registrar).
   **Never make the repo public without asking** — Nico chose private deliberately.
 - **Content**: Claude drafts projects + bio (grounded in the bekumoo after-sales BI platform
   and `~/private/scouting-rag`), Nico corrects. ML/RAG projects may appear as `in-progress`.
-- Full plan: `docs/superpowers/plans/2026-06-13-portfolio-site.md`.
+- Plans: `docs/superpowers/plans/2026-06-13-portfolio-site.md` (scaffold + foundation) and
+  `2026-06-24-portfolio-prototype-integration.md` (the built site — current source of truth for
+  what's implemented; see its `## Implementation Notes`).
 
 ## Wie Claude hier arbeitet
 
@@ -108,10 +114,13 @@ Alternatives weighed, what was deliberately left out, and why.
 
 - Use project skills `frontend-design`, `web-design-guidelines`, `emil-design-eng` for any UI
   work — the taste baseline, not optional.
-- Every UI task executes against the locked direction (variant K) and, once written, the design
-  spec in `docs/superpowers/specs/`.
+- Every UI task executes against the locked direction (`prototype/variant-shift.html`) and the
+  `## Implementation Notes` in `docs/superpowers/plans/2026-06-24-portfolio-prototype-integration.md`
+  (the de-facto design spec until a formal one lands in `docs/superpowers/specs/`).
 - Banned: default AI aesthetics — Inter/Roboto/Space Grotesk, stock Tailwind palettes,
   centered-hero-three-cards layouts, purple-gradient-on-dark, gradients as a depth crutch.
+  (The **Amethyst** theme is a deliberate, desaturated violet Nico explicitly asked for — not the
+  banned neon-purple-gradient cliché; keep it restrained.)
 - Motion is part of the system: easing/durations/stagger defined once, reused; prefer CSS where
   it suffices; respect `prefers-reduced-motion`.
 
