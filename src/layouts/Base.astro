@@ -8,17 +8,43 @@ const {
   title = 'Nico Sutheimer — Fullstack Engineer, Data & BI',
   description = 'Fullstack engineer building data platforms end to end — pipeline to pixel.',
 } = Astro.props;
+
+// Absolute URLs for OG/Twitter need `site` (astro.config.mjs). It's a
+// placeholder until the deploy task sets the real domain; `new URL(…, Astro.site)`
+// yields a clean absolute URL once it does. Astro.url is the per-page request URL.
+const SITE_NAME = 'Nico Sutheimer';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og.svg', Astro.site).href;
+// --bg warm-black (global.css :root) — kept in sync by hand; it's a single literal.
+const THEME_COLOR = '#0E0F0D';
 ---
 <!doctype html>
 <html lang="en" data-theme={DEFAULT_THEME}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content={THEME_COLOR} />
   <title>{title}</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={SITE_NAME} />
+  <meta property="og:url" content={canonical} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Nico Sutheimer — Fullstack Engineer, Data & BI" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
   <script is:inline>
     // apply saved accent theme before first paint — prevents theme flash
     try {
