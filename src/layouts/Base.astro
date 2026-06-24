@@ -32,29 +32,76 @@ const {
   </script>
 </head>
 <body>
+  <!-- Page-wide chrome: ambient aurora (behind content), cursor glow, scroll progress.
+       Grain + scanlines are body::after / body::before in global.css. -->
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
   <slot />
-  <script>
-    // Drives .reveal → .reveal.in for scroll-entrance animations.
-    // Mirrors the prototype's reveals block; respects prefers-reduced-motion.
+  <script is:inline>
+    // Page chrome + scroll-entrance reveals. Single dependency-free block;
+    // everything guards prefers-reduced-motion (and coarse pointers for the glow).
     (function () {
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const els = document.querySelectorAll('.reveal');
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // --- reveal-on-scroll: .reveal → .reveal.in ---
+      var els = document.querySelectorAll('.reveal');
       if (reduce) {
-        els.forEach((el) => el.classList.add('in'));
-        return;
+        els.forEach(function (el) { el.classList.add('in'); });
+      } else {
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) {
+                en.target.classList.add('in');
+                io.unobserve(en.target);
+              }
+            });
+          },
+          { threshold: 0.18 },
+        );
+        els.forEach(function (el) { io.observe(el); });
       }
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((en) => {
-            if (en.isIntersecting) {
-              en.target.classList.add('in');
-              io.unobserve(en.target);
-            }
-          });
-        },
-        { threshold: 0.18 },
-      );
-      els.forEach((el) => io.observe(el));
+
+      // --- cursor glow: lerp-follow the pointer (skip on reduced-motion / coarse pointer) ---
+      (function () {
+        var glow = document.getElementById('cursorGlow');
+        if (!glow || reduce || window.matchMedia('(pointer:coarse)').matches) return;
+        var tx = 0, ty = 0, cx = 0, cy = 0, shown = false, raf = null;
+        window.addEventListener('mousemove', function (e) {
+          tx = e.clientX; ty = e.clientY;
+          if (!shown) { shown = true; glow.style.opacity = '1'; }
+        });
+        function loop() {
+          cx += (tx - cx) * 0.14;
+          cy += (ty - cy) * 0.14;
+          glow.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
+          raf = requestAnimationFrame(loop);
+        }
+        loop();
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = null; }
+          else if (!raf) { loop(); }
+        });
+      })();
+
+      // --- scroll progress bar (rAF-throttled passive scroll handler) ---
+      (function () {
+        var progress = document.getElementById('progress');
+        if (!progress) return;
+        var ticking = false;
+        function update() {
+          var y = window.pageYOffset || document.documentElement.scrollTop;
+          var h = document.documentElement.scrollHeight - window.innerHeight;
+          progress.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+          ticking = false;
+        }
+        function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+        window.addEventListener('scroll', req, { passive: true });
+        window.addEventListener('resize', req);
+        update();
+      })();
     })();
   </script>
 </body>

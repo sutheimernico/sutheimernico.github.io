@@ -69,13 +69,6 @@ import HeroMercury from './HeroMercury';
     to { transform: translate(5%, -7%) scale(1.16) rotate(7deg); }
   }
 
-  .wrap {
-    width: 100%;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 28px;
-  }
-
   .hero-inner {
     position: relative;
     z-index: 2;
@@ -99,22 +92,7 @@ import HeroMercury from './HeroMercury';
     gap: 22px;
   }
 
-  .eyebrow {
-    font-size: 12px;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--accent-soft);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .eyebrow::before {
-    content: "";
-    width: 26px;
-    height: 1px;
-    background: var(--accent-soft);
-  }
+  /* .eyebrow, .wrap, .reveal live in global.css (shared shells) */
 
   /* ---- forged metallic headline ---- */
   .forged {
@@ -195,7 +173,7 @@ import HeroMercury from './HeroMercury';
 
   /* ---- role + sub ---- */
   .hero-role {
-    font-family: var(--serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif);
+    font-family: var(--mono);
     font-style: italic;
     font-size: clamp(18px, 2.6vw, 27px);
     color: var(--ink);
