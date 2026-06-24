@@ -35,9 +35,9 @@ Global personal rules: `~/.claude/CLAUDE.md`.
 
 ## Best first edits
 
-- **New project** → add `src/content/projects/<slug>.md` matching the zod schema in
-  `src/lib/projectSchema.ts` (wired into the collection in `src/content.config.ts`). Fields:
-  `title, order, status (production|in-progress|research|internal), year, stack[], summary, role, featured`.
+- **New project** → add `src/content/projects/<slug>.md`. Full step-by-step (front-matter
+  fields, README body structure, optional `github`) is in `CLAUDE.md` → "Adding a project".
+  Schema: `src/lib/projectSchema.ts`; collection wiring: `src/content.config.ts`.
 - **New accent theme** → add a row to `THEMES` in `src/lib/themes.ts` + an `html[data-theme=…]`
   block in `global.css`.
 - **New animated section** → `.astro` for static; `.tsx` island only if it needs JS; pure math
