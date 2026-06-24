@@ -513,6 +513,23 @@ html[data-theme="daylight"] .mercury-spec {
 .spine-panel .p-tag { font-family: var(--mono); font-style: italic; color: var(--accent); letter-spacing: 0.04em; font-size: 20px; }
 .spine-panel p.p-desc { color: var(--ink-dim); font-size: 15px; margin-top: 14px; max-width: 42ch; }
 .spine-panel .p-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.spine-panel .p-open {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 26px;
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em;
+  color: var(--accent); text-decoration: none;
+  padding: 9px 16px; border-radius: 6px;
+  border: 1px solid var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.spine-panel .p-open .p-open-arrow { transition: transform var(--dur-fast) var(--ease-out); }
+.spine-panel .p-open:hover {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color: var(--accent);
+}
+.spine-panel .p-open:hover .p-open-arrow { transform: translateX(3px); }
+.spine-panel .p-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
 .spine-intro { position: absolute; top: 11vh; left: 0; right: 0; text-align: center; z-index: 3; pointer-events: none; padding: 0 24px; }
 .spine-intro .eyebrow { justify-content: center; }
@@ -628,12 +645,38 @@ html[data-theme="daylight"] .mercury-spec {
   color: var(--ink-dim);
 }
 
-.pcard:hover {
+/* Stretched link: the title anchor's ::after covers the whole card, so the
+   entire card is clickable while the card visuals (transform/box-shadow) stay
+   on the .pcard <article>. The anchor inherits the h4's type, no underline. */
+.pc-link {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+.pc-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: 10px;
+}
+.pc-link:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.25);
+}
+@media (forced-colors: active) {
+  .pc-link:focus-visible::after { outline: 2px solid Highlight; }
+}
+
+.pcard:hover,
+.pcard:focus-within {
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 30px rgba(var(--accent-rgb), 0.14);
   z-index: 5 !important;
 }
 
-.pcard:hover .pc-desc {
+.pcard:hover .pc-desc,
+.pcard:focus-within .pc-desc {
   grid-template-rows: 1fr;
   opacity: 1;
   margin-top: 12px;

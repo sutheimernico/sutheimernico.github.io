@@ -15,12 +15,14 @@ import SiteFooter from '../components/SiteFooter.astro';
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const spineProjects = projects.map((p) => ({
   title: p.data.title,
+  slug: p.id,
   role: p.data.role,
   summary: p.data.summary,
   stack: p.data.stack,
 }));
 const deckProjects = projects.map((p) => ({
   title: p.data.title,
+  slug: p.id,
   status: p.data.status,
   year: p.data.year,
   stack: p.data.stack,
