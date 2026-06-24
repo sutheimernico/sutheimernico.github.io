@@ -8,6 +8,9 @@ import HeroSection from '../components/HeroSection.astro';
 import DataSpine from '../components/DataSpine';
 import ProjectDeck from '../components/ProjectDeck';
 import Constellation from '../components/Constellation';
+import AboutSection from '../components/AboutSection.astro';
+import ContactSection from '../components/ContactSection.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const spineProjects = projects.map((p) => ({
@@ -51,6 +54,10 @@ const deckProjects = projects.map((p) => ({
       <Constellation client:visible />
     </div>
   </section>
+
+  <AboutSection />
+  <ContactSection />
+  <SiteFooter />
 
   <ThemeSwitcher client:idle />
 </Base>
