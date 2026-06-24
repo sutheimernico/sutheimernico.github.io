@@ -307,3 +307,71 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--m
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+/* === hero mercury === */
+
+.mercury {
+  position: relative;
+  display: grid;
+  place-items: center;
+  perspective: 800px;
+  min-height: 340px;
+}
+
+.mercury-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+  position: relative;
+}
+
+.mercury svg {
+  width: clamp(230px, 32vw, 340px);
+  height: auto;
+  overflow: visible;
+  display: block;
+}
+
+.mercury .ring {
+  fill: none;
+  stroke: rgba(var(--accent-rgb), 0.14);
+  stroke-width: 0.8;
+}
+
+.mercury .ns-n {
+  fill: none;
+  stroke: url(#chrome);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.55));
+}
+
+.mercury .ns-s {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 12px rgba(var(--accent-rgb), 0.55));
+  transform: translateZ(26px);
+}
+
+.mercury-spec {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+html[data-theme="daylight"] .mercury-spec {
+  mix-blend-mode: multiply;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.10), transparent 60%);
+}
+
+/* === end hero mercury === */

@@ -1,0 +1,290 @@
+---
+import HeroMercury from './HeroMercury';
+---
+
+<header class="hero" id="top">
+  <div class="hero-aurora" aria-hidden="true"></div>
+
+  <div class="wrap hero-inner">
+    <!-- Left column: copy -->
+    <div class="hero-copy">
+      <div class="eyebrow">Data &amp; BI Engineer</div>
+
+      <!-- Forged metallic headline; data-text drives the shine-sweep ::after -->
+      <div class="forged" data-text={"NICO\nSUTHEIMER"}>NICO<br>SUTHEIMER</div>
+
+      <div class="hero-role">I turn raw data into decisions.</div>
+
+      <p class="hero-sub">
+        Building the after-sales BI platform at bekumoo — pipelines, warehouses,
+        and, lately, language models that reason over domain data.
+      </p>
+
+      <div class="hero-cta">
+        <a class="btn primary" href="#work">View the work</a>
+        <a class="btn" href="#contact">Get in touch</a>
+      </div>
+    </div>
+
+    <!-- Right column: liquid-mercury NS monogram -->
+    <HeroMercury client:idle />
+  </div>
+
+  <div class="scroll-cue" aria-hidden="true">
+    <span>scroll</span>
+    <span class="line"></span>
+  </div>
+</header>
+
+<style>
+  /* ---- layout ---- */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    position: relative;
+    padding: 120px 0 80px;
+    overflow: hidden;
+  }
+
+  .hero-aurora {
+    position: absolute;
+    inset: -20%;
+    z-index: 0;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    background:
+      radial-gradient(38% 30% at 28% 38%, var(--accent-2), transparent 70%),
+      radial-gradient(36% 26% at 72% 56%, var(--accent-3), transparent 72%),
+      radial-gradient(30% 24% at 56% 28%, var(--accent), transparent 70%);
+    animation: aur 20s ease-in-out infinite alternate;
+  }
+
+  :global(html[data-theme="daylight"]) .hero-aurora {
+    opacity: 0.28;
+  }
+
+  @keyframes aur {
+    to { transform: translate(5%, -7%) scale(1.16) rotate(7deg); }
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  @media (max-width: 840px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+  }
+
+  /* ---- copy column ---- */
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--accent-soft);
+  }
+
+  /* ---- forged metallic headline ---- */
+  .forged {
+    font-family: var(--disp);
+    font-size: clamp(44px, 8.5vw, 104px);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    background: linear-gradient(
+      176deg,
+      #6a7370 0%,
+      #cfd6d1 16%,
+      #7c8884 38%,
+      #eef2ee 50%,
+      #5b6560 68%,
+      #aab3ad 86%,
+      #7c8884 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  :global(html[data-theme="daylight"]) .forged {
+    background: linear-gradient(
+      176deg,
+      #414a46 0%,
+      #90998f 16%,
+      #4d564f 40%,
+      #aeb6ac 52%,
+      #3b423d 70%,
+      #7e8a82 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  /* shine-sweep overlay — reads data-text via attr() */
+  .forged::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    white-space: pre;
+    background: linear-gradient(
+      108deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.88) 50%,
+      transparent 60%
+    );
+    background-size: 250% 100%;
+    background-position: 150% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sweep 6s ease-in-out 1.5s infinite;
+  }
+
+  :global(html[data-theme="daylight"]) .forged::after {
+    background: linear-gradient(
+      108deg,
+      transparent 42%,
+      rgba(255, 255, 255, 0.95) 50%,
+      transparent 58%
+    );
+    background-size: 250% 100%;
+    background-position: 150% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  @keyframes sweep {
+    0%,  30% { background-position: 150% 0; }
+    70%, 100% { background-position: -150% 0; }
+  }
+
+  /* ---- role + sub ---- */
+  .hero-role {
+    font-family: var(--serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(18px, 2.6vw, 27px);
+    color: var(--ink);
+  }
+
+  .hero-sub {
+    color: var(--ink-dim);
+    font-size: 15px;
+    max-width: 46ch;
+  }
+
+  /* ---- CTAs ---- */
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 12px 20px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .btn:hover {
+    border-color: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .btn.primary:hover {
+    filter: brightness(1.12);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ---- scroll cue ---- */
+  .scroll-cue {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+  }
+
+  .scroll-cue .line {
+    width: 1px;
+    height: 38px;
+    background: linear-gradient(var(--accent-soft), transparent);
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,  100% { opacity: 0.3; transform: scaleY(0.7); }
+    50%       { opacity: 1;   transform: scaleY(1); }
+  }
+
+  /* ---- reduced motion ---- */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-aurora,
+    .forged::after,
+    .scroll-cue .line {
+      animation: none !important;
+    }
+  }
+</style>
