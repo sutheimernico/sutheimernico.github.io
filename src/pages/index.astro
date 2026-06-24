@@ -2,8 +2,10 @@
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher';
+import ColdBoot from '../components/ColdBoot';
 ---
 <Base>
+  <ColdBoot client:load />
   <Nav />
 
   {/* Tall spacer — lets us verify nav scroll-solidify behaviour */}
