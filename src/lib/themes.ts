@@ -1,4 +1,4 @@
-export type ThemeName = 'phosphor' | 'amber' | 'violet' | 'cyan' | 'red' | 'mono';
+export type ThemeName = 'phosphor' | 'petrol' | 'amethyst' | 'solar' | 'molten' | 'daylight';
 
 export interface Theme {
   name: ThemeName;
@@ -9,11 +9,11 @@ export interface Theme {
 // Order = display order in the switcher; keys 1..6 map to this order.
 export const THEMES: Theme[] = [
   { name: 'phosphor', label: 'Phosphor', swatch: '#45E08A' },
-  { name: 'amber',    label: 'Amber',    swatch: '#FFB000' },
-  { name: 'violet',   label: 'Violet',   swatch: '#BD93F9' },
-  { name: 'cyan',     label: 'Cyan',     swatch: '#4FD8FF' },
-  { name: 'red',      label: 'Red',      swatch: '#FF4538' },
-  { name: 'mono',     label: 'Mono',     swatch: '#F5F2EA' },
+  { name: 'petrol',   label: 'Petrol',   swatch: '#2BD4C0' },
+  { name: 'amethyst', label: 'Amethyst', swatch: '#A98BE6' },
+  { name: 'solar',    label: 'Solar',    swatch: '#FF8A3D' },
+  { name: 'molten',   label: 'Molten',   swatch: '#BFD0D8' },
+  { name: 'daylight', label: 'Daylight', swatch: '#178A50' },
 ];
 
 export const DEFAULT_THEME: ThemeName = 'phosphor';

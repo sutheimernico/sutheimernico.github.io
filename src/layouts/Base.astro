@@ -22,9 +22,12 @@ const {
   <script is:inline>
     // apply saved accent theme before first paint — prevents theme flash
     try {
-      const valid = ['phosphor','amber','violet','cyan','red','mono'];
-      const t = sessionStorage.getItem('k-theme');
-      if (valid.includes(t)) document.documentElement.dataset.theme = t;
+      const valid = ['phosphor','petrol','amethyst','solar','molten','daylight','shift'];
+      const t = localStorage.getItem('ns-theme2');
+      if (valid.includes(t)) {
+        // 'shift' is a meta-theme (animated cycling); use phosphor as the dark base
+        document.documentElement.dataset.theme = t === 'shift' ? 'phosphor' : t;
+      }
     } catch (_) {}
   </script>
 </head>

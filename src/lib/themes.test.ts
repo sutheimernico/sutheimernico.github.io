@@ -4,7 +4,7 @@ import { THEMES, resolveTheme, DEFAULT_THEME } from './themes';
 describe('themes', () => {
   it('exposes the six ported themes with unique names', () => {
     const names = THEMES.map(t => t.name);
-    expect(names).toEqual(['phosphor', 'amber', 'violet', 'cyan', 'red', 'mono']);
+    expect(names).toEqual(['phosphor', 'petrol', 'amethyst', 'solar', 'molten', 'daylight']);
     expect(new Set(names).size).toBe(names.length);
   });
   it('defaults to phosphor (Nico picked the green)', () => {
@@ -12,7 +12,7 @@ describe('themes', () => {
   });
   it('resolveTheme falls back to default for unknown/empty input', () => {
     expect(resolveTheme(null)).toBe('phosphor');
-    expect(resolveTheme('nope')).toBe('phosphor');
-    expect(resolveTheme('violet')).toBe('violet');
+    expect(resolveTheme('bogus')).toBe('phosphor');
+    expect(resolveTheme('petrol')).toBe('petrol');
   });
 });
