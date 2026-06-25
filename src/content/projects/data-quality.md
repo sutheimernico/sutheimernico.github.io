@@ -1,6 +1,6 @@
 ---
 title: "Data Quality Monitoring"
-order: 4
+order: 7
 status: internal
 year: "2024"
 stack: ["dbt", "tests", "alerting"]
