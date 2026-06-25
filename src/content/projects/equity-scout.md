@@ -50,7 +50,9 @@ decision here is a guard against self-deception. **Costs are always on** (and th
 across cost levels) because a free-data edge usually evaporates once you charge for turnover — and
 seeing that happen is the point, not a bug. The **rising Deflated-Sharpe hurdle** exists because
 if you search enough configurations, one will look brilliant by chance; the hurdle climbs as the
-search widens so luck has to clear a higher bar. The **honesty guardrails** — plain-language
+search widens so luck has to clear a higher bar — and the loop reports a **Probability of Backtest
+Overfitting** beside every champion, openly admitting when its own search is more likely finding
+luck than a real edge. The **honesty guardrails** — plain-language
 explanations on every metric, "research assistant, not advice" on every surface — are there
 because the failure mode of a tool like this is someone trusting it.
 
@@ -60,9 +62,10 @@ because the failure mode of a tool like this is someone trusting it.
   Deflated Sharpe Ratio — to force cost-inclusive, deterministic, reproducible reporting.
 - **State-free strategies.** Each strategy is a pure function returning target weights, with no
   dependency on portfolio state, which keeps them deterministic and trivially testable.
-- **Price-derived regime features**, not external macro feeds, so the system stays fully
-  autonomous with no API keys — at the cost of losing macro context, which is noted as a future
-  extension.
+- **Regime features that blend price signals with free macro context** — volatility, trend,
+  breadth, and drawdown derived from prices, plus a market-volatility series pulled from FRED's
+  no-key CSV endpoint — so the model sees macro context while the system still needs no paid API
+  key.
 - Backed by a real test suite (well over a hundred tests) and run against live yfinance data; the
   build gate is pytest + ruff.
 

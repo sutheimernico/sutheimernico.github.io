@@ -54,16 +54,22 @@ code has to carry the orchestration.
   delimited prompt section, never as instructions.
 - **Secrets stay out of the repo** (`.env`, gitignored, token held only in memory and never leaked
   in errors).
-- A focused test suite covers connector parsing, prioritisation, reference resolution, action
-  dispatch, and — importantly — the confirm-gate's refusal to execute unconfirmed; the gate is
-  pytest.
+- **No-egress is enforced, not just promised** — the local-model host is validated to be a
+  loopback address, so even a mis-set environment variable can't quietly ship your tasks and files
+  to a remote model. The guarantee lives in code, not in a README.
+- A focused test suite (fixtures and mocks, zero network dependency) covers connector parsing,
+  prioritisation, reference resolution, action dispatch, the local-model summary with its
+  deterministic offline fallback, and — importantly — the confirm-gate's refusal to execute
+  unconfirmed; the gate is pytest.
 
 ## Trade-offs & what I considered
 
-- **The read path works; the write path is gated and tested, but v1 isn't fully wired yet.** The
-  filesystem snippets live on a feature branch not yet merged into the briefing, and the project is
-  blocked on a few inputs only I can provide (the filesystem allowlist, the Asana scope/token).
-  Stated plainly — this is honest in-progress, not a finished tool.
+- **Both paths work; v1 is feature-complete behind inputs only I can provide.** The prioritised
+  briefing now runs through the local model (with a deterministic fallback when it's offline), and
+  the allowlist-scoped filesystem reader is wired in — inert by default until a directory is
+  explicitly allowed. What remains is genuinely external: an Entra app for the optional Microsoft
+  365 source, and the hosting call (it stays unpublished by design). Honest in-progress, not a
+  finished tool.
 - **Deterministic reference resolution over natural-language intent** for v1. "Complete my report"
   parsed by the model is a v2 idea; v1 resolves references by index, id, or name fragment because
   that's safe and testable today.
