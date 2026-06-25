@@ -57,7 +57,13 @@ is taken seriously.
   worse** — a concrete demonstration of overfitting, which is exactly what the purged validation
   was built to catch. The autonomous paper loop exists but is left disabled because the model
   doesn't justify the edge.
-- Roughly two hundred tests back the engines, the cost model, the point-in-time guarantees, and
+- **A free survivorship stress test.** Most backtests quietly assume today's survivors always
+  existed. Here, a name is penalised point-in-time the moment its SEC delisting became *knowable*,
+  and the same walk-forward is re-run. The result keeps its nerve rather than flattering the
+  author: under stress *both* strategies still lose, and the cause is laid bare — the momentum
+  baseline keeps picking fragile, soon-to-delist names roughly ten times as often as the ML model
+  does. A truly clean test needs paid delisted-price data; that limit is stated, not hidden.
+- Over two hundred tests back the engines, the cost model, the point-in-time guarantees, and
   the validation regime; the gate is pytest + ruff.
 
 ## Trade-offs & what I considered
