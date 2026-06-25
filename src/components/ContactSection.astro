@@ -19,9 +19,10 @@
       <div class="term-body">
         <div><span class="cm"># reach out — pick a channel</span></div>
         <div><span class="pr">&gt;</span> mail&nbsp;&nbsp;&nbsp;<a href="mailto:nico.sutheimer@bekumoo.de">nico.sutheimer@bekumoo.de</a></div>
-        <div><span class="pr">&gt;</span> github&nbsp;<a href="https://github.com/sutheimernico">github.com/sutheimernico</a></div>
-        <!-- TODO: replace href="#" with real LinkedIn URL once Nico confirms the handle -->
-        <div><span class="pr">&gt;</span> linkedin&nbsp;<a href="#" aria-label="LinkedIn profile (coming soon)">in/nico-sutheimer</a></div>
+        <div><span class="pr">&gt;</span> github&nbsp;<a href="https://github.com/sutheimernico" rel="noopener noreferrer">github.com/sutheimernico</a></div>
+        <!-- LinkedIn is a placeholder: rendered as inert text (not a dead link) until Nico
+             confirms the real handle, then swap the span for an <a href="…">. -->
+        <div><span class="pr">&gt;</span> linkedin&nbsp;<span class="soon">in/nico-sutheimer <span class="soon-tag">(soon)</span></span></div>
         <div><span class="pr">&gt;</span> <span class="cur">_</span></div>
       </div>
     </div>
@@ -103,6 +104,22 @@
 
   .term-body a:hover {
     border-bottom-color: var(--accent);
+  }
+
+  .term-body a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* placeholder channel — inert, visibly not-yet-live, kept out of the tab order */
+  .soon {
+    color: var(--ink-dim);
+  }
+  .soon-tag {
+    color: var(--ink-faint);
+    font-size: 0.85em;
+    letter-spacing: 0.04em;
   }
 
   .cur {

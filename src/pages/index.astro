@@ -33,6 +33,7 @@ const deckProjects = projects.map((p) => ({
   <ColdBoot client:load />
   <Nav />
 
+  <main id="main">
   <HeroSection />
 
   <DataSpine client:visible projects={spineProjects} />
@@ -59,6 +60,8 @@ const deckProjects = projects.map((p) => ({
 
   <AboutSection />
   <ContactSection />
+  </main>
+
   <SiteFooter />
 
   <ThemeSwitcher client:idle />

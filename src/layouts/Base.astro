@@ -58,6 +58,10 @@ const THEME_COLOR = '#0E0F0D';
   </script>
 </head>
 <body>
+  <!-- Skip link: first focusable element, visually hidden until focused. Lets
+       keyboard users jump past the fixed nav straight to the page content. -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <!-- Page-wide chrome: ambient aurora (behind content), cursor glow, scroll progress.
        Grain + scanlines are body::after / body::before in global.css. -->
   <div class="ambient" aria-hidden="true"></div>
