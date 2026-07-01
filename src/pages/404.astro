@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Base title="404 — Nico Sutheimer" description="Page not found.">
+  <Nav />
+  <main class="notfound" id="main">
+    <div class="wrap">
+      <div class="eyebrow">404</div>
+      <h1 class="sec-title">This route doesn't exist.</h1>
+      <p class="nf-copy">Whatever you were looking for isn't here — it moved, or never was.</p>
+      <a class="back" href="/">
+        <span class="back-arrow" aria-hidden="true">←</span> back to home
+      </a>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .notfound {
+    min-height: 100vh;
+    display: grid;
+    align-content: center;
+    padding: 120px 0 80px;
+  }
+
+  .nf-copy {
+    margin-top: 18px;
+    max-width: 46ch;
+    color: var(--ink-dim);
+    font-family: var(--mono);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* back link — same treatment as the project-detail back link */
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 32px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .back .back-arrow {
+    display: inline-block;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .back:hover { color: var(--accent); }
+  .back:hover .back-arrow { transform: translateX(-3px); }
+  .back:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+</style>
