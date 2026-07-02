@@ -97,9 +97,11 @@ Equity Scout under both Data Scientist and ML Engineer, etc.). Each project then
 The hero's rotating role line is the teaser; the ride is the walk through those same roles, each backed
 by real work — breadth claimed **and** shown.
 
-**How the skill → projects level is presented** (design choice, see §13 Q5): default is an in-ride
-reveal — clicking/activating a skill station expands its project rows in place (or a focused sub-view),
-staying inside the ride's identity rather than a hard page jump. Detail pages remain their own routes.
+**How the skill → projects level is presented** (confirmed by Nico): a **dedicated deeper view per
+skill** — a "skill chamber". Clicking/activating a skill station triggers a cinematic dive (the ride
+recedes, the chamber comes forward) into a focused view of that skill's projects shown as cards. It is
+its own routed state (`#/skill/<slug>`), not an inline expand — descending a level is explicit and
+felt. Three levels total: ride (skills) → skill chamber (its projects) → project detail.
 
 ## 5. Hero & role rotation
 
@@ -246,9 +248,10 @@ The approved prototype fixes are the baseline; the production build formalizes t
    Recommendation: one-at-a-time swap — more distinctive, on-brand with the terminal cursor.
 4. **`featured: false` in the ride:** include every project under its skill, or let `featured` gate the
    ride (all projects still reachable via detail pages)? Recommendation: include all for now.
-5. **Skill → projects presentation:** in-ride reveal (skill station expands its project rows in place /
-   a focused sub-view, staying in the ride) vs. a dedicated skill page per role. Recommendation: in-ride
-   reveal — keeps the cinematic identity; detail pages stay the only hard route jump.
+5. ~~Skill → projects presentation~~ — **resolved:** dedicated "skill chamber" per role (a cinematic
+   dive to `#/skill/<slug>` showing that skill's projects as cards), then project detail at
+   `#/project/<slug>`. Three levels: ride → chamber → detail. Remaining sub-question: the chamber's
+   exact visual treatment (card layout / dive style) — being validated in the prototype.
 
 ## 14. Out of scope (explicit)
 
