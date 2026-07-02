@@ -17,9 +17,9 @@ Z-impulse crash-zoom, panel-fade-before-pass, grain drop) and approved.
 
 Descent keeps the **locked Kinetic Terminal identity** — warm near-black `#0E0F0D`, phosphor green
 `#45E08A`, Martian Mono display / IBM Plex Mono body, terminal chrome — and expresses it as **one
-continuous scroll-driven camera dolly** through a 3D space: hero → project panels at successive
-depths → contact terminal, with a fixed HUD "depth gauge" reading the camera position like an
-instrument.
+continuous scroll-driven camera dolly** through a 3D space: hero → skill stations at successive
+depths (each nesting the projects that demonstrate it) → contact terminal, with a fixed HUD "depth
+gauge" reading the camera position like an instrument.
 
 The six accent themes + Shift mode from the current site are **retained** (theme switching stays).
 
@@ -28,11 +28,14 @@ The six accent themes + Shift mode from the current site are **retained** (theme
 1. **Hero role** is no longer the static "Data & BI Engineer". It anchors on **Fullstack Engineer**
    and **rotates through additional role hats** (ML Engineer, AI Engineer, Data Scientist, …) to
    signal breadth — "I can do a bit of everything".
-2. **Two-level project structure:** an **overview** (production projects first, each with a one-line
-   description, cleanly animated) → **click a project → a level deeper**: a detail page with a fuller
-   write-up (what it is, how it's built, why it's built that way) plus a **GitHub link**.
-3. **Auto-add:** creating a new project should add it **everywhere automatically** — overview + detail
-   page — without touching component code.
+2. **Skill-first, three-level structure.** What you scroll past in the ride are the **skills / roles**
+   (ML Engineer, AI Engineer, Data Scientist, Fullstack Engineer, Data & BI Engineer) — **not** a flat
+   project list. **Click a skill → one level deeper: the projects that demonstrate that skill**, each
+   with a one-line description. **Click a project → a detail page** with the fuller write-up (what it
+   is, how it's built, why) plus a **GitHub link**. Skills are the spine of the site; projects are the
+   evidence hung under each skill.
+3. **Auto-add:** creating a new project should add it **automatically** under the right skill(s) —
+   ride + detail page — without touching component code.
 
 ### Positioning note (flagged, Nico decides)
 
@@ -56,8 +59,8 @@ draft (§5) for Nico to correct at review.
 
 **Reused as-is (already built, no rework beyond noted fixes)**
 
-- The `projects` **content collection** + zod schema (`src/lib/projectSchema.ts`) — already supports
-  every field this design needs.
+- The `projects` **content collection** + zod schema (`src/lib/projectSchema.ts`) — reused; the only
+  addition is a `skills: string[]` tag (§7).
 - The **detail page** route `src/pages/projects/[slug].astro` — already renders the markdown body as
   the write-up, with badge/year/stack/role and a GitHub button shown only when `github` is set.
 - Theme system (`themes.ts`, `shift.ts`, `ThemeSwitcher`).
@@ -70,25 +73,33 @@ draft (§5) for Nico to correct at review.
 
 ## 4. Information architecture
 
-Two levels, mapped onto the ride:
+**Three levels**, skill-first, mapped onto the ride:
 
 ```
-LANDING (the Descent ride)                         DETAIL (one level deeper)
-┌─────────────────────────────────────┐            ┌────────────────────────────────┐
-│ STN 00  Hero: name + rotating roles  │            │ /projects/<slug>               │
-│ ───────────────────────────────────  │  click a   │ badge · year · title · role    │
-│ project panels (= the OVERVIEW):     │  panel →   │ stack · GitHub link            │
-│   each = title, one-liner, stack,    │ ─────────▶ │ ── write-up (markdown body) ── │
-│   status badge, clickable            │            │ what it is / architecture /    │
-│   ordered PRODUCTION-FIRST           │            │ why / implementation / trade-  │
-│ ───────────────────────────────────  │            │ offs                           │
-│ STN nn  Contact terminal             │  ← back    │ back to work                   │
-└─────────────────────────────────────┘            └────────────────────────────────┘
+LANDING — the Descent ride (SKILLS)        SKILL → its projects        PROJECT detail
+┌──────────────────────────────────┐       ┌─────────────────────┐     ┌────────────────────┐
+│ STN 00  Hero: name + role cycle   │       │ projects that show  │     │ /projects/<slug>   │
+│ ────────────────────────────────  │ click │ this skill, each a  │clic │ badge·year·title·  │
+│ SKILL stations you dolly past:    │ skill │ one-liner + badge:  │ k   │ role·stack·GitHub  │
+│   Data & BI Engineer              │ ────▶ │  · After-Sales BI   │ ──▶ │ ── write-up ────   │
+│   Data Scientist                  │       │  · Data Quality …   │     │ what/architecture/ │
+│   ML Engineer                     │       │ (a project can sit  │     │ why/implementation/│
+│   AI Engineer                     │       │  under >1 skill)    │     │ trade-offs         │
+│   Fullstack Engineer              │       └─────────────────────┘     └────────────────────┘
+│ ────────────────────────────────  │        ← back to skill            ← back to work
+│ STN nn  Contact terminal          │
+└──────────────────────────────────┘
 ```
 
-The ride **is** the overview level: the panels a visitor dollies past are the project list, one-liner
-included. There is no separate third "skills → projects" level; the role rotation lives in the hero,
-the projects substantiate it.
+The ride **is** the skills level: the stations a visitor dollies past are the skills/roles. Each skill,
+when opened, reveals the **projects that demonstrate it** (a project may appear under several skills —
+Equity Scout under both Data Scientist and ML Engineer, etc.). Each project then opens its detail page.
+The hero's rotating role line is the teaser; the ride is the walk through those same roles, each backed
+by real work — breadth claimed **and** shown.
+
+**How the skill → projects level is presented** (design choice, see §13 Q5): default is an in-ride
+reveal — clicking/activating a skill station expands its project rows in place (or a focused sub-view),
+staying inside the ride's identity rather than a hard page jump. Detail pages remain their own routes.
 
 ## 5. Hero & role rotation
 
@@ -96,43 +107,57 @@ the projects substantiate it.
 - **Role line** replaces the static eyebrow with a **rotating role**, terminal-style (type-in / swap
   on a cursor, respecting the existing easing tokens). Anchor role shown first: **Fullstack Engineer**.
 - **Draft role set** (Nico to correct): `Fullstack Engineer` · `Data & BI Engineer` · `ML Engineer` ·
-  `AI Engineer` · `Data Scientist`. Order and membership are his call.
+  `AI Engineer` · `Data Scientist`. Order and membership are his call. **These same roles are the ride's
+  skill stations** (§6) — the hero cycles them, the ride walks through them one by one.
 - **Tagline:** current "I turn raw data into decisions." is data-centric and slightly undercuts the
   breadth message. Draft alternative to consider (Nico corrects): keep it, or broaden to something
   like _"I build the systems between raw data and the decision."_ — marked `_(draft — Nico to refine)_`.
 - **Reduced motion / no-JS:** role line shows the anchor role (or a static comma-separated list); no
   rotation.
 
-## 6. The ride as a content-driven overview
+## 6. The ride as skills, with projects nested under them
 
-- Panels are generated from `getCollection('projects')` — **not hardcoded**. Adding a markdown file
-  adds a panel automatically (§7).
-- **Ordering = production-first:** sort by status group (`production` → `in-progress`/`research` →
-  `internal`), then by `order` within a group. This satisfies "production projects overall first".
-  Implemented as a sort in the ride generator; **no schema change** (uses existing `status` + `order`).
-- **Panel content** (all from front-matter): terminal path `~/projects/<slug>.md`, status badge,
-  index `NN / total`, `title`, `role` (italic), `summary` (the one-liner), `stack` chips, a decorative
-  command line. `featured: false` entries can be excluded from the ride if desired (keeps the deck
-  behavior meaningful) — default: include all.
-- **Each panel is a real link** to `/projects/<slug>` (an `<a>`, keyboard-focusable) — so the overview
-  is navigable by click, keyboard, and AT, not just by scrolling past.
+- **Stations = skills.** The ride's panels are the skills/roles, generated from a small **skills config**
+  (§7), each rendered as a terminal-style station: big skill name (display font), a one-line competency
+  description, a `~/skills/<slug>` eyebrow, index `NN / total` (total = number of skills), and — nested
+  and visually subordinate beneath a divider — the **projects that demonstrate it** as compact rows
+  (project title + status badge + `summary` one-liner), each row a link into `/projects/<slug>`.
+- **Projects are grouped under skills** by a `skills` tag on each project (§7). A project appears under
+  every skill it lists. Within a skill, projects sort production-first, then by `order`.
+- **Skill order** is curated in the skills config (draft: Data & BI Engineer → Data Scientist →
+  ML Engineer → AI Engineer → Fullstack Engineer). Anchor skill (Fullstack) leads the hero rotation;
+  ride order is separately curated.
+- **Keyboard/AT access:** skill stations and the nested project rows are focusable; project rows are
+  real `<a>` links; the reduced-motion flat fallback lists every skill with its projects as links.
 - **Motion carries over from the approved prototype**, incl. the perf fixes in §9.
 
 ## 7. Content model & auto-add workflow
 
-**Decision (Claude's call, as delegated): file-based content collection — the existing architecture.**
+**Decision (Claude's call, as delegated): file-based content collection — extends the existing one.**
 
-Adding a project is one action: **create `src/content/projects/<slug>.md`** with front-matter
-(validated against `projectSchema.ts`) and a markdown body. The same entry then powers the ride panel,
-the overview ordering, and its own `/projects/<slug>` detail page — **no component or route edits**.
+Two pieces:
+
+1. **A small `skills` config** — the ride's stations. Each skill: `slug`, `name`, one-line `blurb`,
+   `order`. This is a short curated list (skills change rarely), e.g. a `src/content/skills/` collection
+   or a typed `src/lib/skills.ts`. Adding/renaming a skill = edit this one place.
+
+2. **Projects gain a `skills` tag** (schema addition to `projectSchema.ts`): `skills: string[]` — the
+   slugs of the skills a project demonstrates. This is the only schema change; it's what nests a
+   project under its skill station(s).
+
+Adding a project is still one action: **create `src/content/projects/<slug>.md`** with front-matter
+(validated by zod) and a markdown body. Its `skills` tag slots it under the right skill station(s)
+automatically; the same entry powers its `/projects/<slug>` detail page — **no component or route
+edits**. Adding a project under an existing skill needs no config change at all.
 
 ```yaml
 title: My New Project
-order: 5                    # position within its status group
-status: in-progress         # production | in-progress | research | internal → drives badge + ordering
+order: 5                    # position within its skill group (production-first, then order)
+status: in-progress         # production | in-progress | research | internal → badge + ordering
 year: "2026"
 stack: ["Python", "FastAPI"]
-summary: One line shown on the ride panel (the overview one-liner).
+skills: ["ml-engineer", "ai-engineer"]   # NEW — which skill station(s) this sits under
+summary: One line shown on the project row under each skill.
 role: what it is to you      # the italic tag line
 featured: true               # include on the landing ride
 # github: https://github.com/sutheimernico/my-repo   # OPTIONAL — detail page shows the button only if set
@@ -194,8 +219,9 @@ The approved prototype fixes are the baseline; the production build formalizes t
 
 ## 11. Accessibility
 
-- Every project reachable by keyboard: panels are `<a>` elements; a "skip to projects" affordance and
-  the reduced-motion flat list guarantee non-scroll access.
+- Every skill and project reachable by keyboard: skill stations are focusable, nested project rows are
+  real `<a>` links; a "skip to skills" affordance and the reduced-motion flat list (every skill with its
+  projects) guarantee non-scroll access.
 - Visible `:focus-visible`, `:active` feedback on all interactive elements (incl. touch), no horizontal
   page scroll at any viewport, responsive to 390px.
 - Role rotation and all motion respect `prefers-reduced-motion`.
@@ -203,9 +229,9 @@ The approved prototype fixes are the baseline; the production build formalizes t
 
 ## 12. Testing / verification
 
-- **Vitest** for pure logic: the production-first ordering function, role-rotation timing/index math,
-  and any camera/scroll mapping helpers (the project already tests `kinetic`, `scroll`, `shift`,
-  `themes`, `deck`, `projectSchema`).
+- **Vitest** for pure logic: the skill-grouping + production-first sort (projects → skill stations),
+  role-rotation timing/index math, and any camera/scroll mapping helpers (the project already tests
+  `kinetic`, `scroll`, `shift`, `themes`, `deck`, `projectSchema`).
 - **Browser-verified** for the visual/motion work (not pixel unit tests): entrance choreography,
   ride storyboard at several scroll depths, detail-page chrome + entrance, reduced-motion fallback,
   mobile at 390px, and a real-hardware smoothness check by Nico (perf mode).
@@ -213,13 +239,16 @@ The approved prototype fixes are the baseline; the production build formalizes t
 
 ## 13. Open questions / draft copy for Nico (resolve at spec review)
 
-1. **Exact role set + order** for the hero rotation (§5 draft).
+1. **Exact skill/station set + order** (= the hero role set, §5 draft) and each skill's one-line blurb +
+   which projects nest under it.
 2. **Tagline:** keep "I turn raw data into decisions." or broaden it (§5).
 3. **Role rotation style:** cycle one-at-a-time (type-in/swap) vs. show all as a static cluster.
    Recommendation: one-at-a-time swap — more distinctive, on-brand with the terminal cursor.
-4. **`featured: false` in the ride:** include every project, or let `featured` gate the landing ride
-   (with all projects still reachable via detail pages / a full index)? Recommendation: include all in
-   the ride for now; revisit if the list grows long.
+4. **`featured: false` in the ride:** include every project under its skill, or let `featured` gate the
+   ride (all projects still reachable via detail pages)? Recommendation: include all for now.
+5. **Skill → projects presentation:** in-ride reveal (skill station expands its project rows in place /
+   a focused sub-view, staying in the ride) vs. a dedicated skill page per role. Recommendation: in-ride
+   reveal — keeps the cinematic identity; detail pages stay the only hard route jump.
 
 ## 14. Out of scope (explicit)
 
