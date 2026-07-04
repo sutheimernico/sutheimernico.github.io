@@ -1,6 +1,6 @@
 ---
 title: "Scouting RAG"
-order: 4
+order: 5
 status: research
 year: "2025"
 stack: ["Python", "RAG", "LLM", "Vector DB"]
