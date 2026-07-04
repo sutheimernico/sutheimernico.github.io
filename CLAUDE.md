@@ -20,10 +20,13 @@ it before touching code.
 - **Stack**: Astro + React islands + Tailwind v4 + TypeScript. Projects are an Astro content
   collection — adding a project means adding a Markdown file, not editing code (full how-to:
   "Adding a project" below). Each project also gets a detail page at `/projects/<slug>`.
-- **Hosting**: repo stays **PRIVATE** → GitHub Pages is NOT free for private repos. Deploy on
-  **Cloudflare Pages** (free, private-repo-friendly, no non-commercial clause). Domain path:
-  `*.pages.dev` → free `nico.is-a.dev` → optional `.dev` (~10 €/yr, Cloudflare Registrar).
-  **Never make the repo public without asking** — Nico chose private deliberately.
+- **Hosting** (revised 2026-07-04, Nico's call in the publish sweep): repo is **PUBLIC** and named
+  `sutheimernico.github.io` → GitHub Pages **user site** at the domain root, deployed by
+  `.github/workflows/pages.yml` (test → build → Pages) on every push to `main`. Commit emails were
+  rewritten to the GitHub noreply address before the flip. Domain path stays:
+  free `nico.is-a.dev` → optional `.dev` (~10 €/yr) via CNAME, no build changes needed.
+  (Superseded: the 2026-06-13 decision was private repo + Cloudflare Pages — obsolete since the
+  other portfolio repos went public anyway and a user site serves from the root.)
 - **Content**: Claude drafts projects + bio (grounded in the bekumoo after-sales BI platform
   and `~/private/scouting-rag`), Nico corrects. ML/RAG projects may appear as `in-progress`.
 - Plans: `docs/superpowers/plans/2026-06-13-portfolio-site.md` (scaffold + foundation) and
@@ -49,8 +52,8 @@ it before touching code.
 
 ## Conventions
 
-- Git hosting is **GitHub** (`github.com/sutheimernico`) — use `gh` (not installed yet; SSH
-  push works), not `az repos`.
+- Git hosting is **GitHub** (`github.com/sutheimernico`) — use `gh` (installed and authed),
+  not `az repos`.
 - Never commit directly to `main`. Topic branches `feat/<kebab-case>` / `fix/<kebab-case>` →
   PR into `main`. Conventional commits, English, imperative.
 - Code, identifiers, comments, commit messages, docs: English.

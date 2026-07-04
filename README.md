@@ -6,11 +6,11 @@ an animated "Shift" mode), deliberate motion design, no generic template aesthet
 
 ## Status
 
-Built and functional: Astro + React islands landing page (cold boot, hero, scroll-driven
-data spine, project deck, skill constellation, about/contact) plus a per-project detail page
-at `/projects/<slug>`. Projects are an `astro:content` collection — see `CLAUDE.md` →
-"Adding a project" for the how-to. Not yet deployed; visual/motion browser verification and
-Nico's content pass (bio prose, LinkedIn handle) are still open.
+Live at **https://sutheimernico.github.io/** — Astro + React islands landing page (cold boot,
+hero, scroll-driven data spine, project deck, skill constellation, about/contact) plus a
+per-project detail page at `/projects/<slug>`. Projects are an `astro:content` collection —
+see `CLAUDE.md` → "Adding a project" for the how-to. Still open: visual/motion browser
+verification pass and Nico's content pass (bio prose, LinkedIn handle).
 
 ## Stack
 
@@ -39,6 +39,7 @@ docs/
 
 ## Deploy
 
-Cloudflare Pages (free, private-repo-friendly). Repo stays **private**, so GitHub Pages is
-not an option (no free private-repo hosting there). See `CLAUDE.md` → "Locked decisions" for
-the domain path. Not yet deployed — `astro.config.mjs`'s `site` is a placeholder until then.
+GitHub Pages user site: the repo is **public** (decision revised 2026-07-04) and named
+`sutheimernico.github.io`, so the site serves from the domain root. `.github/workflows/pages.yml`
+runs tests, builds, and publishes on every push to `main`. A custom domain (`nico.is-a.dev` or a
+paid `.dev`) can be layered on later via CNAME without touching the build.
