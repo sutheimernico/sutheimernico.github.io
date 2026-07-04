@@ -1,13 +1,13 @@
 ---
 title: "Equity Scout"
-order: 2
+order: 3
 status: research
 year: "2026"
 stack: ["Python", "scikit-learn", "CatBoost", "FastAPI", "React"]
 summary: "A local research harness that compares systematic strategies honestly — costs always on, no alpha promised."
 role: "research assistant, not advice"
 featured: true
-# github: https://github.com/...   # local-only for now; no public remote yet
+github: https://github.com/sutheimernico/equity-scout
 ---
 
 ## What it is

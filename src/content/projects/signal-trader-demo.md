@@ -1,13 +1,13 @@
 ---
 title: "Signal Trader"
-order: 3
+order: 4
 status: research
 year: "2026"
 stack: ["Python", "LightGBM", "vectorbt", "FastAPI", "React"]
 summary: "An honest paper-only backtest harness — point-in-time data, costs always on, failed experiments left visible."
 role: "an honest harness, not an edge"
 featured: true
-# github: https://github.com/...   # local-only for now; no public remote yet
+github: https://github.com/sutheimernico/signal-trader-demo
 ---
 
 ## What it is
