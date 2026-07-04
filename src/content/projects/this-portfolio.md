@@ -1,6 +1,6 @@
 ---
 title: "This Portfolio"
-order: 6
+order: 7
 status: in-progress
 year: "2025"
 stack: ["Astro", "React", "TypeScript"]

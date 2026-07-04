@@ -1,6 +1,6 @@
 ---
 title: "Factotum"
-order: 5
+order: 6
 status: in-progress
 year: "2026"
 stack: ["Python", "Ollama", "Qwen2.5", "Typer"]
