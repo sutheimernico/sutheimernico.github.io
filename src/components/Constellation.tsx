@@ -259,6 +259,12 @@ export default function Constellation({ skills = DEFAULT_SKILLS }: Props) {
   return (
     <div className="const-wrap">
       <canvas ref={canvasRef} aria-hidden="true" />
+      {/* The canvas paints labels as pixels only — this list is the accessible equivalent. */}
+      <ul className="sr-only" aria-label="Skills">
+        {skills.map((label) => (
+          <li key={label}>{label}</li>
+        ))}
+      </ul>
       <div className="const-hint">move your cursor</div>
     </div>
   );
