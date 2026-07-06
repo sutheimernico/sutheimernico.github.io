@@ -1,0 +1,533 @@
+<title>NS — Lightfield</title>
+<style>
+/*__FONTS__*/
+:root{
+  --ground:#04070C;
+  --ink:#EAF2FF;
+  --cyan:#5CC8FF;
+  --dim:#3A4A5E;
+  --ca:0px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:clip;background:var(--ground)}
+body{
+  color:var(--ink);
+  font-family:'Archivo',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+::selection{background:rgba(92,200,255,.9);color:#04070C}
+a:focus-visible{outline:2px solid var(--cyan);outline-offset:5px;border-radius:2px}
+
+/* ---- world layers ---- */
+.sky{position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(85% 60% at 50% 40%, rgba(92,200,255,.13), rgba(92,200,255,0) 62%),
+    radial-gradient(120% 80% at 50% 118%, rgba(14,32,54,.95), rgba(14,32,54,0) 70%),
+    linear-gradient(180deg,#04070C 0%,#071019 55%,#04070C 100%);
+}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1}
+.static #gl{display:none}
+.vignette{position:fixed;inset:0;z-index:55;pointer-events:none;
+  background:radial-gradient(130% 100% at 50% 42%, rgba(2,4,8,0) 52%, rgba(2,4,8,.5) 100%)}
+.hud{z-index:57}
+.grain{position:fixed;inset:-50%;width:200%;height:200%;z-index:60;pointer-events:none;
+  opacity:.4;background-repeat:repeat;background-size:128px 128px;
+  animation:grainShift .85s steps(1) infinite}
+@keyframes grainShift{
+  0%{transform:translate(0,0)}
+  12.5%{transform:translate(-2.6%,-3.4%)}
+  25%{transform:translate(1.6%,-2.2%)}
+  37.5%{transform:translate(-3.1%,1.2%)}
+  50%{transform:translate(2.2%,3.1%)}
+  62.5%{transform:translate(-1.2%,2.4%)}
+  75%{transform:translate(3.2%,-1.4%)}
+  87.5%{transform:translate(-2.2%,-2.6%)}
+  100%{transform:translate(0,0)}
+}
+
+/* ---- HUD ---- */
+.hud{position:fixed;inset:0;pointer-events:none;
+  font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:10px;
+  letter-spacing:.24em;color:var(--dim);
+  opacity:0;animation:fadeIn .9s ease 1.5s forwards}
+.hud b{color:var(--cyan);font-weight:500}
+.hc{position:fixed;white-space:nowrap}
+.tl{top:1.3rem;left:1.7rem}
+.tr{top:1.3rem;right:1.7rem}
+.bl{bottom:1.3rem;left:1.7rem}
+.br{bottom:1.3rem;right:1.7rem;transition:opacity .7s ease}
+.br.gone{opacity:0}
+@keyframes fadeIn{to{opacity:1}}
+
+/* ---- stations ---- */
+main{position:relative;z-index:10}
+.station{min-height:88vh;display:flex;align-items:center;position:relative;padding:0 8vw}
+.station.hero,.station.contact{min-height:100vh}
+.station.hero,.station.contact{justify-content:center;text-align:center}
+.station.frame{justify-content:flex-start}
+.station.frame.alt{justify-content:flex-end}
+.st{will-change:transform,opacity,filter}
+.static .st{opacity:1!important;transform:none!important;filter:none!important;visibility:visible!important}
+.static .hud{display:none} /* fallback scrolls as a plain page; frozen telemetry would collide with content */
+
+/* ---- hero ---- */
+.kicker{font-family:'IBM Plex Mono',monospace;font-weight:500;
+  font-size:clamp(.65rem,1vw,.8rem);letter-spacing:.52em;text-indent:.52em;
+  color:var(--cyan);margin-bottom:2.4rem;
+  opacity:0;animation:fadeIn .9s ease .95s forwards}
+.display{font-weight:900;font-stretch:125%;
+  font-size:clamp(2.6rem,10.4vw,10rem);
+  line-height:.94;letter-spacing:-.015em;text-transform:uppercase;
+  filter:drop-shadow(0 0 42px rgba(92,200,255,.15))}
+.display .line{display:block;overflow:hidden;padding:.03em 0}
+.display .line>span{display:block;transform:translateY(114%);
+  animation:rise 1.15s cubic-bezier(.16,1,.3,1) forwards;
+  text-shadow:calc(var(--ca) * -1.2) 0 0 rgba(255,74,92,.45), var(--ca) 0 0 rgba(92,200,255,.55)}
+.display .line:nth-child(2)>span{animation-delay:.14s}
+@keyframes rise{to{transform:translateY(0)}}
+.tag{margin-top:2.5rem;font-weight:350;
+  font-size:clamp(1rem,1.5vw,1.3rem);letter-spacing:.012em;
+  color:rgba(234,242,255,.85);
+  opacity:0;animation:fadeIn .9s ease 1.2s forwards}
+
+/* ---- project frames ---- */
+.card{position:relative;max-width:600px;padding:2.4rem 2.6rem}
+.card::before{content:"";position:absolute;inset:-24% -28%;z-index:-1;
+  background:radial-gradient(58% 54% at 44% 50%, rgba(3,6,11,.9), rgba(3,6,11,0) 74%)}
+.rule{height:1px;width:100%;margin-bottom:1.5rem;
+  background:linear-gradient(90deg,var(--cyan),rgba(92,200,255,0) 88%);
+  box-shadow:0 0 14px rgba(92,200,255,.55)}
+.coord{font-family:'IBM Plex Mono',monospace;font-weight:500;
+  font-size:clamp(.6rem,.8vw,.72rem);letter-spacing:.24em;
+  color:var(--cyan);margin-bottom:1.2rem}
+.card h2{font-weight:820;font-stretch:116%;
+  font-size:clamp(2rem,4.4vw,3.9rem);line-height:.99;letter-spacing:-.012em;
+  text-transform:uppercase;margin-bottom:1.15rem;
+  text-shadow:calc(var(--ca) * -1) 0 0 rgba(255,74,92,.4), var(--ca) 0 0 rgba(92,200,255,.5),
+    0 0 60px rgba(92,200,255,.14)}
+.sum{font-weight:380;font-size:clamp(.98rem,1.2vw,1.08rem);line-height:1.6;
+  color:rgba(234,242,255,.82);max-width:46ch}
+.meta{margin-top:1.5rem;font-family:'IBM Plex Mono',monospace;
+  font-size:.65rem;letter-spacing:.28em;color:#566B85}
+.meta b{color:var(--cyan);font-weight:500}
+
+/* ---- contact endframe ---- */
+.endframe{position:relative;display:flex;flex-direction:column;align-items:center;padding:3rem 2rem}
+.endframe::before{content:"";position:absolute;inset:-30% -40%;z-index:-1;
+  background:radial-gradient(52% 52% at 50% 50%, rgba(3,6,11,.88), rgba(3,6,11,0) 72%)}
+.endframe .coord{margin-bottom:1.7rem}
+.nb{white-space:nowrap}
+.endframe h2{font-weight:900;font-stretch:122%;
+  font-size:clamp(2.1rem,6.5vw,5.2rem);letter-spacing:-.01em;line-height:1;
+  text-transform:uppercase;
+  text-shadow:calc(var(--ca) * -1) 0 0 rgba(255,74,92,.4), var(--ca) 0 0 rgba(92,200,255,.5),
+    0 0 70px rgba(92,200,255,.16)}
+.cursor{display:inline-block;width:.5em;height:.82em;margin-left:.16em;
+  background:var(--cyan);box-shadow:0 0 18px rgba(92,200,255,.8);
+  animation:blink 1.15s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.links{margin-top:2.7rem;display:flex;flex-direction:column;gap:1.2rem;align-items:center}
+.links a{font-family:'IBM Plex Mono',monospace;font-weight:500;
+  font-size:clamp(.95rem,1.8vw,1.35rem);letter-spacing:.06em;
+  color:var(--ink);text-decoration:none;display:inline-block;overflow-wrap:anywhere;
+  border-bottom:1px solid rgba(92,200,255,.35);padding-bottom:.28em;
+  transition:color .25s ease,border-color .25s ease}
+.links a:hover{color:var(--cyan);border-color:var(--cyan)}
+.links a:active{transform:translateY(1px);color:#fff}
+
+/* ---- responsive ---- */
+@media (max-width:720px){
+  .station{padding:0 6vw}
+  .display{font-size:12vw}
+  .endframe{padding:3rem 1rem}
+  .station.frame,.station.frame.alt{justify-content:flex-start}
+  .card{padding:1.8rem 1.5rem;max-width:100%}
+  .card::before{inset:-14% -12%}
+  .hud{font-size:9px;letter-spacing:.2em}
+  .tl{top:.95rem;left:1.05rem}.tr{top:.95rem;right:1.05rem}
+  .bl{bottom:.95rem;left:1.05rem}.br{bottom:.95rem;right:1.05rem}
+  .kicker{margin-bottom:1.7rem}
+  .tag{margin-top:1.8rem}
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion:reduce){
+  .grain{animation:none}
+  .display .line>span{animation:none;transform:none}
+  .kicker,.tag,.hud{animation:none;opacity:1}
+  .cursor{animation:none}
+  .br{transition:none}
+  .links a{transition:none}
+}
+</style>
+
+<div class="sky" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<div class="hud" aria-hidden="true">
+  <span class="hc tl">NS — LIGHTFIELD</span>
+  <span class="hc tr">Z <b id="tz">+000.0</b> · V <b id="tv">0.00</b></span>
+  <span class="hc bl" id="seq">SEQ 01 / 06</span>
+  <span class="hc br" id="hint">SCROLL TO FLY ↓</span>
+</div>
+
+<main>
+  <section class="station hero">
+    <div class="st">
+      <p class="kicker">DATA &amp; BI ENGINEER</p>
+      <h1 class="display" id="display">
+        <span class="line"><span>Nico</span></span>
+        <span class="line"><span>Sutheimer</span></span>
+      </h1>
+      <p class="tag">I turn raw data into decisions.</p>
+    </div>
+  </section>
+
+  <section class="station frame">
+    <article class="st card">
+      <div class="rule"></div>
+      <p class="coord">PRJ-01 / 2024 / AZURE · DBT · AIRFLOW · POWER BI</p>
+      <h2>After-Sales BI Platform</h2>
+      <p class="sum">The analytics backbone for after-sales — raw events to the KPIs the business runs on.</p>
+      <p class="meta">STATUS: <b>PRODUCTION</b></p>
+    </article>
+  </section>
+
+  <section class="station frame alt">
+    <article class="st card">
+      <div class="rule"></div>
+      <p class="coord">PRJ-02 / 2026 / PYTHON · SCIKIT-LEARN · CATBOOST · FASTAPI · REACT</p>
+      <h2>Equity Scout</h2>
+      <p class="sum">A local research harness that compares systematic strategies honestly — costs always on, no alpha promised.</p>
+      <p class="meta">STATUS: <b>RESEARCH</b></p>
+    </article>
+  </section>
+
+  <section class="station frame">
+    <article class="st card">
+      <div class="rule"></div>
+      <p class="coord">PRJ-03 / 2026 / PYTHON · LIGHTGBM · VECTORBT · FASTAPI · REACT</p>
+      <h2>Signal Trader</h2>
+      <p class="sum">An honest paper-only backtest harness — point-in-time data, costs always on, failed experiments left visible.</p>
+      <p class="meta">STATUS: <b>RESEARCH</b></p>
+    </article>
+  </section>
+
+  <section class="station frame alt">
+    <article class="st card">
+      <div class="rule"></div>
+      <p class="coord">PRJ-04 / 2025 / PYTHON · RAG · LLM · VECTOR DB</p>
+      <h2>Scouting RAG</h2>
+      <p class="sum">Grounded Q&amp;A over scouting data — retrieval, re-ranking, and answers you can trust.</p>
+      <p class="meta">STATUS: <b>RESEARCH</b></p>
+    </article>
+  </section>
+
+  <section class="station contact">
+    <div class="st endframe">
+      <p class="coord">ENDFRAME / GET IN TOUCH</p>
+      <h2>Say <span class="nb">hello<span class="cursor" aria-hidden="true"></span></span></h2>
+      <nav class="links">
+        <a href="mailto:nico.sutheimer@bekumoo.de">nico.sutheimer@bekumoo.de</a>
+        <a href="https://github.com/sutheimernico">github.com/sutheimernico</a>
+      </nav>
+    </div>
+  </section>
+</main>
+
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" id="grain" aria-hidden="true"></div>
+
+<script>
+(function () {
+  'use strict';
+  var docEl = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canvas = document.getElementById('gl');
+  var stations = Array.prototype.slice.call(document.querySelectorAll('.station'));
+  var display = document.getElementById('display');
+  var tz = document.getElementById('tz'), tv = document.getElementById('tv');
+  var seqEl = document.getElementById('seq'), hint = document.getElementById('hint');
+
+  /* film grain tile (generated locally, no external request) */
+  (function grain() {
+    var c = document.createElement('canvas');
+    c.width = c.height = 128;
+    var x = c.getContext('2d');
+    var id = x.createImageData(128, 128), d = id.data;
+    for (var i = 0; i < d.length; i += 4) {
+      var v = (Math.random() * 255) | 0;
+      d[i] = v; d[i + 1] = v; d[i + 2] = v; d[i + 3] = 26;
+    }
+    x.putImageData(id, 0, 0);
+    document.getElementById('grain').style.backgroundImage = 'url(' + c.toDataURL() + ')';
+  })();
+
+  /* ------------ WebGL light-field world ------------ */
+  var VS = [
+    'attribute vec2 aPos;',
+    'void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }'
+  ].join('\n');
+
+  var FS = [
+    '#ifdef GL_FRAGMENT_PRECISION_HIGH',
+    'precision highp float;',
+    '#else',
+    'precision mediump float;',
+    '#endif',
+    'uniform vec2 uRes;',
+    'uniform float uTime;',
+    'uniform float uCam;',
+    'uniform float uVel;',
+    'uniform float uFade;',
+    '',
+    'const vec3 GROUND = vec3(0.0157, 0.0275, 0.0471);',
+    'const vec3 CYAN   = vec3(0.361, 0.784, 1.0);',
+    'const vec3 DEEP   = vec3(0.075, 0.22, 0.38);',
+    'const float SP = 3.0;',
+    'const float FAR = 24.0;',
+    '',
+    'float h21(vec2 p){',
+    '  p = fract(p * vec2(123.34, 456.21));',
+    '  p += dot(p, p + 45.32);',
+    '  return fract(p.x * p.y);',
+    '}',
+    'vec2 h22(vec2 p){',
+    '  float n = h21(p);',
+    '  return vec2(n, h21(p + n + 17.17));',
+    '}',
+    'float vnoise(vec2 p){',
+    '  vec2 i = floor(p); vec2 f = fract(p);',
+    '  f = f * f * (3.0 - 2.0 * f);',
+    '  return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), f.x),',
+    '             mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), f.x), f.y);',
+    '}',
+    '/* lateral drift of the flight path — the world curves past the camera */',
+    'vec2 path(float z){',
+    '  return vec2(sin(z * 0.13) * 1.1 + sin(z * 0.041) * 0.7,',
+    '              cos(z * 0.083) * 0.5);',
+    '}',
+    '/* density boost near braided current centrelines */',
+    'float currents(vec2 rl, float z){',
+    '  float g = 0.0;',
+    '  for (int k = 0; k < 3; k++){',
+    '    float fk = float(k) - 1.0;',
+    '    vec2 c = vec2(sin(z * 0.09 + fk * 2.3) * 1.5 + fk * 2.3,',
+    '                  cos(z * 0.061 + fk * 1.9) * 0.9 + fk * 0.55);',
+    '    vec2 d = rl - c;',
+    '    g += exp(-dot(d, d) * 0.7);',
+    '  }',
+    '  return g;',
+    '}',
+    '/* one depth-plane of light dashes; 3x3 neighbour cells so streaks never clip */',
+    'const float CS = 1.3;',
+    'vec2 layerLights(vec2 w, vec2 rd, float streak, float zs, float tw){',
+    '  vec2 acc = vec2(0.0);',
+    '  vec2 cell0 = floor(w / CS);',
+    '  for (int oy = -1; oy <= 1; oy++){',
+    '    for (int ox = -1; ox <= 1; ox++){',
+    '      vec2 cell = cell0 + vec2(float(ox), float(oy));',
+    '      float gate = h21(cell * 3.31 + zs);',
+    '      if (gate < 0.38) continue;             /* sparse: not every cell holds a light */',
+    '      vec2 rnd = h22(cell + zs * 0.173);',
+    '      vec2 lp = (cell + 0.15 + rnd * 0.7) * CS;',
+    '      vec2 d = w - lp;',
+    '      float along = dot(d, rd);',
+    '      float across = dot(d, vec2(-rd.y, rd.x));',
+    '      float sl = min(CS * 0.9, CS * streak * (0.35 + rnd.x * 0.65));',
+    '      float aw = 0.028 + rnd.y * 0.02;',
+    '      float b = exp(-along * along / (sl * sl) - across * across / (aw * aw));',
+    '      float lum = 0.25 + 0.75 * h21(cell * 1.71 + zs);',
+    '      lum *= 0.7 + 0.3 * sin(tw * (0.6 + rnd.y * 1.8) + rnd.x * 31.4);',
+    '      float pb = b * lum;',
+    '      acc += vec2(pb, pb * pb);',
+    '    }',
+    '  }',
+    '  return acc;',
+    '}',
+    'void main(){',
+    '  vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;',
+    '  float camZ = uCam;',
+    '  vec2 camP = path(camZ);',
+    '  vec2 vp = vec2(0.0, -0.12);',
+    '',
+    '  vec3 col = GROUND;',
+    '  float dc = length(uv - vp);',
+    '  col += DEEP * exp(-dc * dc * 2.6) * 0.30;   /* destination glow */',
+    '  col += CYAN * exp(-dc * dc * 10.0) * 0.05;',
+    '  float neb = vnoise(uv * 2.3 + vec2(uTime * 0.02, -uTime * 0.013)) * 0.6',
+    '            + vnoise(uv * 4.7 - vec2(uTime * 0.012, 0.0)) * 0.4;',
+    '  col += vec3(0.007, 0.02, 0.042) * neb;',
+    '  col += vec3(0.03, 0.08, 0.14) * exp(-abs(uv.y - vp.y) * 4.5) * 0.2;',
+    '',
+    '  /* radial speed rays, only awake at velocity */',
+    '  float ang = atan(uv.y - vp.y, uv.x - vp.x);',
+    '  float rays = vnoise(vec2(cos(ang), sin(ang)) * 5.0 + camZ * 0.7);',
+    '  rays = pow(rays, 3.0) * smoothstep(0.12, 0.8, dc);',
+    '  col += CYAN * rays * uVel * 0.4;',
+    '',
+    '  /* layered light-current field */',
+    '  float streak = 0.32 + uVel * 4.0;',
+    '  float acc = 0.0;',
+    '  float accW = 0.0;',
+    '  float axMask = smoothstep(0.05, 0.28, length(uv));  /* keep the convergence point clean */',
+    '  float base = floor(camZ / SP) * SP;',
+    '  for (int l = 0; l < 6; l++){',
+    '    float zP = base + SP * (float(l) + 1.0);',
+    '    float rel = zP - camZ;',
+    '    float fog = smoothstep(1.3, 4.6, rel) * (1.0 - smoothstep(FAR * 0.5, FAR, rel));',
+    '    if (fog < 0.004) continue;',
+    '    vec2 q = uv * rel;                 /* camera-centred plane coords */',
+    '    vec2 w = q + camP;                 /* world coords on this plane  */',
+    '    vec2 rl = w - path(zP);            /* position relative to path   */',
+    '    /* clear corridor along the flight axis + braided current density */',
+    '    float cur = smoothstep(0.25, 1.1, length(rl)) * (0.14 + currents(rl, zP) * 2.6);',
+    '    if (cur < 0.01) continue;',
+    '    float zs = mod(zP, 997.0);',
+    '    vec2 rd = normalize(q + vec2(0.0001, 0.0002));',
+    '    vec2 pb = layerLights(w, rd, streak, zs, uTime) * cur * fog * axMask;',
+    '    acc += pb.x;',
+    '    accW += pb.y;',
+    '  }',
+    '  col += CYAN * acc * 0.85 + vec3(0.85, 0.96, 1.0) * accW * 0.22;',
+    '',
+    '  col *= 1.0 + uVel * 0.35;          /* exposure lift with speed */',
+    '  col = 1.0 - exp(-col * 1.1);       /* filmic rolloff           */',
+    '  col += (h21(gl_FragCoord.xy + fract(uTime) * 61.7) - 0.5) * 0.012;',
+    '  col *= uFade;',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+  ].join('\n');
+
+  var gl = null, uni = {}, glOK = false;
+
+  function initGL() {
+    try {
+      gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false })
+        || canvas.getContext('experimental-webgl', { alpha: false });
+    } catch (e) { return false; }
+    if (!gl) return false;
+    function sh(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn('shader compile failed: ' + gl.getShaderInfoLog(s));
+        return null;
+      }
+      return s;
+    }
+    var v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS);
+    if (!v || !f) return false;
+    var p = gl.createProgram();
+    gl.attachShader(p, v); gl.attachShader(p, f); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      console.warn('program link failed: ' + gl.getProgramInfoLog(p));
+      return false;
+    }
+    gl.useProgram(p);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(p, 'aPos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    ['uRes', 'uTime', 'uCam', 'uVel', 'uFade'].forEach(function (n) {
+      uni[n] = gl.getUniformLocation(p, n);
+    });
+    return true;
+  }
+
+  function resize() {
+    if (!glOK) return;
+    /* half-resolution render, upscaled by CSS — glow field survives it happily */
+    var s = 0.5 * Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(2, Math.round(innerWidth * s));
+    canvas.height = Math.max(2, Math.round(innerHeight * s));
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+
+  glOK = !reduce && initGL();
+  if (!glOK) docEl.classList.add('static');
+  else {
+    resize();
+    addEventListener('resize', resize);
+    canvas.addEventListener('webglcontextlost', function (e) {
+      e.preventDefault();
+      glOK = false;
+      docEl.classList.add('static');
+    });
+  }
+
+  if (reduce) return; /* static sky, everything visible via CSS — no motion at all */
+
+  /* ------------ scroll flight + choreography ------------ */
+  function ss(a, b, x) {
+    x = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return x * x * (3 - 2 * x);
+  }
+
+  var smooth = 0, velS = 0, t0 = performance.now(), last = t0, raf = 0, fc = 0;
+
+  function choreo() {
+    var best = -1, bi = 0, ih = innerHeight;
+    for (var i = 0; i < stations.length; i++) {
+      var el = stations[i].firstElementChild;
+      var r = stations[i].getBoundingClientRect();
+      var c = r.top + r.height / 2 - ih / 2;
+      var p = Math.max(0, 1 - Math.abs(c) / (ih * 0.68));
+      var f = ss(0.05, 0.62, p);
+      el.style.opacity = f > 0.995 ? '1' : f.toFixed(3);
+      el.style.filter = f > 0.99 ? 'none' : 'blur(' + ((1 - f) * 7).toFixed(2) + 'px)';
+      el.style.transform = 'translate3d(0,' + (c * -0.10).toFixed(1) + 'px,0) scale(' + (0.95 + 0.05 * f).toFixed(4) + ')';
+      el.style.visibility = f < 0.015 ? 'hidden' : 'visible';
+      if (f > best) { best = f; bi = i; }
+    }
+    return bi;
+  }
+
+  function frame(t) {
+    raf = requestAnimationFrame(frame);
+    var dt = Math.min(50, t - last); last = t;
+    var max = Math.max(1, docEl.scrollHeight - innerHeight);
+    var target = (window.scrollY || window.pageYOffset || 0) / max;
+    var prev = smooth;
+    smooth += (target - smooth) * (1 - Math.pow(0.93, dt / 16.7));
+    var v = Math.abs(smooth - prev) * (16.7 / Math.max(1, dt));
+    velS += (Math.min(1, v * 60) - velS) * 0.14;
+    if (velS < 0.001) velS = 0;
+
+    var sec = (t - t0) / 1000;
+    var cam = smooth * 52 + sec * 0.5;
+    var fade = ss(0.06, 1, Math.min(1, (t - t0) / 1900));
+
+    if (glOK) {
+      gl.uniform2f(uni.uRes, canvas.width, canvas.height);
+      gl.uniform1f(uni.uTime, sec);
+      gl.uniform1f(uni.uCam, cam);
+      gl.uniform1f(uni.uVel, velS);
+      gl.uniform1f(uni.uFade, fade);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+
+    /* typography breathes with the flight */
+    docEl.style.setProperty('--ca', (velS * 6).toFixed(2) + 'px');
+    display.style.fontStretch = (125 - velS * 42).toFixed(1) + '%';
+
+    var bi = choreo();
+    if ((fc++ % 6) === 0) {
+      seqEl.textContent = 'SEQ 0' + (bi + 1) + ' / 06';
+      tz.textContent = '+' + ('00' + cam.toFixed(1)).slice(-5);
+      tv.textContent = velS.toFixed(2);
+      hint.classList.toggle('gone', smooth > 0.02);
+    }
+  }
+
+  raf = requestAnimationFrame(frame);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) cancelAnimationFrame(raf);
+    else { last = performance.now(); raf = requestAnimationFrame(frame); }
+  });
+})();
+</script>
