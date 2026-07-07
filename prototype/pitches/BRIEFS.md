@@ -128,4 +128,10 @@ signature mechanic of `02-pipeline.html` (the transforming event token):
 
 ## Verdict
 
-_(to fill after Nico reviews: which direction won, what to steal from the others)_
+**Winner: 01 — Stratigraph (2026-07-07, Nico's call).** The Descent ride stays the
+direction; the strata semantics (descent through the tech stack, layer-aware HUD) are
+adopted. The other five directions are dropped; their files are deleted from the working
+tree (recoverable from commits `a88586e` / `902441a`). `01-stratigraph.html` is the visual
+reference for the production implementation — next step: update the Descent spec
+(`docs/superpowers/specs/2026-07-02-descent-portfolio-design.md`) to the Stratigraph
+semantics and plan the real build.
