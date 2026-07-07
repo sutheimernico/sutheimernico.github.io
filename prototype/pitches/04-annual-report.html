@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Sutheimer, N. — Report No. 01 / 2026</title>
+<link rel="stylesheet" href="./fonts-cinema.css">
+<style>
+  /* ---------------------------------------------------------------------
+     04 — ANNUAL REPORT
+     BI applied to oneself: a printed personal data report, Feltron-style.
+     Light paper, one ink, one restrained accent. No dark terminal styling —
+     this pitch deliberately breaks the site's Kinetic Terminal identity.
+  --------------------------------------------------------------------- */
+
+  :root{
+    --paper: #F2EFE7;
+    --ink: #22241E;
+    --ink-08: rgba(34,36,30,.08);
+    --ink-15: rgba(34,36,30,.15);
+    --ink-30: rgba(34,36,30,.30);
+    --ink-35: rgba(34,36,30,.35);
+    --ink-45: rgba(34,36,30,.45);
+    --ink-60: rgba(34,36,30,.60);
+    --accent: #8A2F1E;
+
+    --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --page-margin: clamp(1.1rem, 4vw, 3.5rem);
+    --runhead-h: 46px;
+    --dur: 640ms;
+    --ease: cubic-bezier(.16,.8,.24,1);
+  }
+
+  *,*::before,*::after{ box-sizing: border-box; }
+  html{ color-scheme: light; }
+  html,body{ margin: 0; padding: 0; overflow-x: hidden; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-top: var(--runhead-h);
+  }
+  ::selection{ background: var(--accent); color: var(--paper); }
+  a{ color: inherit; }
+  h1,h2,h3{ margin: 0; }
+  p{ margin: 0; }
+  dl{ margin: 0; }
+
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .caption{
+    font-family: var(--font-mono);
+    font-size: .6875rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-60);
+  }
+
+  .hairline{
+    border: 0;
+    border-top: 1px solid var(--ink-15);
+    margin: 0;
+  }
+
+  .page{
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+    position: relative;
+  }
+
+  /* -------------------------- scroll reveal -------------------------- */
+  .reveal{ opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: no-preference){
+    .js .reveal{
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+      transition-delay: calc(var(--i, 0) * 60ms);
+    }
+    .js .reveal.is-visible{ opacity: 1; transform: none; }
+    html{ scroll-behavior: smooth; }
+  }
+
+  /* ----------------------- fixed print artifacts ---------------------- */
+  .frame{
+    position: fixed;
+    top: 10px; right: 10px; bottom: 10px; left: 10px;
+    border: 1px solid var(--ink-15);
+    pointer-events: none;
+    z-index: 3;
+  }
+  @media (max-width: 520px){ .frame{ inset: 6px; } }
+
+  .regmark{ position: fixed; width: 14px; height: 14px; pointer-events: none; z-index: 4; }
+  .regmark::before{ content:''; position:absolute; top:50%; left:0; right:0; height:1px; background: var(--ink-30); }
+  .regmark::after{ content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background: var(--ink-30); }
+  .regmark--tl{ top: 3px; left: 3px; }
+  .regmark--tr{ top: 3px; right: 3px; }
+  .regmark--bl{ bottom: 3px; left: 3px; }
+  .regmark--br{ bottom: 3px; right: 3px; }
+  @media (max-width: 520px){ .regmark{ display: none; } }
+
+  .spine{
+    position: fixed;
+    top: 50%;
+    right: 14px;
+    writing-mode: vertical-rl;
+    transform: translateY(-50%) rotate(180deg);
+    font-family: var(--font-mono);
+    font-size: .6875rem;
+    letter-spacing: .2em;
+    color: var(--ink-45);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 4;
+  }
+  @media (max-width: 900px){ .spine{ display: none; } }
+  @media (min-width: 901px){ .page{ padding-right: calc(var(--page-margin) + 44px); } }
+
+  .runhead{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--runhead-h);
+    padding-inline: var(--page-margin);
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink-15);
+    font-family: var(--font-mono);
+    font-size: .6875rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-60);
+  }
+  @media (prefers-reduced-motion: no-preference){
+    .js .runhead{ transform: translateY(-100%); transition: transform var(--dur) var(--ease); }
+    .js .runhead.is-active{ transform: translateY(0); }
+  }
+  .runhead-short{ display: none; }
+  @media (max-width: 480px){
+    .runhead-full{ display: none; }
+    .runhead-short{ display: inline; }
+  }
+  .runhead-chapter{ color: var(--accent); }
+
+  /* -------------------------------- toc -------------------------------- */
+  .toc{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1rem 1.4rem;
+    font-family: var(--font-mono);
+    font-size: .6875rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 0; margin: 0; list-style: none;
+  }
+  .toc a{
+    text-decoration: none;
+    color: var(--ink-60);
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+  }
+  .toc a:hover, .toc a:focus-visible{ color: var(--ink); border-color: var(--accent); }
+
+  /* ------------------------------- cover -------------------------------- */
+  .cover{
+    position: relative;
+    overflow: hidden;
+    min-height: calc(100vh - var(--runhead-h));
+    display: flex;
+    flex-direction: column;
+    padding-block: clamp(1.5rem, 4vw, 2.5rem) clamp(2rem, 6vw, 4rem);
+  }
+  .cover-meta{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+  }
+  .report-no{ white-space: nowrap; }
+
+  .cover-watermark{
+    position: absolute;
+    right: clamp(-2rem, -2vw, 1rem);
+    bottom: clamp(-4rem, -2vw, 0rem);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 70%;
+    font-size: clamp(9rem, 34vw, 24rem);
+    line-height: .8;
+    color: var(--ink-08);
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .cover-main{
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    padding-top: clamp(2rem, 8vw, 5rem);
+  }
+  .cover-title{
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 70%;
+    font-size: clamp(3.25rem, 13vw, 9.5rem);
+    line-height: .86;
+    letter-spacing: -.01em;
+    margin: 0;
+  }
+  .cover-title .line{ display: block; }
+  .cover-title .line--accent{ color: var(--accent); }
+
+  .cover-tagline{
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.15rem, 3vw, 1.6rem);
+    max-width: 22ch;
+    margin-top: clamp(1rem, 3vw, 1.75rem);
+  }
+  .cover-roles{
+    margin-top: 1.25rem;
+    max-width: 60ch;
+  }
+
+  .cover-foot{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    margin-top: clamp(2rem, 6vw, 3.5rem);
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink-15);
+  }
+
+  /* ------------------------------ chapters ------------------------------ */
+  .chapter{ padding-block: clamp(3rem, 9vw, 6.5rem); }
+  .chapter-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: .75rem 1.5rem;
+    padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+    border-bottom: 1px solid var(--ink-15);
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+  .chapter-title{
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 78%;
+    font-size: clamp(2rem, 6vw, 3.75rem);
+    letter-spacing: -.01em;
+    line-height: 1;
+  }
+
+  /* --------------------------- badges (stamps) --------------------------- */
+  .badge{
+    font-family: var(--font-mono);
+    font-size: .625rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    padding: .2em .55em;
+    border: 1px solid var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge--production{ background: var(--accent); color: var(--paper); }
+  .badge--wip{ background: transparent; color: var(--accent); }
+  .badge--internal{ background: transparent; color: var(--ink-45); border-color: var(--ink-30); }
+
+  /* ------------------------------ work entries ---------------------------- */
+  .entry{
+    display: grid;
+    grid-template-columns: 110px 1fr 220px;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: start;
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid var(--ink-15);
+  }
+  .entry:last-child{ border-bottom: 1px solid var(--ink-15); }
+  @media (max-width: 700px){
+    .entry{ grid-template-columns: 1fr; }
+    .entry-meta{ align-items: flex-start; text-align: left; margin-top: .75rem; }
+  }
+  .entry-index{
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 72%;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: .9;
+    color: var(--ink-30);
+    font-variant-numeric: tabular-nums;
+  }
+  .entry.is-production .entry-index{ color: var(--accent); }
+  .entry-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+    letter-spacing: -.01em;
+    margin: 0 0 .55rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .65rem;
+  }
+  .entry-summary{ margin: 0 0 .55rem; max-width: 58ch; }
+  .entry-role{
+    font-family: var(--font-mono);
+    font-size: .75rem;
+    letter-spacing: .04em;
+    color: var(--ink-60);
+    font-style: italic;
+  }
+  .entry-meta{
+    font-family: var(--font-mono);
+    font-size: .75rem;
+    color: var(--ink-60);
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .entry-stack{ letter-spacing: .06em; text-transform: uppercase; }
+  .entry-year{ font-variant-numeric: tabular-nums; color: var(--ink-45); }
+  .entry-repo a{
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+  .entry-repo a:hover{ color: var(--ink); }
+
+  .work-tally{ margin-top: clamp(1.5rem, 4vw, 2.5rem); }
+
+  /* ------------------------------ competence ------------------------------ */
+  .key-legend{
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem 1.5rem;
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+  }
+  .key-legend .sw{ display:inline-block; width:9px; height:9px; margin-right:.5em; vertical-align:middle; }
+  .key-legend .sw--ink{ background: var(--ink); }
+  .key-legend .sw--accent{ background: var(--accent); }
+
+  .figures{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+  @media (max-width: 820px){ .figures{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 420px){ .figures{ grid-template-columns: 1fr; } }
+  .figure{ border-top: 1px solid var(--ink-15); padding-top: 1rem; }
+  .figure-num{
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 72%;
+    font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+    line-height: .95;
+    letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .figure-label{ font-size: .6875rem; letter-spacing: .1em; text-transform: uppercase; margin-top: .4rem; }
+  .figure-caption{ font-family: var(--font-mono); font-size: .6875rem; color: var(--ink-60); margin-top: .35rem; max-width: 26ch; }
+
+  .spread{ margin-top: clamp(2.5rem, 6vw, 4rem); }
+  .spread-head{ display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .5rem 1rem; margin-bottom: 1rem; }
+
+  .statusbar{ display: flex; height: 14px; border: 1px solid var(--ink-15); overflow: hidden; }
+  .statusbar > span{ display: block; }
+  .statusbar > span:not(:last-child){ border-right: 2px solid var(--paper); }
+  .seg--production{ flex: 2 2 0; background: var(--ink); }
+  .seg--research{ flex: 3 3 0; background: rgba(34,36,30,.6); }
+  .seg--progress{ flex: 2 2 0; background: rgba(34,36,30,.35); }
+  .seg--internal{ flex: 1 1 0; background: transparent; border: 1px dashed var(--ink-45) !important; }
+
+  .statuslegend{
+    display: flex; flex-wrap: wrap; gap: .5rem 1.25rem;
+    margin-top: .65rem;
+    font-family: var(--font-mono); font-size: .6875rem; color: var(--ink-60);
+  }
+  .swatch{ display: inline-block; width: 9px; height: 9px; margin-right: .4em; vertical-align: middle; }
+  .swatch--production{ background: var(--ink); }
+  .swatch--research{ background: rgba(34,36,30,.6); }
+  .swatch--progress{ background: rgba(34,36,30,.35); }
+  .swatch--internal{ background: transparent; border: 1px dashed var(--ink-45); }
+
+  .toolbars{ margin-top: 1.1rem; display: flex; flex-direction: column; gap: .6rem; max-width: 480px; }
+  .toolbar-row{ display: grid; grid-template-columns: 92px 1fr 22px; gap: .75rem; align-items: center; font-size: .75rem; }
+  .toolbar-track{ height: 8px; background: var(--ink-08); }
+  .toolbar-fill{ height: 100%; background: var(--ink); }
+  .toolbar-count{ text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-45); }
+  .toolbars-note{ margin-top: .6rem; font-size: .6875rem; color: var(--ink-45); max-width: 480px; }
+
+  .skillgrid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.5rem 2rem;
+    margin-top: 1.4rem;
+  }
+  .skill{ border-top: 1px solid var(--ink-15); padding-top: .9rem; }
+  .skill-name{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0 0 .55rem;
+  }
+  .dotrow{ display: flex; gap: 4px; margin-bottom: .5rem; }
+  .dot{ width: 9px; height: 9px; border: 1px solid var(--ink-30); }
+  .dot.is-filled{ background: var(--accent); border-color: var(--accent); }
+  .skill-tag{
+    font-size: .625rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* -------------------------------- contact -------------------------------- */
+  .contact-mail{
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 74%;
+    font-size: clamp(1.9rem, 8vw, 4.75rem);
+    letter-spacing: -.01em;
+    line-height: 1.05;
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 2px solid transparent;
+    word-break: break-word;
+  }
+  .contact-mail:hover, .contact-mail:focus-visible{ color: var(--accent); border-color: var(--accent); }
+
+  .contact-lede{ margin-top: 1rem; max-width: 46ch; }
+
+  .colophon{
+    margin-top: clamp(2rem, 5vw, 3rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--ink-15);
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    row-gap: .85rem;
+    column-gap: 1.5rem;
+    font-size: .8125rem;
+  }
+  .colophon > div{ display: contents; }
+  .colophon dt{ text-transform: uppercase; letter-spacing: .1em; color: var(--ink-45); margin: 0; }
+  .colophon dd{ margin: 0; }
+  .colophon a{ color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+  .colophon a:hover{ color: var(--ink); }
+  @media (max-width: 560px){
+    .colophon{ grid-template-columns: 1fr; row-gap: 1.1rem; }
+    .colophon > div{ display: block; }
+    .colophon dt{ margin-bottom: .2rem; }
+  }
+
+  .report-foot{
+    text-align: center;
+    padding-block: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid var(--ink-15);
+  }
+</style>
+</head>
+<body>
+
+  <!-- decorative print artifacts: purely visual, never carry information -->
+  <div class="frame" aria-hidden="true"></div>
+  <div class="regmark regmark--tl" aria-hidden="true"></div>
+  <div class="regmark regmark--tr" aria-hidden="true"></div>
+  <div class="regmark regmark--bl" aria-hidden="true"></div>
+  <div class="regmark regmark--br" aria-hidden="true"></div>
+  <div class="spine" aria-hidden="true">SUTHEIMER — PERSONAL DATA REPORT — 2026</div>
+
+  <div class="runhead" aria-hidden="true">
+    <span>
+      <span class="runhead-full">SUTHEIMER, N. — REPORT NO. 01 / 2026</span>
+      <span class="runhead-short">N.S. — 01/2026</span>
+    </span>
+    <span class="runhead-chapter">COVER</span>
+  </div>
+
+  <main>
+
+    <!-- ============================== COVER ============================== -->
+    <section id="cover" class="cover page" data-chapter="COVER">
+      <div class="cover-watermark">01</div>
+
+      <div class="cover-meta">
+        <p class="caption report-no reveal" style="--i:0">Report No. 01 / 2026 — Personal Edition</p>
+        <nav class="toc reveal" aria-label="Report contents" style="--i:1">
+          <a href="#cover">00 · Cover</a>
+          <a href="#work">I · Work</a>
+          <a href="#competence">II · Competence</a>
+          <a href="#contact">III · Contact</a>
+        </nav>
+      </div>
+
+      <div class="cover-main">
+        <h1 class="cover-title reveal" style="--i:2">
+          <span class="line">Sutheimer,</span>
+          <span class="line line--accent">N.</span>
+        </h1>
+        <p class="cover-tagline reveal" style="--i:3">I turn raw data into decisions.</p>
+        <p class="caption cover-roles reveal" style="--i:4">
+          Data &amp; BI Engineer · Data Scientist · ML Engineer · AI Engineer · Fullstack Engineer
+        </p>
+      </div>
+
+      <div class="cover-foot reveal" style="--i:5">
+        <p class="caption">Eight projects on record — chapter I</p>
+        <p class="caption">Scroll to begin ↓</p>
+      </div>
+    </section>
+
+    <!-- ============================== WORK ================================ -->
+    <section id="work" class="chapter page" data-chapter="WORK">
+      <div class="chapter-head reveal" style="--i:0">
+        <h2 class="chapter-title">I — Work</h2>
+        <p class="caption">Case files 01–08, ordered as maintained</p>
+      </div>
+
+      <article class="entry is-production reveal" style="--i:0">
+        <div class="entry-index">01</div>
+        <div class="entry-body">
+          <h3 class="entry-title">After-Sales BI Platform <span class="badge badge--production">Production</span></h3>
+          <p class="entry-summary">The analytics backbone for after-sales — raw events to the KPIs the business runs on.</p>
+          <p class="entry-role">the backbone — bekumoo</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Azure · dbt · Airflow · Power BI</div>
+          <div class="entry-year">2024</div>
+        </div>
+      </article>
+
+      <article class="entry is-production reveal" style="--i:1">
+        <div class="entry-index">02</div>
+        <div class="entry-body">
+          <h3 class="entry-title">Grid Scout <span class="badge badge--production">Production</span></h3>
+          <p class="entry-summary">A self-operating German power-market intelligence system — price forecasts, battery backtests, and a measured LLM agent, running itself for 0 €.</p>
+          <p class="entry-role">self-operating, honestly measured</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Python · LightGBM · GitHub Actions · React · Ollama · MCP</div>
+          <div class="entry-year">2026</div>
+          <div class="entry-repo"><a href="https://github.com/sutheimernico/grid-scout" target="_blank" rel="noopener noreferrer">→ Repository</a></div>
+        </div>
+      </article>
+
+      <article class="entry reveal" style="--i:2">
+        <div class="entry-index">03</div>
+        <div class="entry-body">
+          <h3 class="entry-title">Equity Scout <span class="badge badge--wip">WIP</span></h3>
+          <p class="entry-summary">A local research harness that compares systematic strategies honestly — costs always on, no alpha promised.</p>
+          <p class="entry-role">research assistant, not advice</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Python · scikit-learn · CatBoost · FastAPI · React</div>
+          <div class="entry-year">2026</div>
+          <div class="entry-repo"><a href="https://github.com/sutheimernico/equity-scout" target="_blank" rel="noopener noreferrer">→ Repository</a></div>
+        </div>
+      </article>
+
+      <article class="entry reveal" style="--i:3">
+        <div class="entry-index">04</div>
+        <div class="entry-body">
+          <h3 class="entry-title">Signal Trader <span class="badge badge--wip">WIP</span></h3>
+          <p class="entry-summary">An honest paper-only backtest harness — point-in-time data, costs always on, failed experiments left visible.</p>
+          <p class="entry-role">an honest harness, not an edge</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Python · LightGBM · vectorbt · FastAPI · React</div>
+          <div class="entry-year">2026</div>
+          <div class="entry-repo"><a href="https://github.com/sutheimernico/signal-trader-demo" target="_blank" rel="noopener noreferrer">→ Repository</a></div>
+        </div>
+      </article>
+
+      <article class="entry reveal" style="--i:4">
+        <div class="entry-index">05</div>
+        <div class="entry-body">
+          <h3 class="entry-title">Scouting RAG <span class="badge badge--wip">WIP</span></h3>
+          <p class="entry-summary">Grounded Q&amp;A over scouting data — retrieval, re-ranking, and answers you can trust.</p>
+          <p class="entry-role">in-progress experiment</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Python · RAG · LLM · Vector DB</div>
+          <div class="entry-year">2025</div>
+        </div>
+      </article>
+
+      <article class="entry reveal" style="--i:5">
+        <div class="entry-index">06</div>
+        <div class="entry-body">
+          <h3 class="entry-title">Factotum <span class="badge badge--wip">WIP</span></h3>
+          <p class="entry-summary">A local-first task assistant: reads Asana and your files, acts only on confirmation, never sends data to a cloud model.</p>
+          <p class="entry-role">local-first, confirm-then-execute</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Python · Ollama · Qwen2.5 · Typer</div>
+          <div class="entry-year">2026</div>
+        </div>
+      </article>
+
+      <article class="entry reveal" style="--i:6">
+        <div class="entry-index">07</div>
+        <div class="entry-body">
+          <h3 class="entry-title">This Portfolio <span class="badge badge--wip">WIP</span></h3>
+          <p class="entry-summary">A kinetic-terminal portfolio — the site you're looking at, treated as a real project.</p>
+          <p class="entry-role">pipeline to pixel</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">Astro · React · TypeScript</div>
+          <div class="entry-year">2025</div>
+        </div>
+      </article>
+
+      <article class="entry reveal" style="--i:7">
+        <div class="entry-index">08</div>
+        <div class="entry-body">
+          <h3 class="entry-title">Data Quality Monitoring <span class="badge badge--internal">Internal</span></h3>
+          <p class="entry-summary">Continuous checks that catch broken data before a dashboard ever lies.</p>
+          <p class="entry-role">trust, by construction</p>
+        </div>
+        <div class="entry-meta">
+          <div class="entry-stack">dbt · tests · alerting</div>
+          <div class="entry-year">2024</div>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============================ COMPETENCE ============================ -->
+    <section id="competence" class="chapter page" data-chapter="COMPETENCE">
+      <div class="chapter-head reveal" style="--i:0">
+        <h2 class="chapter-title">II — Competence</h2>
+        <p class="caption">Key figures — measured and self-rated</p>
+      </div>
+
+      <p class="key-legend reveal" style="--i:0">
+        <span class="caption"><span class="sw sw--ink"></span>Ink — measured, from the case files</span>
+        <span class="caption"><span class="sw sw--accent"></span>Oxide — self-rated, demo data</span>
+      </p>
+
+      <div class="figures">
+        <div class="figure reveal" style="--i:0">
+          <div class="figure-num">08</div>
+          <p class="caption figure-label">Projects logged</p>
+          <p class="figure-caption">Shipped, researched, or maintained — see chapter I.</p>
+        </div>
+        <div class="figure reveal" style="--i:1">
+          <div class="figure-num">23</div>
+          <p class="caption figure-label">Distinct tools</p>
+          <p class="figure-caption">Unique stack entries counted across all eight case files.</p>
+        </div>
+        <div class="figure reveal" style="--i:2">
+          <div class="figure-num">2024–26</div>
+          <p class="caption figure-label">Active range</p>
+          <p class="figure-caption">Years spanned by the dated projects on record.</p>
+        </div>
+        <div class="figure reveal" style="--i:3">
+          <div class="figure-num">5 / 8</div>
+          <p class="caption figure-label">Run on Python</p>
+          <p class="figure-caption">Projects with Python somewhere in the stack.</p>
+        </div>
+      </div>
+
+      <div class="spread">
+        <div class="spread-head reveal" style="--i:0">
+          <p class="caption figure-label">Status distribution — 8 projects</p>
+        </div>
+        <div class="statusbar reveal" style="--i:1" role="img" aria-label="Of eight projects: two production, three work-in-progress, two more in progress, one internal">
+          <span class="seg--production"></span>
+          <span class="seg--research"></span>
+          <span class="seg--progress"></span>
+          <span class="seg--internal"></span>
+        </div>
+        <p class="statuslegend reveal" style="--i:2">
+          <span><span class="swatch swatch--production"></span>2 Production</span>
+          <span><span class="swatch swatch--research"></span>3 Research (WIP)</span>
+          <span><span class="swatch swatch--progress"></span>2 In-progress (WIP)</span>
+          <span><span class="swatch swatch--internal"></span>1 Internal</span>
+        </p>
+      </div>
+
+      <div class="spread">
+        <div class="spread-head reveal" style="--i:0">
+          <p class="caption figure-label">Most-used tools, by project count</p>
+        </div>
+        <div class="toolbars reveal" style="--i:1">
+          <div class="toolbar-row">
+            <span>Python</span>
+            <span class="toolbar-track"><span class="toolbar-fill" style="width:100%"></span></span>
+            <span class="toolbar-count">5</span>
+          </div>
+          <div class="toolbar-row">
+            <span>React</span>
+            <span class="toolbar-track"><span class="toolbar-fill" style="width:80%"></span></span>
+            <span class="toolbar-count">4</span>
+          </div>
+          <div class="toolbar-row">
+            <span>dbt</span>
+            <span class="toolbar-track"><span class="toolbar-fill" style="width:40%"></span></span>
+            <span class="toolbar-count">2</span>
+          </div>
+        </div>
+        <p class="toolbars-note reveal" style="--i:2">Tied at 2×, not shown above: LightGBM · FastAPI · Ollama.</p>
+      </div>
+
+      <div class="spread">
+        <div class="spread-head reveal" style="--i:0">
+          <p class="caption figure-label">Skill signal — self-rated, out of 10</p>
+        </div>
+        <div class="skillgrid">
+          <div class="skill reveal" style="--i:0">
+            <p class="skill-name">Data &amp; BI Engineer</p>
+            <div class="dotrow" role="img" aria-label="9 out of 10, self-rated">
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot"></span>
+            </div>
+            <p class="skill-tag">Demo data — self-rated</p>
+          </div>
+          <div class="skill reveal" style="--i:1">
+            <p class="skill-name">Data Scientist</p>
+            <div class="dotrow" role="img" aria-label="7 out of 10, self-rated">
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <p class="skill-tag">Demo data — self-rated</p>
+          </div>
+          <div class="skill reveal" style="--i:2">
+            <p class="skill-name">ML Engineer</p>
+            <div class="dotrow" role="img" aria-label="7 out of 10, self-rated">
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <p class="skill-tag">Demo data — self-rated</p>
+          </div>
+          <div class="skill reveal" style="--i:3">
+            <p class="skill-name">AI Engineer</p>
+            <div class="dotrow" role="img" aria-label="8 out of 10, self-rated">
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <p class="skill-tag">Demo data — self-rated</p>
+          </div>
+          <div class="skill reveal" style="--i:4">
+            <p class="skill-name">Fullstack Engineer</p>
+            <div class="dotrow" role="img" aria-label="6 out of 10, self-rated">
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot is-filled"></span><span class="dot is-filled"></span><span class="dot is-filled"></span>
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <p class="skill-tag">Demo data — self-rated</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== CONTACT ============================== -->
+    <section id="contact" class="chapter page" data-chapter="CONTACT">
+      <div class="chapter-head reveal" style="--i:0">
+        <h2 class="chapter-title">III — Contact</h2>
+        <p class="caption">Colophon</p>
+      </div>
+
+      <a class="contact-mail reveal" href="mailto:nico.sutheimer@bekumoo.de" style="--i:0">nico.sutheimer<br>@bekumoo.de</a>
+      <p class="contact-lede reveal" style="--i:1">Open to conversations about data platforms, ML systems, and the occasional honest backtest.</p>
+
+      <dl class="colophon reveal" style="--i:2">
+        <div><dt>Correspondence</dt><dd><a href="mailto:nico.sutheimer@bekumoo.de">nico.sutheimer@bekumoo.de</a></dd></div>
+        <div><dt>Repository</dt><dd><a href="https://github.com/sutheimernico" target="_blank" rel="noopener noreferrer">github.com/sutheimernico</a></dd></div>
+        <div><dt>Network</dt><dd>in/nico-sutheimer (soon)</dd></div>
+        <div><dt>Role</dt><dd>Data &amp; BI Engineer · Data Scientist · ML Engineer · AI Engineer · Fullstack Engineer</dd></div>
+        <div><dt>Typefaces</dt><dd>Archivo (display) · IBM Plex Mono (data)</dd></div>
+        <div><dt>Edition</dt><dd>Report No. 01 / 2026 — compiled in a browser, not a print shop</dd></div>
+      </dl>
+    </section>
+
+    <p class="report-foot caption">End of report — Sutheimer, N. — 2026</p>
+  </main>
+
+  <script>
+    (function(){
+      if(!('IntersectionObserver' in window)) return; // no IO: content stays statically visible
+
+      document.documentElement.classList.add('js');
+
+      var revealEls = document.querySelectorAll('.reveal');
+      var revealIO = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            entry.target.classList.add('is-visible');
+            revealIO.unobserve(entry.target);
+          }
+        });
+      }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
+      revealEls.forEach(function(el){ revealIO.observe(el); });
+
+      var runhead = document.querySelector('.runhead');
+      var cover = document.getElementById('cover');
+      if(runhead && cover){
+        var coverIO = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            runhead.classList.toggle('is-active', !entry.isIntersecting);
+          });
+        }, { threshold: 0 });
+        coverIO.observe(cover);
+      }
+
+      var chapterLabel = document.querySelector('.runhead-chapter');
+      var chapters = document.querySelectorAll('[data-chapter]');
+      if(chapterLabel && chapters.length){
+        var chapterIO = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            if(entry.isIntersecting){ chapterLabel.textContent = entry.target.getAttribute('data-chapter'); }
+          });
+        }, { threshold: 0, rootMargin: '-45% 0px -45% 0px' });
+        chapters.forEach(function(ch){ chapterIO.observe(ch); });
+      }
+    })();
+  </script>
+
+</body>
+</html>
