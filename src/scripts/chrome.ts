@@ -1,18 +1,18 @@
 /**
- * Page chrome + motion primitives, shared by every route.
+ * Page chrome + motion enhancements, shared by every route.
  *
  * Runs on `astro:page-load` (initial load AND every view-transition
  * navigation), so everything here is idempotent per page: observers are
- * rebuilt, window listeners are bound exactly once, and elements are
- * re-queried instead of cached across navigations.
+ * rebuilt, window listeners are bound exactly once, elements re-queried.
  *
- * Primitives (opt-in via data attributes, all reduced-motion aware):
- *   .reveal              fade/rise once when scrolled into view
- *   [data-stagger]       children get --i for CSS stagger delays
- *   [data-decode]        heading glyphs resolve left→right from noise on reveal
- *   [data-count]         integer counts up from 0 on reveal
- *   [data-typed]         rotating typed statement (JSON array of lines)
- *   [data-magnetic]      element leans toward a fine pointer, springs back
+ * Nothing here gates visibility. Scroll-entrance reveals are pure CSS
+ * (scroll-driven animations, see global.css); this script only adds the
+ * enhancements that need JS and degrade to plain content without it:
+ *   [data-stagger]   children get --i for CSS stagger offsets
+ *   [data-decode]    heading glyphs resolve left→right from noise when in view
+ *   [data-count]     integer counts up from 0 when in view
+ *   [data-magnetic]  element leans toward a fine pointer, springs back
+ *   nav: .solid past 60 px, aria-current on the section in view; progress bar
  */
 
 const GLYPHS = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&$/\\<>';
@@ -20,17 +20,15 @@ const GLYPHS = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&$/\\<>';
 const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-let revealIo: IntersectionObserver | null = null;
+let fxIo: IntersectionObserver | null = null;
 let navIo: IntersectionObserver | null = null;
-let typedTimer: ReturnType<typeof setTimeout> | null = null;
 let windowBound = false;
 
 export function initChrome(): void {
   bindWindowOnce();
   initStagger();
-  initReveal();
+  initEffects();
   initNav();
-  initTyped();
   initMagnetic();
   onScroll();
 }
@@ -40,7 +38,6 @@ export function initChrome(): void {
 function bindWindowOnce(): void {
   if (windowBound) return;
   windowBound = true;
-
   let ticking = false;
   const req = () => {
     if (ticking) return;
@@ -52,8 +49,6 @@ function bindWindowOnce(): void {
   };
   window.addEventListener('scroll', req, { passive: true });
   window.addEventListener('resize', req);
-
-  initCursorGlow();
 }
 
 function onScroll(): void {
@@ -66,39 +61,7 @@ function onScroll(): void {
   document.getElementById('nav')?.classList.toggle('solid', y > 60);
 }
 
-function initCursorGlow(): void {
-  if (reduce() || !finePointer()) return;
-  let tx = 0, ty = 0, cx = 0, cy = 0, shown = false;
-  let raf: number | null = null;
-
-  const loop = () => {
-    const glow = document.getElementById('cursorGlow');
-    cx += (tx - cx) * 0.14;
-    cy += (ty - cy) * 0.14;
-    if (glow) glow.style.transform = `translate(${cx}px,${cy}px)`;
-    raf = requestAnimationFrame(loop);
-  };
-  window.addEventListener('mousemove', (e) => {
-    tx = e.clientX;
-    ty = e.clientY;
-    if (!shown) {
-      shown = true;
-      const glow = document.getElementById('cursorGlow');
-      if (glow) glow.style.opacity = '1';
-    }
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      if (raf) cancelAnimationFrame(raf);
-      raf = null;
-    } else if (!raf) {
-      loop();
-    }
-  });
-  loop();
-}
-
-/* ---------- reveal / stagger / decode / count ---------- */
+/* ---------- stagger / decode / count ---------- */
 
 function initStagger(): void {
   document.querySelectorAll<HTMLElement>('[data-stagger]').forEach((group) => {
@@ -108,52 +71,44 @@ function initStagger(): void {
   });
 }
 
-function activate(el: HTMLElement): void {
-  el.classList.add('in');
-  const noMotion = reduce();
-  if (el.matches('[data-decode]')) decode(el, noMotion);
-  el.querySelectorAll<HTMLElement>('[data-decode]').forEach((h) => decode(h, noMotion));
-  el.querySelectorAll<HTMLElement>('[data-count]').forEach((n) => countUp(n, noMotion));
-}
-
-function initReveal(): void {
-  revealIo?.disconnect();
-  revealIo = null;
-  const els = document.querySelectorAll<HTMLElement>('.reveal:not(.in)');
+function initEffects(): void {
+  fxIo?.disconnect();
+  fxIo = null;
+  const els = document.querySelectorAll<HTMLElement>('[data-decode]:not([data-done]), [data-count]:not([data-done])');
+  if (els.length === 0) return;
+  const run = (el: HTMLElement) => {
+    el.dataset.done = '1';
+    if (el.hasAttribute('data-decode')) decode(el);
+    if (el.hasAttribute('data-count')) countUp(el);
+  };
   if (reduce()) {
-    els.forEach(activate);
+    els.forEach((el) => (el.dataset.done = '1'));
     return;
   }
-  revealIo = new IntersectionObserver(
+  fxIo = new IntersectionObserver(
     (entries) => {
       for (const en of entries) {
         if (!en.isIntersecting) continue;
-        activate(en.target as HTMLElement);
-        revealIo?.unobserve(en.target);
+        run(en.target as HTMLElement);
+        fxIo?.unobserve(en.target);
       }
     },
-    // Fire once the element's leading edge is ~10% of the viewport above the
-    // fold. A ratio threshold would never trigger for blocks taller than a few
-    // viewports (the project index on a phone), so this is edge-based instead.
     { threshold: 0, rootMargin: '0px 0px -10% 0px' },
   );
-  els.forEach((el) => revealIo!.observe(el));
+  els.forEach((el) => fxIo!.observe(el));
 }
 
 /** Resolve a heading's glyphs left→right from terminal noise. Text-only nodes. */
-function decode(el: HTMLElement, instant: boolean): void {
-  if (el.dataset.decoded) return;
-  el.dataset.decoded = '1';
+function decode(el: HTMLElement): void {
   const final = el.textContent ?? '';
-  if (instant || !final.trim()) return;
-
+  if (!final.trim()) return;
   const n = final.length;
   const dur = Math.min(900, 420 + n * 9);
   const start = performance.now();
   // Screen readers get the final text throughout; sighted users see the noise.
   el.setAttribute('aria-label', final);
-
   const tick = (now: number) => {
+    if (!el.isConnected) return;
     const t = Math.min(1, (now - start) / dur);
     const settled = Math.floor(t * n);
     let out = '';
@@ -162,9 +117,8 @@ function decode(el: HTMLElement, instant: boolean): void {
       out += i < settled || c === ' ' || c === '\n' ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
     }
     el.textContent = out;
-    if (t < 1) {
-      requestAnimationFrame(tick);
-    } else {
+    if (t < 1) requestAnimationFrame(tick);
+    else {
       el.textContent = final;
       el.removeAttribute('aria-label');
     }
@@ -172,16 +126,13 @@ function decode(el: HTMLElement, instant: boolean): void {
   requestAnimationFrame(tick);
 }
 
-function countUp(el: HTMLElement, instant: boolean): void {
+function countUp(el: HTMLElement): void {
   const target = parseInt(el.dataset.count ?? '', 10);
   if (Number.isNaN(target)) return;
-  if (instant) {
-    el.textContent = String(target);
-    return;
-  }
   const dur = 900;
   const start = performance.now();
   const tick = (now: number) => {
+    if (!el.isConnected) return;
     const t = Math.min(1, (now - start) / dur);
     const eased = 1 - Math.pow(1 - t, 3);
     el.textContent = String(Math.round(target * eased));
@@ -217,56 +168,6 @@ function initNav(): void {
     { rootMargin: '-42% 0px -54% 0px', threshold: 0 },
   );
   targets.forEach((t) => navIo!.observe(t));
-}
-
-/* ---------- typed statement ---------- */
-
-function initTyped(): void {
-  if (typedTimer) {
-    clearTimeout(typedTimer);
-    typedTimer = null;
-  }
-  const el = document.querySelector<HTMLElement>('[data-typed]');
-  if (!el) return;
-  let lines: string[] = [];
-  try {
-    lines = JSON.parse(el.dataset.typed ?? '[]');
-  } catch {
-    return;
-  }
-  const text = el.querySelector<HTMLElement>('.typed-text') ?? el;
-  if (lines.length < 2 || reduce()) {
-    text.textContent = lines[0] ?? text.textContent;
-    return;
-  }
-  // The full first line is server-rendered; the loop starts by erasing it.
-  let li = 0;
-  let ci = lines[0].length;
-  let deleting = true;
-  const step = () => {
-    const line = lines[li];
-    if (deleting) {
-      ci -= 1;
-      text.textContent = line.slice(0, ci);
-      if (ci <= 0) {
-        deleting = false;
-        li = (li + 1) % lines.length;
-        typedTimer = setTimeout(step, 380);
-      } else {
-        typedTimer = setTimeout(step, 18);
-      }
-      return;
-    }
-    ci += 1;
-    text.textContent = lines[li].slice(0, ci);
-    if (ci >= lines[li].length) {
-      deleting = true;
-      typedTimer = setTimeout(step, 3400);
-    } else {
-      typedTimer = setTimeout(step, 34 + Math.random() * 36);
-    }
-  };
-  typedTimer = setTimeout(step, 3600);
 }
 
 /* ---------- magnetic buttons ---------- */

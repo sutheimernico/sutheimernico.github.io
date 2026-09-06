@@ -1,8 +1,7 @@
 ---
 // ContactSection.astro
-// TODO(Nico): private e-mail + LinkedIn URL. The employer address was removed on
-// purpose (an application asset must not route replies through the current
-// employer) and a half-live LinkedIn placeholder reads worse than none.
+// Mail stays the address Nico chose (2026-09-06: he wants it on the site).
+// TODO(Nico): LinkedIn URL once the profile handle is final.
 ---
 
 <section id="contact" class="contact-sec">
@@ -20,6 +19,7 @@
       </div>
       <div class="term-body" data-stagger>
         <div><span class="cm"># reach out — pick a channel</span></div>
+        <div><span class="pr">&gt;</span> mail&nbsp;&nbsp;&nbsp;&nbsp;<a href="mailto:nico.sutheimer@bekumoo.de">nico.sutheimer@bekumoo.de</a></div>
         <div><span class="pr">&gt;</span> github&nbsp;&nbsp;<a href="https://github.com/sutheimernico" rel="noopener noreferrer">github.com/sutheimernico</a></div>
         <div><span class="pr">&gt;</span> source&nbsp;&nbsp;<a href="https://github.com/sutheimernico/sutheimernico.github.io" rel="noopener noreferrer">this site, as a repo</a></div>
         <div><span class="pr">&gt;</span> <span class="cur">_</span></div>
@@ -87,14 +87,17 @@
     font-family: var(--mono);
   }
 
-  /* lines print one after another once the terminal is revealed */
-  .term-body > div {
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
-    transition-delay: calc(0.2s + var(--i, 0) * 160ms);
+  /* lines print in as the terminal scrolls into view — CSS only, visible without JS */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .term-body > div {
+        animation: lineIn 1ms linear both;
+        animation-timeline: view();
+        animation-range: entry calc(10% + var(--i, 0) * 6%) entry calc(45% + var(--i, 0) * 6%);
+      }
+    }
   }
-  .reveal.in .term-body > div { opacity: 1; transform: none; }
+  @keyframes lineIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
 
   .pr {
     color: var(--accent);
@@ -133,6 +136,5 @@
 
   @media (prefers-reduced-motion: reduce) {
     .cur { animation: none; }
-    .term-body > div { opacity: 1; transform: none; transition: none; }
   }
 </style>

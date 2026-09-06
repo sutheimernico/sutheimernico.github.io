@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./descent.css";
 
 /*
   @theme inline: utilities emit var(--font-*) references instead of inlining the
@@ -90,9 +91,8 @@ html[data-theme="daylight"] {
 
 .theme-bar {
   position: fixed;
-  left: 50%;
+  right: 18px;
   bottom: 18px;
-  transform: translateX(-50%);
   z-index: 170;
   display: flex;
   align-items: center;
@@ -206,110 +206,12 @@ html.theming * {
     color var(--dur-slow) var(--ease-out) !important;
 }
 
-/* === cold boot === */
 
-.boot {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-  animation: bootOut 0.8s ease 3.4s forwards;
-}
-
-.boot.boot-skip {
-  animation: bootOut 0.45s ease forwards;
-}
-
-@keyframes bootOut {
-  to { opacity: 0; visibility: hidden; pointer-events: none; }
-}
-
-/* Scanline veil over the boot overlay */
-.boot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(var(--accent-rgb), 0.04) 0 1px,
-    transparent 1px 4px
-  );
-  animation: bootFlick 0.12s steps(2) infinite;
-}
-
-@keyframes bootFlick {
-  50% { opacity: 0.55; }
-}
-
-/* NS monogram in the boot overlay */
-.boot-mark {
-  width: 130px;
-  height: 130px;
-}
-
-.boot-mark path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.5));
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: bootDraw 2.6s ease-in-out forwards;
-}
-
-@keyframes bootDraw {
-  to { stroke-dashoffset: 0; }
-}
-
-.boot-log {
-  font-size: 12.5px;
-  line-height: 1.9;
-  color: var(--ink-dim);
-  width: min(420px, 80vw);
-  font-family: var(--mono);
-}
-
-.boot-ok {
-  color: var(--accent);
-}
-
-.boot-skip-hint {
-  position: absolute;
-  bottom: 26px;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--ink-faint);
-  text-transform: uppercase;
-  font-family: var(--mono);
-}
-
-/* Reduced-motion overrides for boot overlay */
-@media (prefers-reduced-motion: reduce) {
-  .boot {
-    animation: bootOut 0.3s ease 0.4s forwards;
-  }
-  .boot::after {
-    animation: none;
-  }
-  .boot-mark path {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
-}
-
-/* === end cold boot === */
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; line-height: 1.6; overflow-x: hidden; }
+html, body { overflow-x: clip; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; line-height: 1.6; }
 ::selection { background: rgba(var(--accent-rgb), 0.30); color: var(--ink); }
 
 /* skip-to-content link — off-screen until focused, then pinned top-left above
@@ -342,74 +244,22 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--m
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
-/* === global page chrome (grain, scanlines, aurora, cursor glow, progress) === */
-
-/* film grain — fixed SVG turbulence overlay; multiply + higher opacity on daylight */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 200;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-html[data-theme="daylight"] body::after { opacity: 0.06; mix-blend-mode: multiply; }
-
-/* scanlines — fixed repeating veil; lower opacity on daylight */
+/* === global page chrome (scanlines, progress) === */
+/* scanlines — one cheap repeating gradient, part of the terminal look. (Film grain, the
+   drifting blurred aurora and the blend-mode cursor glow were removed: full-viewport
+   layers composited over a moving 3D scene every frame.) */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 199;
-  opacity: 0.35;
+  opacity: 0.3;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0.04) 3px);
 }
-html[data-theme="daylight"] body::before { opacity: 0.15; }
+html[data-theme="daylight"] body::before { opacity: 0.12; }
 
-/* ambient aurora — drifting radial-gradient field behind content; follows theme/shift */
-.ambient {
-  position: fixed;
-  inset: -25vh -25vw;
-  z-index: -1;
-  pointer-events: none;
-  filter: blur(10px);
-  background:
-    radial-gradient(42vw 42vw at 16% 10%, rgba(var(--accent-rgb), 0.10), transparent 60%),
-    radial-gradient(48vw 48vw at 86% 26%, rgba(var(--accent-2-rgb), 0.08), transparent 62%),
-    radial-gradient(52vw 52vw at 62% 96%, rgba(var(--accent-3-rgb), 0.07), transparent 60%);
-  animation: drift 28s ease-in-out infinite alternate;
-}
-html[data-theme="daylight"] .ambient { opacity: 0.6; }
-@keyframes drift {
-  to { transform: translate3d(2.5%, -2.5%, 0) scale(1.08); }
-}
-
-/* cursor glow — lerp-follows pointer via rAF (see Base.astro); screen blend, multiply on daylight */
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 380px;
-  height: 380px;
-  margin: -190px 0 0 -190px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 150;
-  mix-blend-mode: screen;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  will-change: transform;
-  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.10), rgba(var(--accent-2-rgb), 0.04) 40%, transparent 65%);
-}
-html[data-theme="daylight"] .cursor-glow {
-  mix-blend-mode: multiply;
-  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.12), transparent 60%);
-}
-
-/* scroll progress bar — width driven by scroll position (see Base.astro) */
+/* scroll progress bar — width driven by scroll position (chrome.ts) */
 .progress {
   position: fixed;
   top: 0;
@@ -420,302 +270,33 @@ html[data-theme="daylight"] .cursor-glow {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.6);
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .ambient { animation: none !important; }
-  .cursor-glow { display: none; }
-}
-
 /* === end global page chrome === */
 
-/* === hero mercury === */
 
-.mercury {
-  position: relative;
-  display: grid;
-  place-items: center;
-  perspective: 800px;
-  min-height: 340px;
-}
 
-.mercury-tilt {
-  transform-style: preserve-3d;
-  transition: transform 0.15s ease-out;
-  will-change: transform;
-  position: relative;
-}
-
-.mercury svg {
-  width: clamp(230px, 32vw, 340px);
-  height: auto;
-  overflow: visible;
-  display: block;
-}
-
-.mercury .ring {
-  fill: none;
-  stroke: rgba(var(--accent-rgb), 0.14);
-  stroke-width: 0.8;
-}
-
-.mercury .ns-n {
-  fill: none;
-  stroke: url(#chrome);
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.55));
-}
-
-.mercury .ns-s {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 8.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 12px rgba(var(--accent-rgb), 0.55));
-  transform: translateZ(26px);
-}
-
-.mercury-spec {
-  position: absolute;
-  width: 190px;
-  height: 190px;
-  border-radius: 50%;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-html[data-theme="daylight"] .mercury-spec {
-  mix-blend-mode: multiply;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.10), transparent 60%);
-}
-
-/* === end hero mercury === */
-
-/* === data spine === */
-/*
-  This island is React-mounted, so it can't use Astro-scoped styles — its
-  selectors live here. `.eyebrow`, `.sec-title`, `.wrap`, `.chip` and `.reveal`
-  are shared shells used across every section; their single definition lives in
-  the "shared shells" block below. The italic `.p-tag` accent uses mono italic —
-  the site is mono-led (Kinetic Terminal), no serif typeface.
-*/
-.spine-sec { height: 360vh; position: relative; }
-.spine-sticky {
-  position: sticky; top: 0; height: 100vh;
-  display: grid; grid-template-columns: 1fr 1fr; align-items: center; overflow: hidden;
-}
-.spine-stage { perspective: 1100px; height: 100%; display: grid; place-items: center; }
-.spine { position: relative; width: 300px; height: 60vh; transform-style: preserve-3d; will-change: transform; }
-
-.vertebra {
-  position: absolute; left: 50%; top: 50%; width: 300px; height: 46px; margin: -23px 0 0 -150px;
-  transform-style: preserve-3d;
-  border: 1px solid var(--line); border-left: 3px solid var(--accent-soft); border-radius: 5px;
-  background: linear-gradient(98deg, rgba(var(--accent-2-rgb), 0.10), rgba(20, 22, 20, 0.22) 60%, rgba(var(--accent-rgb), 0.05));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -2px 6px rgba(0, 0, 0, 0.45);
-  display: flex; align-items: center; gap: 12px; padding: 0 16px;
-  font-size: 12px; letter-spacing: 0.06em; color: var(--ink-dim);
-  transition: border-color 0.3s, background 0.3s, box-shadow 0.3s, color 0.3s;
-}
-.vertebra .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-soft); transition: background 0.3s, box-shadow 0.3s; flex: 0 0 auto; }
-.vertebra .vlabel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.vertebra .vidx { margin-left: auto; font-size: 10px; color: var(--ink-faint); }
-.vertebra.active {
-  border-left-color: var(--accent); color: var(--ink);
-  background: linear-gradient(98deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-2-rgb), 0.08) 55%, rgba(var(--accent-3-rgb), 0.10));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 28px rgba(var(--accent-rgb), 0.25);
-}
-.vertebra.active .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-
-.spine-panel { padding: 0 8% 0 4%; }
-.spine-panel .eyebrow { margin-bottom: 18px; }
-.spine-panel .p-count { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.18em; }
-.spine-panel h3 { font-size: clamp(24px, 3.4vw, 38px); font-weight: 600; letter-spacing: -0.01em; margin: 10px 0 14px; min-height: 1.2em; }
-.spine-panel .p-tag { font-family: var(--mono); font-style: italic; color: var(--accent); letter-spacing: 0.04em; font-size: 20px; }
-.spine-panel p.p-desc { color: var(--ink-dim); font-size: 15px; margin-top: 14px; max-width: 42ch; }
-.spine-panel .p-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-.spine-panel .p-open {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 26px;
-  font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em;
-  color: var(--accent); text-decoration: none;
-  padding: 9px 16px; border-radius: 6px;
-  border: 1px solid var(--accent-soft);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
-}
-.spine-panel .p-open .p-open-arrow { transition: transform var(--dur-fast) var(--ease-out); }
-.spine-panel .p-open:hover {
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-  border-color: var(--accent);
-}
-.spine-panel .p-open:hover .p-open-arrow { transform: translateX(3px); }
-.spine-panel .p-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-
-.spine-intro { position: absolute; top: 11vh; left: 0; right: 0; text-align: center; z-index: 3; pointer-events: none; padding: 0 24px; }
-.spine-intro .eyebrow { justify-content: center; }
-
-/* shared shells the spine relies on (also styled scoped in HeroSection.astro) */
+/* === shared shells (used by every section) === */
 .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 .eyebrow { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent-soft); display: flex; align-items: center; gap: 12px; }
 .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent-soft); }
 .sec-title { font-size: clamp(26px, 4vw, 44px); font-weight: 600; letter-spacing: -0.02em; margin-top: 14px; text-wrap: balance; }
 .chip { font-size: 11px; letter-spacing: 0.05em; padding: 4px 11px; border: 1px solid var(--line); border-radius: 100px; color: var(--ink-dim); }
-.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.reveal.in { opacity: 1; transform: none; }
 
-@media (max-width: 840px) {
-  .spine-sec { height: 180vh; }
-  .spine-sticky { grid-template-columns: 1fr; }
-  .spine-panel { display: none !important; }
+/* Scroll-entrance reveal — pure CSS so content is never hidden behind JS.
+   Browsers without scroll-driven animations simply show everything. */
+.reveal { opacity: 1; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: revealIn 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 8% entry 42%;
+    }
+  }
 }
+@keyframes revealIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 
-@media (prefers-reduced-motion: reduce) {
-  .spine { transform: rotateX(-6deg) rotateY(-18deg) !important; }
-}
 
-/* === end data spine === */
 
-/* === project deck === */
-
-.deck-sec { padding: 16vh 0; }
-
-.deck-stage {
-  position: relative;
-  height: 460px;
-  margin-top: 50px;
-  perspective: 1300px;
-}
-
-.pcard {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 280px; height: 340px;
-  margin: -170px 0 0 -140px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-  background: linear-gradient(165deg, var(--surface-2), var(--bg-warm));
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 22px;
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, box-shadow 0.4s ease;
-  cursor: pointer;
-}
-
-.pcard .pc-top {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 150px;
-  background: radial-gradient(120% 100% at 30% 0%, rgba(var(--accent-rgb), 0.16), transparent 60%);
-}
-
-.pcard .pc-badge {
-  position: absolute;
-  top: 18px; right: 18px;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 4px 9px;
-  border-radius: 100px;
-  border: 1px solid var(--line);
-  color: var(--ink-dim);
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
-}
-
-.pcard .pc-badge.live {
-  color: var(--accent);
-  border-color: var(--accent-soft);
-}
-
-.pcard .pc-badge.wip {
-  color: var(--wip);
-  border-color: color-mix(in srgb, var(--wip) 50%, transparent);
-}
-
-.pcard h4 {
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.pcard .pc-meta {
-  font-size: 12px;
-  color: var(--ink-faint);
-  margin-top: 8px;
-  letter-spacing: 0.04em;
-}
-
-.pcard .pc-desc {
-  display: grid;
-  grid-template-rows: 0fr;
-  margin-top: 0;
-  opacity: 0;
-  transition:
-    grid-template-rows var(--dur-mid) var(--ease-out),
-    opacity var(--dur-mid) var(--ease-out),
-    margin-top var(--dur-mid) var(--ease-out);
-}
-
-.pcard .pc-desc > span {
-  min-height: 0;
-  overflow: hidden;
-  font-size: 13px;
-  color: var(--ink-dim);
-}
-
-/* Stretched link: the title anchor's ::after covers the whole card, so the
-   entire card is clickable while the card visuals (transform/box-shadow) stay
-   on the .pcard <article>. The anchor inherits the h4's type, no underline. */
-.pc-link {
-  color: inherit;
-  text-decoration: none;
-  outline: none;
-}
-.pc-link::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  border-radius: 10px;
-}
-.pc-link:focus-visible::after {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.25);
-}
-@media (forced-colors: active) {
-  .pc-link:focus-visible::after { outline: 2px solid Highlight; }
-}
-
-.pcard:hover,
-.pcard:focus-within {
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 30px rgba(var(--accent-rgb), 0.14);
-  z-index: 5 !important;
-}
-
-.pcard:hover .pc-desc,
-.pcard:focus-within .pc-desc {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  margin-top: 12px;
-}
-
-/* Cards are invisible until IO fires (.deck-stage gets .in) */
-.deck-stage:not(.in) .pcard { opacity: 0; }
-
-@media (prefers-reduced-motion: reduce) {
-  .pcard { transition: none; }
-}
-
-/* === end project deck === */
 
 /* === constellation === */
 
@@ -859,15 +440,18 @@ html[data-theme="daylight"] .mercury-spec {
 }
 .idx-row {
   border-bottom: 1px solid var(--line-soft);
-  opacity: 0;
-  transform: translateY(8px);
 }
-/* rows print in sequence once the block is revealed (and again per filter) */
-.reveal.in .idx-row {
-  animation: rowIn 420ms var(--ease-out) forwards;
-  animation-delay: calc(var(--i, 0) * 38ms);
+/* rows print in as they enter the viewport — CSS only, no JS gating */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .idx-row {
+      animation: rowIn 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
 }
-@keyframes rowIn { to { opacity: 1; transform: none; } }
+@keyframes rowIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 .idx-link {
   position: relative;
@@ -951,43 +535,9 @@ html[data-theme="daylight"] .mercury-spec {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .idx-row { opacity: 1; transform: none; }
-  .reveal.in .idx-row { animation: none; }
   .led { animation: none !important; }
 }
 
-/* === deck: cursor tilt + glare (inner wrapper keeps the fan transform intact) === */
-.pcard { perspective: 900px; }
-.pc-tilt {
-  position: absolute;
-  inset: 0;
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  transform-style: preserve-3d;
-  transition: transform 180ms var(--ease-out);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.pcard .pc-glare {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    220px 220px at var(--mx, 50%) var(--my, 50%),
-    rgba(255, 255, 255, 0.10),
-    transparent 70%
-  );
-  transition: opacity var(--dur-mid) var(--ease-out);
-}
-.pcard:hover .pc-glare { opacity: 1; }
-html[data-theme="daylight"] .pcard .pc-glare {
-  background: radial-gradient(220px 220px at var(--mx, 50%) var(--my, 50%), rgba(0, 0, 0, 0.06), transparent 70%);
-}
-/* the card itself no longer pads — the inner wrapper does */
-.pcard { padding: 0; display: block; }
 
 /* === live proof line === */
 .liveproof {
@@ -1012,10 +562,6 @@ html[data-theme="daylight"] .pcard .pc-glare {
 .liveproof > .led, .liveproof a > .led { margin-right: 8px; }
 .liveproof.ok { color: var(--ink); }
 .liveproof.bad { color: #e0645a; }
-
-/* The boot intro plays once per tab session (flag set pre-paint in Base.astro);
-   afterwards the SSR overlay must never flash before the island unmounts it. */
-html[data-booted] .boot { display: none; }
 @media (max-width: 520px) {
   /* the ID column is hidden on phones — hide its header label too */
   .idx-head > span:first-child { display: none; }

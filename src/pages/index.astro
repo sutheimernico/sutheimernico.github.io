@@ -3,10 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher';
-import ColdBoot from '../components/ColdBoot';
-import HeroSection from '../components/HeroSection.astro';
-import DataSpine from '../components/DataSpine';
-import ProjectDeck from '../components/ProjectDeck';
+import Descent from '../components/Descent.astro';
 import ProjectIndex from '../components/ProjectIndex';
 import Constellation from '../components/Constellation';
 import AboutSection from '../components/AboutSection.astro';
@@ -15,22 +12,16 @@ import SiteFooter from '../components/SiteFooter.astro';
 import { DOMAINS, topStack } from '../lib/domains';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const featured = projects.filter((p) => p.data.featured);
 
-const spineProjects = featured.map((p) => ({
-  title: p.data.title,
+const rideProjects = projects.map((p) => ({
   slug: p.id,
+  title: p.data.title,
   role: p.data.role,
   summary: p.data.summary,
   stack: p.data.stack,
-}));
-const deckProjects = featured.map((p) => ({
-  title: p.data.title,
-  slug: p.id,
   status: p.data.status,
-  year: p.data.year,
-  stack: p.data.stack,
-  summary: p.data.summary,
+  domain: p.data.domain,
+  context: p.data.context,
 }));
 const indexProjects = projects.map((p) => ({
   slug: p.id,
@@ -41,34 +32,18 @@ const indexProjects = projects.map((p) => ({
   summary: p.data.summary,
   domain: p.data.domain,
   context: p.data.context,
-  featured: p.data.featured,
+  featured: false, // every row carries its transition name — the ride panels have none
 }));
 
-const allStacks = projects.map((p) => p.data.stack);
-const tickerStack = topStack(allStacks, 18);
-const skills = topStack(allStacks, 16);
-
+const skills = topStack(projects.map((p) => p.data.stack), 16);
 const nLive = projects.filter((p) => p.data.status === 'production').length;
 const nWork = projects.filter((p) => p.data.context === 'work').length;
 ---
 <Base>
-  <ColdBoot client:load />
   <Nav />
 
   <main id="main">
-  <HeroSection stack={tickerStack} />
-
-  <DataSpine client:visible projects={spineProjects} />
-
-  <section class="deck-sec" id="projects">
-    <div class="wrap">
-      <div class="reveal">
-        <div class="eyebrow">Selected Projects</div>
-        <h2 class="sec-title" data-decode>Things that shipped — and things in flight.</h2>
-      </div>
-      <ProjectDeck client:visible projects={deckProjects} />
-    </div>
-  </section>
+  <Descent projects={rideProjects} />
 
   <section class="index-sec" id="index">
     <div class="wrap">
@@ -78,15 +53,13 @@ const nWork = projects.filter((p) => p.data.context === 'work').length;
           <h2 class="sec-title" data-decode>Everything on the bench.</h2>
         </div>
         <dl class="index-stats" aria-label="Portfolio totals">
-          <div><dt>projects</dt><dd><span data-count={projects.length}>0</span></dd></div>
-          <div><dt>in operation</dt><dd><span data-count={nLive}>0</span></dd></div>
-          <div><dt>domains</dt><dd><span data-count={DOMAINS.length}>0</span></dd></div>
-          <div><dt>at work</dt><dd><span data-count={nWork}>0</span></dd></div>
+          <div><dt>projects</dt><dd><span data-count={projects.length}>{projects.length}</span></dd></div>
+          <div><dt>in operation</dt><dd><span data-count={nLive}>{nLive}</span></dd></div>
+          <div><dt>domains</dt><dd><span data-count={DOMAINS.length}>{DOMAINS.length}</span></dd></div>
+          <div><dt>at work</dt><dd><span data-count={nWork}>{nWork}</span></dd></div>
         </dl>
       </div>
-      <div class="reveal">
-        <ProjectIndex client:visible projects={indexProjects} />
-      </div>
+      <ProjectIndex client:visible projects={indexProjects} />
     </div>
   </section>
 

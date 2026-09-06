@@ -1,0 +1,233 @@
+/* ============ Descent — the camera ride ============
+   Ported from prototype/descent/variant-b (approved 2026-07-02). Rules of the
+   road: transform/opacity only in the per-frame loop, no filter:blur on 3D
+   layers, no full-viewport blend-mode overlays, shadows capped. */
+
+/* the section is one viewport tall until the script measures the track */
+.ride-sec { position: relative; height: 100vh; height: 100svh; }
+html.no-ride .ride-sec { height: 100vh; }
+
+.viewport {
+  position: sticky; top: 0; height: 100vh; height: 100svh;
+  overflow: hidden;
+  animation: vpIn 0.6s ease-out 0.05s both;
+}
+@keyframes vpIn { from { opacity: 0; } }
+/* vignette */
+.viewport::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(120% 95% at 50% 46%, transparent 55%, rgba(4, 5, 4, 0.55) 100%);
+}
+html[data-theme="daylight"] .viewport::after {
+  background: radial-gradient(120% 95% at 50% 46%, transparent 60%, rgba(60, 62, 50, 0.25) 100%);
+}
+
+.stage { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 46%; }
+.world { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+
+/* floor grid — camera-fixed, the texture slides to fake infinite travel */
+.floor {
+  position: absolute; left: 50%; top: 50%; width: 1800px; height: 1400px; margin: -700px 0 0 -900px;
+  transform: rotateX(90deg) translateZ(-330px); overflow: hidden; pointer-events: none;
+}
+.floor::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, var(--bg) 4%, color-mix(in srgb, var(--bg) 16%, transparent) 42%, color-mix(in srgb, var(--bg) 70%, transparent) 100%);
+}
+.floor-grid {
+  position: absolute; left: 0; top: -240px; width: 100%; height: calc(100% + 480px); will-change: transform;
+  background:
+    repeating-linear-gradient(0deg, rgba(var(--accent-rgb), 0.10) 0 1px, transparent 1px 120px),
+    repeating-linear-gradient(90deg, rgba(var(--accent-rgb), 0.05) 0 1px, transparent 1px 120px);
+}
+.floor-grid .cline {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px;
+  background: repeating-linear-gradient(0deg, rgba(var(--accent-rgb), 0.25) 0 16px, transparent 16px 56px);
+}
+.tglow {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(30% 26% at 50% 46%, rgba(var(--accent-rgb), 0.075), transparent 70%);
+}
+html.perf-lite .tglow { display: none; }
+
+/* every element placed in depth */
+.zp { position: absolute; left: 50%; top: 50%; pointer-events: none; backface-visibility: hidden; }
+.zp.gone { visibility: hidden; }
+
+/* --- station 0: hero --- */
+.hero-a { text-align: center; width: max-content; max-width: 96vw; }
+.ride-eyebrow {
+  justify-content: center; margin-bottom: 26px; gap: 14px;
+  animation: fadeIn 0.5s var(--ease-out) 0.35s both;
+}
+.ride-eyebrow::after { content: ""; width: 26px; height: 1px; background: var(--accent-soft); }
+.role-wrap { display: inline-flex; align-items: center; justify-content: center; min-width: 200px; white-space: nowrap; }
+.role { color: var(--accent); }
+.role-cur { display: inline-block; width: 0.5em; height: 1em; margin-left: 2px; background: var(--accent); vertical-align: -0.08em; animation: blink 1.1s steps(1) infinite; }
+h1.name {
+  font-family: var(--disp); font-weight: 750; font-size: clamp(44px, 11.5vw, 182px);
+  line-height: 0.98; letter-spacing: -0.015em; color: var(--ink); margin: 0;
+  text-shadow: 0 0 26px rgba(var(--accent-rgb), 0.13);
+}
+h1.name .row { display: block; white-space: nowrap; }
+.ltr { display: inline-block; opacity: 0; animation: lIn 0.09s steps(1, end) forwards; }
+@keyframes lIn {
+  0%   { opacity: 1; color: var(--accent); text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.75); }
+  100% { opacity: 1; color: var(--ink); text-shadow: 0 0 26px rgba(var(--accent-rgb), 0.13); }
+}
+.hero-b { text-align: center; width: max-content; max-width: 92vw; margin-top: clamp(120px, 21vw, 300px); animation: fadeIn 0.55s var(--ease-out) 1.15s both; }
+.tagline { font-family: var(--mono); font-style: italic; font-size: clamp(16px, 2.1vw, 22px); color: var(--ink-dim); margin: 0; }
+.tagline b { color: var(--ink); font-weight: 500; }
+.hero-meta { margin: 16px 0 0; font-size: 12px; letter-spacing: 0.12em; color: var(--ink-faint); text-transform: uppercase; }
+.hero-meta .sep { color: var(--accent-soft); padding: 0 6px; }
+@keyframes fadeIn { from { opacity: 0; } }
+
+/* --- passage: project panels --- */
+.panel {
+  display: block; width: min(480px, 88vw); text-decoration: none; color: inherit;
+  border: 1px solid var(--line); border-left: 3px solid var(--accent-soft);
+  background: linear-gradient(168deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--bg-warm) 96%, transparent));
+  /* capped blur radius: this shadow re-rasterises with the panel on the close pass.
+     No CSS containment here: `contain: layout paint` made the panels unreachable for
+     hit-testing inside the perspective context (clicks landed on .stage). */
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+html.perf-lite .panel { box-shadow: none; }
+/* defocus veil for the fly-past: a panel-coloured wash on its own layer, opacity-only */
+.panel::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: color-mix(in srgb, var(--bg-warm) 55%, transparent); opacity: 0; transform: translateZ(0);
+  transition: opacity 0.4s var(--ease-out);
+}
+.panel.passed::before { opacity: 1; }
+.panel.on { border-left-color: var(--accent); box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), 0 0 22px rgba(var(--accent-rgb), 0.16); }
+html.perf-lite .panel.on { box-shadow: none; }
+.panel.reach { pointer-events: auto; cursor: pointer; }
+.panel.reach:hover, .panel:focus-visible { border-left-color: var(--accent); }
+.panel:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.panel.reach:hover .p-line .typed, .panel:focus-visible .p-line .typed { color: var(--ink); }
+
+.p-head {
+  display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--line-soft);
+  font-size: 11px; letter-spacing: 0.05em; color: var(--ink-faint); white-space: nowrap;
+}
+.p-head .led { width: 7px; height: 7px; border-radius: 50%; background: var(--line); flex: 0 0 auto; transition: background-color 0.3s, box-shadow 0.3s; }
+.panel.on .p-head .led { background: var(--accent); box-shadow: 0 0 9px var(--accent); }
+.p-head .path { overflow: hidden; text-overflow: ellipsis; }
+.badge {
+  margin-left: auto; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; padding: 3px 8px;
+  border: 1px solid var(--line); color: var(--ink-dim); opacity: 0.55; transition: opacity 0.3s;
+}
+.panel.on .badge { opacity: 1; }
+.badge.live { color: var(--accent); border-color: var(--accent-soft); }
+.badge.wip { color: var(--wip); border-color: color-mix(in srgb, var(--wip) 45%, transparent); }
+.p-body { display: block; padding: 18px 20px 16px; }
+.p-idx { display: block; font-size: 10.5px; letter-spacing: 0.22em; color: var(--ink-faint); text-transform: uppercase; }
+.p-idx b { color: var(--accent-soft); font-weight: 500; }
+.p-title { display: block; font-family: var(--disp); font-weight: 640; font-size: clamp(21px, 2.3vw, 27px); letter-spacing: -0.01em; margin: 9px 0 5px; color: var(--ink); }
+.p-role { display: block; font-size: 12.5px; font-style: italic; color: var(--accent-soft); }
+.panel.on .p-role { color: var(--accent); }
+.p-sum { display: block; margin-top: 10px; font-size: 13px; line-height: 1.6; color: var(--ink-dim); }
+.p-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.p-stack .chip { font-size: 10px; padding: 2px 9px; }
+.p-line { display: block; margin-top: 14px; padding-top: 11px; border-top: 1px dashed var(--line-soft); font-size: 11.5px; color: var(--accent); min-height: 1.7em; white-space: nowrap; overflow: hidden; }
+.p-line .dollar { color: var(--ink-faint); }
+/* the command "types in" via a steps() clip reveal one frame after activation */
+.p-line .typed { display: inline-block; clip-path: inset(-4px 100% -4px 0); transition: color 0.2s; }
+.panel.typing .p-line .typed { animation: typeRev 0.85s steps(34, end) 0.05s forwards; }
+@keyframes typeRev { to { clip-path: inset(-4px -4px -4px 0); } }
+.panel.typing .p-line .cur { opacity: 0; animation: curOn 1.1s 0.95s infinite; }
+@keyframes curOn { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+.cur { display: inline-block; width: 0.62em; height: 1.05em; background: var(--accent); vertical-align: text-bottom; animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* --- depth markers + gates --- */
+.mk { font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); white-space: nowrap; }
+.mk .plus { color: var(--accent-soft); margin-right: 8px; }
+.gate { width: min(920px, 94vw); height: min(560px, 72vh); border: 1px solid rgba(var(--accent-rgb), 0.3); }
+.gate i { position: absolute; width: 18px; height: 18px; border: 0 solid var(--accent); font-style: normal; }
+.gate i.tl  { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.gate i.tr  { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
+.gate i.bl2 { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
+.gate i.br  { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+.gate .glabel {
+  position: absolute; top: -9px; left: 50%; transform: translateX(-50%); padding: 0 12px; background: var(--bg);
+  font-size: 10.5px; letter-spacing: 0.26em; color: var(--accent-soft); text-transform: uppercase; white-space: nowrap;
+}
+
+/* ============ HUD (inside the sticky viewport) ============ */
+.bootlog {
+  position: absolute; top: 72px; left: 22px; z-index: 4; font-size: 10px; line-height: 1.9; letter-spacing: 0.08em;
+  color: var(--ink-faint); pointer-events: none; font-family: var(--mono);
+}
+.bootlog div { opacity: 0; animation: logIn 0.12s steps(1, end) forwards; }
+.bootlog div:nth-child(1) { animation-delay: 0.25s; }
+.bootlog div:nth-child(2) { animation-delay: 0.5s; }
+.bootlog div:nth-child(3) { animation-delay: 0.75s; }
+.bootlog .ok { color: var(--accent-soft); }
+@keyframes logIn { to { opacity: 0.8; } }
+
+.cue {
+  position: absolute; bottom: 86px; left: 50%; transform: translateX(-50%); z-index: 4;
+  font-size: 10.5px; letter-spacing: 0.3em; color: var(--ink-faint); text-transform: uppercase;
+  animation: fadeIn 0.5s var(--ease-out) 1.7s both; transition: opacity 0.4s; pointer-events: none;
+}
+.cue .arrow { display: inline-block; color: var(--accent-soft); animation: cueB 1.4s steps(2, start) infinite; }
+@keyframes cueB { 50% { transform: translateY(3px); opacity: 0.4; } }
+
+.hud-bot {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 4; display: flex; align-items: center; justify-content: center; gap: 18px;
+  padding: 14px 22px 16px; animation: hudBot 0.45s var(--ease-out) 0.45s both;
+  border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--bg) 78%, transparent), transparent);
+  font-size: 11px; letter-spacing: 0.14em; font-family: var(--mono);
+}
+@keyframes hudBot { from { opacity: 0; transform: translateY(10px); } }
+.g-depth { color: var(--ink-dim); white-space: nowrap; }
+/* inline-block + contain:paint: the per-frame digit swap invalidates only this box */
+.g-depth b { color: var(--accent); font-weight: 500; display: inline-block; min-width: 4ch; contain: paint; }
+.g-depth .max { color: var(--ink-faint); }
+.rail { position: relative; width: min(330px, 34vw); height: 14px; pointer-events: auto; }
+.rail::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 16px);
+  transform-origin: left center; animation: railIn 0.7s var(--ease-hard) 0.6s both;
+}
+@keyframes railIn { from { transform: scaleX(0); } }
+.rail .sdot {
+  position: absolute; top: 50%; width: 2px; height: 8px; margin: -4px 0 0 -1px; padding: 0; border: 0;
+  background: var(--accent-soft); opacity: 0.45; cursor: pointer;
+}
+.rail .sdot::after { content: ""; position: absolute; inset: -6px -5px; }
+.rail .sdot.here { background: var(--accent); opacity: 1; box-shadow: 0 0 8px var(--accent); }
+.rail .needle {
+  position: absolute; left: 0; top: 50%; width: 2px; height: 14px; margin: -7px 0 0 -1px; background: var(--accent);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.8); will-change: transform; pointer-events: none;
+}
+.g-stn { color: var(--ink-faint); white-space: nowrap; min-width: 23ch; max-width: 40ch; overflow: hidden; text-overflow: ellipsis; }
+.g-stn b { color: var(--ink-dim); font-weight: 500; }
+.g-stn.flash b { animation: stnF 0.35s steps(2, start); }
+@keyframes stnF { 50% { color: var(--accent); } }
+
+/* ============ responsive ============ */
+@media (max-width: 640px) {
+  .bootlog { display: none; }
+  .hud-bot { gap: 10px; padding: 12px 12px 14px; font-size: 9.5px; }
+  .rail { width: 26vw; }
+  .g-stn { min-width: 0; max-width: 34vw; }
+  .cue { bottom: 76px; }
+  .p-body { padding: 14px 16px 13px; }
+  .p-sum { font-size: 12px; }
+  .panel { width: 82vw; }
+}
+
+/* ============ flat mode: reduced motion / no 3D / script never ran ============ */
+@media (prefers-reduced-motion: reduce) {
+  .viewport { animation: none; }
+  .ltr { opacity: 1; animation: none; }
+  .ride-eyebrow, .hero-b, .cue, .hud-bot, .bootlog { animation: none; }
+}
+html.no-ride .hud-bot, html.no-ride .cue, html.no-ride .bootlog, html.no-ride .gate, html.no-ride .mk, html.no-ride .panel, html.no-ride .floor, html.no-ride .tglow { display: none; }
+/* before the script measures the track, nothing but the hero should show */
+html:not(.ride-live) .hud-bot, html:not(.ride-live) .cue { display: none; }

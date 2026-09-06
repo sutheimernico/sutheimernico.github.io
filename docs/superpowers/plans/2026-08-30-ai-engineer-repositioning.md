@@ -295,9 +295,30 @@ per project (not just two).
   the variable-font import, added under `src/types/`). Left as-is: `aria-pressed` filter chips
   (valid pattern), un-cancellable rAF loops in decode/count-up (≤900 ms, harmless).
 
+### Correction the same evening — landing rebuilt as Descent (v2.1)
+Nico rejected the v2 landing: "eine ganz alte, ganz schlechte Version" — the Kinetic-Terminal
+spine/deck layout he had already replaced in his mind with the **Descent camera ride** he chose
+on 2026-07-02 (windows approaching left/right, zoom, fly-through). He also reported a half-empty
+page (sections hidden behind a JS-gated `.reveal`), laggy animation, and wanted the contact mail
+back. Done in response:
+- `Descent.astro` + `scripts/descent.ts` + `lib/descent.ts` (+ tests) + `styles/descent.css`:
+  the prototype-B mechanic ported with **all 26 projects as panels** (order = `order` field),
+  entry/exit gates, depth markers, HUD gauge with clickable station dots, bootlog, role cycler,
+  letter boot. Sticky viewport inside a tall section, so index/skills/about/contact follow.
+  Loop sleeps when settled; perf probe adds `html.perf-lite` (no shadows/glow) on weak GPUs.
+- Removed: DataSpine, ProjectDeck, HeroSection (typed line + ticker), ColdBoot overlay,
+  HeroMercury, cursor glow, blurred ambient aurora, film grain, `deck.ts`. Shift mode is opt-in;
+  phosphor is the default.
+- Visibility no longer depends on JS anywhere: CSS scroll-driven reveals under `@supports`.
+- Contact mail restored (Nico's call). Four more projects added (tap-approve, vol-scout,
+  pulse-scout, incremental-game) → 26 entries. Nav: Work · Index · Skills · About · Contact.
+- Verified headless: 28 pages build, typecheck 0, 54 tests; ride at 1440×900 and 390×844,
+  reduced-motion flat mode, detail → back re-mounts the ride, scripted-scroll frame time
+  avg ≈19 ms / p95 ≈33 ms on a software renderer (no GPU) — a real GPU sits at 60 fps.
+
 ### Needs Nico
-- Merge/publish decision (public identity), wording veto (AI Engineer label, German H2, typed
-  statements), confidentiality check of the three bekumoo entries, `reviewed: true` pass.
+- Merge/publish decision (public identity), wording veto (AI Engineer label, German H2, the
+  hero role cycle), confidentiality check of the three bekumoo entries, `reviewed: true` pass.
 - Private e-mail + LinkedIn URL for the contact block.
 - Publish decisions for ml-lab / hugin / others (repo links), screenshots (B6), Stratigraph
   (Stage B of the July plan) remains a separate go.

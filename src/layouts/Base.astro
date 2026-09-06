@@ -49,9 +49,7 @@ const THEME_COLOR = '#0E0F0D';
   <ClientRouter />
 
   <script is:inline>
-    // Runs before first paint: restore the saved accent theme (prevents a theme
-    // flash) and remember whether the cold-boot intro already played this
-    // session (prevents it replaying on every return to the start page).
+    // Runs before first paint: restore the saved accent theme (prevents a theme flash).
     // The ClientRouter swap replaces every <html> attribute with the incoming
     // page's defaults, so the same restore runs again on astro:after-swap —
     // synchronously, before the new page paints.
@@ -64,7 +62,6 @@ const THEME_COLOR = '#0E0F0D';
             // 'shift' is a meta-theme (animated cycling); use phosphor as the dark base
             document.documentElement.dataset.theme = t === 'shift' ? 'phosphor' : t;
           }
-          if (sessionStorage.getItem('ns-booted')) document.documentElement.dataset.booted = '1';
         } catch (_) {}
       }
       restoreRoot();
@@ -77,19 +74,22 @@ const THEME_COLOR = '#0E0F0D';
        keyboard users jump past the fixed nav straight to the page content. -->
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Page-wide chrome: ambient aurora (behind content), cursor glow, scroll progress.
-       Persisted across view transitions so the glow loop and the aurora drift never
-       restart. Grain + scanlines are body::after / body::before in global.css. -->
-  <div class="ambient" aria-hidden="true" transition:persist="ambient"></div>
-  <div class="cursor-glow" id="cursorGlow" aria-hidden="true" transition:persist="glow"></div>
+  <!-- Scroll progress hairline, persisted across view transitions. Scanlines are
+       body::before in global.css. -->
   <div class="progress" id="progress" aria-hidden="true" transition:persist="progress"></div>
 
   <slot />
 
   <script>
     import { initChrome } from '../scripts/chrome';
-    // Fires on the initial load and after every client-side navigation.
-    document.addEventListener('astro:page-load', initChrome);
+    import { initDescent, destroyDescent } from '../scripts/descent';
+    // page-load fires on the initial load and after every client-side navigation;
+    // the ride's rAF loop is torn down before the old page is swapped out.
+    document.addEventListener('astro:page-load', () => {
+      initChrome();
+      initDescent();
+    });
+    document.addEventListener('astro:before-swap', destroyDescent);
   </script>
 </body>
 </html>

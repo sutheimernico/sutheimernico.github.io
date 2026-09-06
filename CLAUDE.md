@@ -14,9 +14,13 @@ it before touching code.
 - **Design**: "Kinetic Terminal" — dark warm black + a single phosphor-green accent (refined
   `#45E08A`, not stock neon `#33FF66`). Six switchable accent themes — **phosphor** (default),
   petrol, amethyst, solar, molten, daylight — plus an animated **"Shift" mode** that cross-fades
-  through the dark palettes (Nico's favorite; the default on first load). Visual source of truth:
-  `prototype/variant-shift.html` (committed on `feat/build-site`; **supersedes** the earlier
-  `variant-k.html`).
+  through the dark palettes (opt-in since 2026-09-06: its per-frame palette writes cost too much
+  next to the ride). **Landing = "Descent"** (Nico's choice 2026-07-02, rebuilt 2026-09-06 after
+  the Kinetic-Terminal-only landing was rejected): the scroll-driven camera ride from
+  `prototype/descent/variant-b.src.html` (branch `feat/descent-prototype`) with **projects as
+  the stations**. Spec: `docs/superpowers/specs/2026-07-02-descent-portfolio-design.md`
+  (skill-station level and chambers were NOT built — projects ride directly). Section styling
+  below the ride still follows `prototype/variant-shift.html`.
 - **Stack**: Astro + React islands + Tailwind v4 + TypeScript. Projects are an Astro content
   collection — adding a project means adding a Markdown file, not editing code (full how-to:
   "Adding a project" below). Each project also gets a detail page at `/projects/<slug>`.
