@@ -42,6 +42,7 @@ Global personal rules: `~/.claude/CLAUDE.md`.
 - `npm run dev` — dev server (http://localhost:4321).
 - `npm run build` — static output to `dist/` (what GitHub Pages serves).
 - `npx vitest run` — unit tests for `src/lib` + content schema.
+- `npm run typecheck` — `astro check` (TypeScript strict, enforced in CI alongside test + build).
 - `node scripts/og.mjs` — re-render `public/og.png` from `public/og.svg` after editing the card.
 - Visual checks: `npx astro preview` + `playwright-cli open http://localhost:4321/ --browser=chromium`
   (the default `chrome` channel is not installed on this machine).

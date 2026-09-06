@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { deckGeom } from '../lib/deck';
+import type { ProjectStatus } from '../lib/projectSchema';
 
 export interface DeckProject {
   title: string;
   slug: string;
-  status: 'production' | 'in-progress' | 'research' | 'internal';
+  status: ProjectStatus;
   year: string;
   stack: string[];
   summary: string;
@@ -15,7 +16,7 @@ interface Props {
 }
 
 // Badge label + CSS class per status
-const BADGE: Record<DeckProject['status'], { label: string; cls: string }> = {
+const BADGE: Record<ProjectStatus, { label: string; cls: string }> = {
   production: { label: 'Production', cls: 'live' },
   'in-progress': { label: 'In-progress', cls: 'wip' },
   research: { label: 'Research', cls: 'wip' },

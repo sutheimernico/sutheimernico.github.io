@@ -285,6 +285,15 @@ per project (not just two).
 - Headless Chromium (playwright-cli) at 1440×900 and 390×844: hero, spine, deck, index, skills,
   about, contact, detail page, prev/next, live-proof (real run data), theme persistence and
   boot-once across client-side navigation, magnetic + tilt transforms. Console clean.
+- Frontend review (subagent, against the built `dist/`): no bugs — view-transition names
+  unique (22/22), chrome script deduped by module URL, after-swap restore correct, Nav's
+  absolute hashes confirmed as scroll-only in Astro's router. Fixed from its should-fix list:
+  `ProjectStatus` imported instead of a duplicated union in `ProjectDeck`; the index's
+  `aria-live` moved from the whole list to a one-line "n of 22 shown" status node; TypeScript
+  strictness now actually enforced — `@astrojs/check` + `typescript` as devDependencies,
+  `npm run typecheck` (`astro check`) as a CI step (surfaced one missing module declaration for
+  the variable-font import, added under `src/types/`). Left as-is: `aria-pressed` filter chips
+  (valid pattern), un-cancellable rAF loops in decode/count-up (≤900 ms, harmless).
 
 ### Needs Nico
 - Merge/publish decision (public identity), wording veto (AI Engineer label, German H2, typed

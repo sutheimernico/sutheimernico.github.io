@@ -31,7 +31,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 /**
  * ProjectIndex — the complete list of projects as a filterable process table.
- * Rows re-mount on filter change (keyed by slug) so the CSS stagger replays.
+ * Rows are keyed by slug: ones newly shown by a filter change mount fresh and
+ * replay the CSS stagger; rows that stay visible keep their settled state.
  */
 export default function ProjectIndex({ projects }: Props) {
   const [filter, setFilter] = useState<FilterId>('all');
@@ -81,7 +82,12 @@ export default function ProjectIndex({ projects }: Props) {
         <span />
       </div>
 
-      <ol className="idx-list" aria-live="polite">
+      {/* One small live region instead of announcing every inserted row. */}
+      <p className="sr-only" aria-live="polite">
+        {rows.length} of {projects.length} projects shown
+      </p>
+
+      <ol className="idx-list">
         {rows.map((p, k) => {
           const s = STATUS[p.status];
           return (
