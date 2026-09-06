@@ -114,7 +114,7 @@ const SHARP_NEAR = -160;
 const SHARP_FAR = 900;
 /** panels dissolve on approach: gone by the time they reach the camera plane, so the
     fly-through never shows a huge half-transparent window over the next one */
-const PANEL_NEAR = 420;
+const PANEL_NEAR = 300; // panels stay sharp closer to the camera → they read larger
 /** far ghost panels are culled entirely beyond this so they stop being composited */
 const PANEL_CULL = 3400;
 
@@ -140,7 +140,7 @@ export function bandOpacity(kind: Kind, rel: number, mobile = false): number {
   if (kind !== 'mk') {
     const near = kind === 'panel' ? PANEL_NEAR : SHARP_NEAR;
     const dimF = kind === 'panel' ? 0.97 : 0.5;
-    const dimSpan = kind === 'panel' ? 380 : 300;
+    const dimSpan = kind === 'panel' ? 300 : 300;
     if (rel < near) op *= 1 - dimF * Math.min(1, (near - rel) / dimSpan);
     else if (rel > SHARP_FAR) op *= 1 - 0.25 * Math.min(1, (rel - SHARP_FAR) / 1100);
   }
