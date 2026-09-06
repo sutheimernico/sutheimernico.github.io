@@ -148,6 +148,13 @@ export default function ThemeSwitcher() {
     const saved = readSaved();
     applyTheme(saved, /* skipFlash */ true);
 
+    // This island is transition:persist-ed, so it survives client-side
+    // navigation — but the ClientRouter swap wipes every <html> attribute,
+    // including data-theme and the inline vars the shift loop writes. Re-apply
+    // the current theme synchronously after each swap so nothing flashes.
+    const onAfterSwap = () => applyTheme(readSaved(), /* skipFlash */ true);
+    document.addEventListener('astro:after-swap', onAfterSwap);
+
     const onKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName ?? '';
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -160,6 +167,7 @@ export default function ThemeSwitcher() {
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('astro:after-swap', onAfterSwap);
       // Clean up rAF on unmount.
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);

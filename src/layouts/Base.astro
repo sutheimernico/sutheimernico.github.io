@@ -52,15 +52,24 @@ const THEME_COLOR = '#0E0F0D';
     // Runs before first paint: restore the saved accent theme (prevents a theme
     // flash) and remember whether the cold-boot intro already played this
     // session (prevents it replaying on every return to the start page).
-    try {
-      var valid = ['phosphor','petrol','amethyst','solar','molten','daylight','shift'];
-      var t = localStorage.getItem('ns-theme2');
-      if (valid.indexOf(t) !== -1) {
-        // 'shift' is a meta-theme (animated cycling); use phosphor as the dark base
-        document.documentElement.dataset.theme = t === 'shift' ? 'phosphor' : t;
+    // The ClientRouter swap replaces every <html> attribute with the incoming
+    // page's defaults, so the same restore runs again on astro:after-swap —
+    // synchronously, before the new page paints.
+    (function () {
+      function restoreRoot() {
+        try {
+          var valid = ['phosphor','petrol','amethyst','solar','molten','daylight','shift'];
+          var t = localStorage.getItem('ns-theme2');
+          if (valid.indexOf(t) !== -1) {
+            // 'shift' is a meta-theme (animated cycling); use phosphor as the dark base
+            document.documentElement.dataset.theme = t === 'shift' ? 'phosphor' : t;
+          }
+          if (sessionStorage.getItem('ns-booted')) document.documentElement.dataset.booted = '1';
+        } catch (_) {}
       }
-      if (sessionStorage.getItem('ns-booted')) document.documentElement.dataset.booted = '1';
-    } catch (_) {}
+      restoreRoot();
+      document.addEventListener('astro:after-swap', restoreRoot);
+    })();
   </script>
 </head>
 <body>
