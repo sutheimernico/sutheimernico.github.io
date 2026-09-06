@@ -7,8 +7,18 @@ Global personal rules: `~/.claude/CLAUDE.md`.
 
 - This is a static, content-driven **Astro** site. **Astro renders; React islands add
   interaction only where JS state/effects are needed** (current islands: `ThemeSwitcher`,
-  `ColdBoot`, `HeroMercury`, `DataSpine`, `ProjectDeck`, `Constellation`). Default move: a new
-  section is an `.astro` component; reach for a `.tsx` island only when it genuinely needs runtime JS.
+  `ColdBoot`, `HeroMercury`, `DataSpine`, `ProjectDeck`, `ProjectIndex`, `Constellation`,
+  `LiveProof`). Default move: a new section is an `.astro` component; reach for a `.tsx` island
+  only when it genuinely needs runtime JS.
+- **Client-side routing is on** (`<ClientRouter />` in `Base.astro`): pages swap without a full
+  load, the project title morphs via matching `view-transition-name`s (`p-<slug>`), and `Nav`,
+  the theme switcher and the page chrome are `transition:persist`ed. Consequence: page-level JS
+  must run on `astro:page-load`, not on module load — `src/scripts/chrome.ts` is the one place
+  for that and is idempotent per page. The cold boot plays once per tab session
+  (`sessionStorage` flag → `html[data-booted]`).
+- **Motion primitives are opt-in data attributes** handled by `chrome.ts`: `.reveal`,
+  `[data-stagger]`, `[data-decode]`, `[data-count]`, `[data-typed]`, `[data-magnetic]`. Reuse
+  them instead of writing per-component observers; they all honour `prefers-reduced-motion`.
 - **Pure logic does not live in components.** Anything testable (kinetic-font math, theme
   resolution, scroll progress, counter formatting, content schema) lives in `src/lib/*.ts` and
   is unit-tested with Vitest. Components import from there.
@@ -30,8 +40,11 @@ Global personal rules: `~/.claude/CLAUDE.md`.
 ## Run / build / test
 
 - `npm run dev` — dev server (http://localhost:4321).
-- `npm run build` — static output to `dist/` (what Cloudflare Pages serves).
+- `npm run build` — static output to `dist/` (what GitHub Pages serves).
 - `npx vitest run` — unit tests for `src/lib` + content schema.
+- `node scripts/og.mjs` — re-render `public/og.png` from `public/og.svg` after editing the card.
+- Visual checks: `npx astro preview` + `playwright-cli open http://localhost:4321/ --browser=chromium`
+  (the default `chrome` channel is not installed on this machine).
 
 ## Best first edits
 

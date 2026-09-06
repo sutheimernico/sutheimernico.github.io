@@ -75,16 +75,22 @@ i.e. the URL and the entry id). Fill the front-matter, then write the body as a 
 ```markdown
 ---
 title: My New Project              # shown everywhere
-order: 5                           # display order, ascending, across spine + deck
+order: 5                           # display order, ascending, across spine + deck + index
 status: in-progress                # production | in-progress | research | internal
 year: "2026"                       # quoted string
-stack: ["Python", "FastAPI"]       # tech chips
-summary: One line shown on the deck card and the spine panel.
+stack: ["Python", "FastAPI"]       # tech chips (first 4 shown on cards/rows)
+summary: One line shown on the deck card, the spine panel and the index row.
 role: what it is to you            # the italic tag line, e.g. "the backbone — bekumoo"
-featured: true                     # include on the landing page
-# github: https://github.com/sutheimernico/my-repo   # OPTIONAL — uncomment + set a real URL
-                                                      # when the repo is public; the detail
-                                                      # page shows a GitHub button only if present
+featured: false                    # true = flagship: also in the spine + deck (keep to ~6)
+domain: ml                         # agents | ml | data | product — drives the index filter
+context: personal                  # personal | work (work = "@ bekumoo" chip in the index)
+reviewed: false                    # editorial flag only; Nico flips it after signing off
+fieldNote: "One honest finding."   # OPTIONAL — rendered as an aside on the detail page
+liveRepo: owner/repo               # OPTIONAL — public repo whose Actions history proves
+                                   # the system runs itself; renders the live-proof line
+# github: https://github.com/sutheimernico/my-repo   # OPTIONAL — set only when the repo is
+                                                      # public; the detail page shows a
+                                                      # GitHub button only if present
 ---
 
 ## What it is
@@ -105,12 +111,19 @@ Alternatives weighed, what was deliberately left out, and why.
 
 - **`status`** drives the badge: `production`→"Production" (accent), `in-progress`/`research`→
   amber "WIP", `internal`→neutral. Stick to the four enum values or the build fails.
-- **`order`** controls position in both spine and deck (lowest first). Renumber siblings if needed.
-- **`github`** is optional; leave it commented out until a real public URL exists — never invent one.
+- **`order`** controls position in spine, deck and index (lowest first). Renumber siblings if needed.
+  Convention: 1–9 flagships, 10–29 personal breadth, 30+ day-job entries.
+- **`featured`** defaults to false. Only flagships opt in — they populate the spine and the deck;
+  every project (featured or not) appears in the index table.
+- **`domain`** + **`context`** feed the index filter chips and the detail-page meta.
+- **`github`** is optional; leave it out until a real public URL exists — never invent one.
 - The body is rendered as the detail-page README. The `##` sections above are the house style
   (structure → rationale → implementation → trade-offs), not "how to install".
-- Content is **Claude drafts, Nico corrects** (see Locked decisions). Mark unfinished prose
-  `_(draft — Nico to refine)_`. No invented metrics/KPIs/confidential numbers.
+- Content is **Claude drafts, Nico corrects** (see Locked decisions). Drafts are flagged with
+  `reviewed: false` in the front-matter — **never** with a visible marker in the body (the old
+  `_(draft — Nico to refine)_` convention rendered on the live site and is abolished). Every
+  number in a body must be traceable: list the sources in an HTML comment at the end of the file.
+  No invented metrics/KPIs/confidential numbers.
 - No component edits, no route edits, no theme work needed — drop the file in and it's live.
 
 ## Design quality bar (every UI task)
