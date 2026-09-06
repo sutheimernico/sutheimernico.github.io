@@ -1,13 +1,15 @@
 ---
 title: "Data Quality Monitoring"
-order: 8
+order: 31
 status: internal
 year: "2024"
 stack: ["dbt", "tests", "alerting"]
 summary: "Continuous checks that catch broken data before a dashboard ever lies."
 role: "trust, by construction"
-featured: true
-# github: https://github.com/...   # fill in if/when public
+featured: false
+domain: data
+context: work
+reviewed: false
 ---
 
 ## What it is
@@ -51,5 +53,3 @@ prompts a question, a wrong dashboard erodes trust in every dashboard.
 - **dbt's native tests over a separate DQ tool.** Keeping checks in dbt means they live next to
   the transformations, version together, and run in the same pipeline — no second system to
   keep in sync with reality.
-
-_(draft — Nico to refine)_

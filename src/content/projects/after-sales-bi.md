@@ -1,13 +1,15 @@
 ---
 title: "After-Sales BI Platform"
-order: 1
+order: 6
 status: production
 year: "2024"
 stack: ["Azure", "dbt", "Airflow", "Power BI"]
 summary: "The analytics backbone for after-sales — raw events to the KPIs the business runs on."
 role: "the backbone — bekumoo"
 featured: true
-# github: https://github.com/...   # fill in if/when public
+domain: data
+context: work
+reviewed: false
 ---
 
 ## What it is
@@ -62,5 +64,3 @@ quirk of an upstream system into a KPI definition.
 - **dbt + Airflow over an all-in-one tool.** Splitting transformation (dbt) from orchestration
   (Airflow) keeps each tool doing what it's best at and avoids lock-in to a single vendor's
   modeling layer.
-
-_(draft — Nico to refine)_

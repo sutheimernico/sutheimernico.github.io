@@ -1,13 +1,15 @@
 ---
 title: "This Portfolio"
-order: 7
+order: 23
 status: in-progress
 year: "2025"
 stack: ["Astro", "React", "TypeScript"]
 summary: "A kinetic-terminal portfolio — the site you're looking at, treated as a real project."
 role: "pipeline to pixel"
-featured: true
-# github: https://github.com/...   # fill in if/when public
+featured: false
+domain: product
+context: personal
+reviewed: false
 ---
 
 ## What it is
@@ -57,5 +59,3 @@ mean the site scales with writing, not with engineering. The token-based theming
   point is a site that doesn't read as a generic AI/template build.
 - **Six themes + a shift mode is more than a portfolio needs.** Indulgent on purpose — the
   theme engine is itself a small demonstration of the token architecture.
-
-_(draft — Nico to refine)_

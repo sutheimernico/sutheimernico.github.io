@@ -1,6 +1,6 @@
 ---
 title: "Equity Scout"
-order: 3
+order: 2
 status: research
 year: "2026"
 stack: ["Python", "scikit-learn", "CatBoost", "FastAPI", "React"]
@@ -8,6 +8,9 @@ summary: "A local research harness that compares systematic strategies honestly 
 role: "research assistant, not advice"
 featured: true
 github: https://github.com/sutheimernico/equity-scout
+domain: ml
+context: personal
+reviewed: false
 ---
 
 ## What it is
@@ -80,5 +83,3 @@ because the failure mode of a tool like this is someone trusting it.
 - **Lower reported numbers, on purpose.** Charging realistic costs everywhere makes the headline
   figures smaller than a cost-free backtest would show. That's the honest number, and the honest
   number is the deliverable.
-
-_(draft — Nico to refine)_

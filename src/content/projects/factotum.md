@@ -1,13 +1,15 @@
 ---
 title: "Factotum"
-order: 6
+order: 12
 status: in-progress
 year: "2026"
 stack: ["Python", "Ollama", "Qwen2.5", "Typer"]
 summary: "A local-first task assistant: reads Asana and your files, acts only on confirmation, never sends data to a cloud model."
 role: "local-first, confirm-then-execute"
-featured: true
-# github: never — factotum is local-only by design and is intentionally never published
+featured: false
+domain: agents
+context: personal
+reviewed: false
 ---
 
 ## What it is
@@ -75,5 +77,3 @@ code has to carry the orchestration.
   that's safe and testable today.
 - **Reusable core, thin front end.** The logic lives independently of the CLI, so a later web UI
   would be a second front end rather than a rewrite — without over-building for it now.
-
-_(draft — Nico to refine)_

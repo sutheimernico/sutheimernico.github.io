@@ -7,7 +7,9 @@ stack: ["Python", "RAG", "LLM", "Vector DB"]
 summary: "Grounded Q&A over scouting data — retrieval, re-ranking, and answers you can trust."
 role: "in-progress experiment"
 featured: true
-# github: https://github.com/...   # fill in if/when public
+domain: agents
+context: personal
+reviewed: false
 ---
 
 ## What it is
@@ -57,5 +59,3 @@ first, then be strict about what actually informs the answer.
   but well-grounded answer beats a fast confident guess.
 - **Chunking is the quiet hard problem.** Chunk too large and retrieval gets noisy; too small
   and you lose context. Still being tuned — this is research, not a finished product.
-
-_(draft — Nico to refine)_

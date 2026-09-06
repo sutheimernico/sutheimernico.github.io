@@ -1,6 +1,6 @@
 ---
 title: "Grid Scout"
-order: 2
+order: 1
 status: production
 year: "2026"
 stack: ["Python", "LightGBM", "GitHub Actions", "React", "Ollama", "MCP"]
@@ -8,6 +8,9 @@ summary: "A self-operating German power-market intelligence system — price for
 role: "self-operating, honestly measured"
 featured: true
 github: https://github.com/sutheimernico/grid-scout
+domain: ml
+context: personal
+reviewed: false
 ---
 
 ## What it is
@@ -66,5 +69,3 @@ dashboard, not hidden.
   is the known next step; shipping with an honestly-labeled weakness beat shipping late.
 - **GitHub-only has limits.** Actions cron is best-effort and Pages is static — acceptable here,
   because the point is a self-operating *demonstration*, not a trading desk.
-
-_(draft — Nico to refine)_
