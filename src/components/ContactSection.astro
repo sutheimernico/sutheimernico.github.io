@@ -1,13 +1,15 @@
 ---
 // ContactSection.astro
-// linkedin handle is a placeholder — Nico to confirm real handle later
+// TODO(Nico): private e-mail + LinkedIn URL. The employer address was removed on
+// purpose (an application asset must not route replies through the current
+// employer) and a half-live LinkedIn placeholder reads worse than none.
 ---
 
 <section id="contact" class="contact-sec">
   <div class="wrap">
     <div class="contact-header reveal">
       <div class="eyebrow contact-eyebrow">Get in touch</div>
-      <h2 class="sec-title">Let's build something that reads the data right.</h2>
+      <h2 class="sec-title" data-decode>Let's build something that reads the data right.</h2>
     </div>
     <div class="term reveal">
       <div class="term-bar">
@@ -16,13 +18,10 @@
         <span class="d"></span>
         <span class="t">nico@portfolio: ~/contact</span>
       </div>
-      <div class="term-body">
+      <div class="term-body" data-stagger>
         <div><span class="cm"># reach out — pick a channel</span></div>
-        <div><span class="pr">&gt;</span> mail&nbsp;&nbsp;&nbsp;<a href="mailto:nico.sutheimer@bekumoo.de">nico.sutheimer@bekumoo.de</a></div>
-        <div><span class="pr">&gt;</span> github&nbsp;<a href="https://github.com/sutheimernico" rel="noopener noreferrer">github.com/sutheimernico</a></div>
-        <!-- LinkedIn is a placeholder: rendered as inert text (not a dead link) until Nico
-             confirms the real handle, then swap the span for an <a href="…">. -->
-        <div><span class="pr">&gt;</span> linkedin&nbsp;<span class="soon">in/nico-sutheimer <span class="soon-tag">(soon)</span></span></div>
+        <div><span class="pr">&gt;</span> github&nbsp;&nbsp;<a href="https://github.com/sutheimernico" rel="noopener noreferrer">github.com/sutheimernico</a></div>
+        <div><span class="pr">&gt;</span> source&nbsp;&nbsp;<a href="https://github.com/sutheimernico/sutheimernico.github.io" rel="noopener noreferrer">this site, as a repo</a></div>
         <div><span class="pr">&gt;</span> <span class="cur">_</span></div>
       </div>
     </div>
@@ -51,6 +50,7 @@
     overflow: hidden;
     max-width: 720px;
     margin: 0 auto;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
   }
 
   .term-bar {
@@ -87,6 +87,15 @@
     font-family: var(--mono);
   }
 
+  /* lines print one after another once the terminal is revealed */
+  .term-body > div {
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+    transition-delay: calc(0.2s + var(--i, 0) * 160ms);
+  }
+  .reveal.in .term-body > div { opacity: 1; transform: none; }
+
   .pr {
     color: var(--accent);
   }
@@ -99,10 +108,11 @@
     color: var(--ink);
     text-decoration: none;
     border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, color 0.2s;
   }
 
   .term-body a:hover {
+    color: var(--accent);
     border-bottom-color: var(--accent);
   }
 
@@ -110,16 +120,6 @@
     outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 3px;
-  }
-
-  /* placeholder channel — inert, visibly not-yet-live, kept out of the tab order */
-  .soon {
-    color: var(--ink-dim);
-  }
-  .soon-tag {
-    color: var(--ink-faint);
-    font-size: 0.85em;
-    letter-spacing: 0.04em;
   }
 
   .cur {
@@ -132,8 +132,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cur {
-      animation: none;
-    }
+    .cur { animation: none; }
+    .term-body > div { opacity: 1; transform: none; transition: none; }
   }
 </style>

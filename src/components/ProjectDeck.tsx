@@ -22,9 +22,13 @@ const BADGE: Record<DeckProject['status'], { label: string; cls: string }> = {
   internal: { label: 'Internal', cls: '' },
 };
 
+const TILT_DEG = 7;
+
 /**
  * Exploded project deck — cards start scattered off-screen and fan in on
  * entering the viewport. Mirrors the prototype's deck-building JS faithfully.
+ * On fine pointers each card additionally tilts toward the cursor with a
+ * specular glare (inner wrapper, so the fan transform on the card stays intact).
  */
 export default function ProjectDeck({ projects }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -106,15 +110,51 @@ export default function ProjectDeck({ projects }: Props) {
     };
   }, [projects.length]);
 
+  // Cursor tilt + glare: writes to the inner .pc-tilt so the fan transform on
+  // the card itself is untouched. Fine pointers only; reduced motion opts out.
+  useEffect(() => {
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!fine || reduce) return;
+
+    const cleanups: (() => void)[] = [];
+    cardRefs.current.forEach((card) => {
+      if (!card) return;
+      const inner = card.querySelector<HTMLElement>('.pc-tilt');
+      if (!inner) return;
+      const onMove = (e: PointerEvent) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        inner.style.transform = `rotateY(${(px * TILT_DEG * 2).toFixed(2)}deg) rotateX(${(-py * TILT_DEG * 2).toFixed(2)}deg)`;
+        inner.style.setProperty('--mx', `${((px + 0.5) * 100).toFixed(1)}%`);
+        inner.style.setProperty('--my', `${((py + 0.5) * 100).toFixed(1)}%`);
+      };
+      const onLeave = () => {
+        inner.style.transform = '';
+      };
+      card.addEventListener('pointermove', onMove);
+      card.addEventListener('pointerleave', onLeave);
+      cleanups.push(() => {
+        card.removeEventListener('pointermove', onMove);
+        card.removeEventListener('pointerleave', onLeave);
+      });
+    });
+    return () => cleanups.forEach((fn) => fn());
+  }, [projects.length]);
+
+  // Stacking depends only on the count, so it is safe to compute at render time
+  // (the width-dependent transforms stay in the effects above).
+  const stacking = deckGeom(900, projects.length).z;
+
   return (
     <div className="deck-stage" ref={stageRef}>
       {projects.map((p, i) => {
         const badge = BADGE[p.status];
-        // Cards nearer the center of the fan layer above the outer ones, so the
-        // spread reads as a deck with a clear front-to-back order for any count.
-        const center = (projects.length - 1) / 2;
-        const zIndex = projects.length - Math.round(Math.abs(i - center));
-        const meta = `${p.year} · ${p.stack.join(' · ')}`;
+        // Stacking order comes from the geometry: a deck (center in front) for
+        // up to four cards, a hand (left to right) beyond that — see lib/deck.ts.
+        const zIndex = stacking[i];
+        const meta = `${p.year} · ${p.stack.slice(0, 4).join(' · ')}`;
 
         return (
           <article
@@ -125,21 +165,25 @@ export default function ProjectDeck({ projects }: Props) {
               cardRefs.current[i] = el;
             }}
           >
-            <div className="pc-top" />
-            <span className={`pc-badge${badge.cls ? ` ${badge.cls}` : ''}`}>
-              {badge.label}
-            </span>
-            {/* Stretched link: the title is the link, and .pc-link stretches over
-                the whole card via CSS so the entire card is clickable. Accessible
-                name = project title (no duplicate sr-only label). */}
-            <h4>
-              <a className="pc-link" href={`/projects/${p.slug}`}>
-                {p.title}
-              </a>
-            </h4>
-            <div className="pc-meta">{meta}</div>
-            <div className="pc-desc">
-              <span>{p.summary}</span>
+            <div className="pc-tilt">
+              <div className="pc-top" />
+              <div className="pc-glare" aria-hidden="true" />
+              <span className={`pc-badge${badge.cls ? ` ${badge.cls}` : ''}`}>
+                {badge.label}
+              </span>
+              {/* Stretched link: the title is the link, and .pc-link stretches over
+                  the whole card via CSS so the entire card is clickable. Accessible
+                  name = project title (no duplicate sr-only label). The title also
+                  carries the view-transition name that morphs into the detail h1. */}
+              <h4 style={{ viewTransitionName: `p-${p.slug}` }}>
+                <a className="pc-link" href={`/projects/${p.slug}`}>
+                  {p.title}
+                </a>
+              </h4>
+              <div className="pc-meta">{meta}</div>
+              <div className="pc-desc">
+                <span>{p.summary}</span>
+              </div>
             </div>
           </article>
         );

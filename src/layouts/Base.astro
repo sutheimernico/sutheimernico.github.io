@@ -3,18 +3,17 @@ import '@fontsource-variable/martian-mono';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import { DEFAULT_THEME } from '../lib/themes';
 const {
-  title = 'Nico Sutheimer — Fullstack Engineer, Data & BI',
-  description = 'Fullstack engineer building data platforms end to end — pipeline to pixel.',
+  title = 'Nico Sutheimer — AI Engineer',
+  description = 'AI engineer building and operating ML-backed systems end to end — evaluation harnesses, honest statistics gates, live paper-trading ops, retrieval-augmented assistants.',
 } = Astro.props;
 
-// Absolute URLs for OG/Twitter need `site` (astro.config.mjs). It's a
-// placeholder until the deploy task sets the real domain; `new URL(…, Astro.site)`
-// yields a clean absolute URL once it does. Astro.url is the per-page request URL.
 const SITE_NAME = 'Nico Sutheimer';
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const ogImage = new URL('/og.svg', Astro.site).href;
+// PNG, not SVG: LinkedIn/X/Slack unfurlers do not render SVG previews.
+const ogImage = new URL('/og.png', Astro.site).href;
 // --bg warm-black (global.css :root) — kept in sync by hand; it's a single literal.
 const THEME_COLOR = '#0E0F0D';
 ---
@@ -39,7 +38,7 @@ const THEME_COLOR = '#0E0F0D';
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Nico Sutheimer — Fullstack Engineer, Data & BI" />
+  <meta property="og:image:alt" content="Nico Sutheimer — AI Engineer" />
 
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -47,15 +46,20 @@ const THEME_COLOR = '#0E0F0D';
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
 
+  <ClientRouter />
+
   <script is:inline>
-    // apply saved accent theme before first paint — prevents theme flash
+    // Runs before first paint: restore the saved accent theme (prevents a theme
+    // flash) and remember whether the cold-boot intro already played this
+    // session (prevents it replaying on every return to the start page).
     try {
-      const valid = ['phosphor','petrol','amethyst','solar','molten','daylight','shift'];
-      const t = localStorage.getItem('ns-theme2');
-      if (valid.includes(t)) {
+      var valid = ['phosphor','petrol','amethyst','solar','molten','daylight','shift'];
+      var t = localStorage.getItem('ns-theme2');
+      if (valid.indexOf(t) !== -1) {
         // 'shift' is a meta-theme (animated cycling); use phosphor as the dark base
         document.documentElement.dataset.theme = t === 'shift' ? 'phosphor' : t;
       }
+      if (sessionStorage.getItem('ns-booted')) document.documentElement.dataset.booted = '1';
     } catch (_) {}
   </script>
 </head>
@@ -65,76 +69,18 @@ const THEME_COLOR = '#0E0F0D';
   <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- Page-wide chrome: ambient aurora (behind content), cursor glow, scroll progress.
-       Grain + scanlines are body::after / body::before in global.css. -->
-  <div class="ambient" aria-hidden="true"></div>
-  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
-  <div class="progress" id="progress" aria-hidden="true"></div>
+       Persisted across view transitions so the glow loop and the aurora drift never
+       restart. Grain + scanlines are body::after / body::before in global.css. -->
+  <div class="ambient" aria-hidden="true" transition:persist="ambient"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true" transition:persist="glow"></div>
+  <div class="progress" id="progress" aria-hidden="true" transition:persist="progress"></div>
 
   <slot />
-  <script is:inline>
-    // Page chrome + scroll-entrance reveals. Single dependency-free block;
-    // everything guards prefers-reduced-motion (and coarse pointers for the glow).
-    (function () {
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // --- reveal-on-scroll: .reveal → .reveal.in ---
-      var els = document.querySelectorAll('.reveal');
-      if (reduce) {
-        els.forEach(function (el) { el.classList.add('in'); });
-      } else {
-        var io = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (en) {
-              if (en.isIntersecting) {
-                en.target.classList.add('in');
-                io.unobserve(en.target);
-              }
-            });
-          },
-          { threshold: 0.18 },
-        );
-        els.forEach(function (el) { io.observe(el); });
-      }
-
-      // --- cursor glow: lerp-follow the pointer (skip on reduced-motion / coarse pointer) ---
-      (function () {
-        var glow = document.getElementById('cursorGlow');
-        if (!glow || reduce || window.matchMedia('(pointer:coarse)').matches) return;
-        var tx = 0, ty = 0, cx = 0, cy = 0, shown = false, raf = null;
-        window.addEventListener('mousemove', function (e) {
-          tx = e.clientX; ty = e.clientY;
-          if (!shown) { shown = true; glow.style.opacity = '1'; }
-        });
-        function loop() {
-          cx += (tx - cx) * 0.14;
-          cy += (ty - cy) * 0.14;
-          glow.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
-          raf = requestAnimationFrame(loop);
-        }
-        loop();
-        document.addEventListener('visibilitychange', function () {
-          if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = null; }
-          else if (!raf) { loop(); }
-        });
-      })();
-
-      // --- scroll progress bar (rAF-throttled passive scroll handler) ---
-      (function () {
-        var progress = document.getElementById('progress');
-        if (!progress) return;
-        var ticking = false;
-        function update() {
-          var y = window.scrollY;
-          var h = document.documentElement.scrollHeight - window.innerHeight;
-          progress.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
-          ticking = false;
-        }
-        function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-        window.addEventListener('scroll', req, { passive: true });
-        window.addEventListener('resize', req);
-        update();
-      })();
-    })();
+  <script>
+    import { initChrome } from '../scripts/chrome';
+    // Fires on the initial load and after every client-side navigation.
+    document.addEventListener('astro:page-load', initChrome);
   </script>
 </body>
 </html>

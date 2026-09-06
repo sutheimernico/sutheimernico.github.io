@@ -1,22 +1,26 @@
 ---
 import NsMonogram from './NsMonogram.astro';
+// Copy: Claude draft 2026-09-06 (grounded in Nico's LinkedIn About text) — Nico
+// reviews wording before merge. No metrics, no confidential details.
 ---
 
 <section id="about" class="about-sec">
   <div class="wrap">
     <div class="reveal">
       <div class="eyebrow">About</div>
-      <h2 class="sec-title">Between the raw data and the decision.</h2>
+      <h2 class="sec-title" data-decode>Woher weiß ich, dass es funktioniert?</h2>
+      <p class="sec-sub">“How do I know it works?” — the first question I ask any AI system, and the one this whole portfolio tries to answer.</p>
     </div>
     <div class="about-grid reveal">
       <div class="about-portrait" aria-hidden="true">
         <NsMonogram />
         <span class="ap-meta">NS · identity</span>
       </div>
-      <div>
-        <p>I'm <b>Nico</b> — a data &amp; BI engineer building the after-sales analytics platform at <b>bekumoo</b>. I live in the layer between raw data and the decisions it should drive: orchestrating pipelines, modeling warehouses, and shipping the dashboards people actually open.</p>
-        <p>Lately I've been teaching <b>language models to reason over domain data</b> — a retrieval-augmented scouting assistant being the current playground. Solid in SQL, Python, TypeScript and Azure; frontend and React are my deliberate growth edge, and this site is part of that work.</p>
-        <p class="placeholder-note">— prototype copy, grounded but placeholder</p>
+      <div class="about-copy" data-stagger>
+        <p>I'm <b>Nico</b> — an engineer who builds software that actually uses AI in operation, not as a demo. My centre of gravity is <b>backend and data platforms</b> in Python and TypeScript, and the integration of <b>language models into systems someone has to rely on</b>.</p>
+        <p>I started with a dual degree in business informatics: three years of practice alongside the theory, so I didn't begin at zero after graduating. Today I work on a data platform at <b>bekumoo</b> — from modelling in dbt through FastAPI services on Azure to the React frontend.</p>
+        <p>What separates this from plain application development is the question I ask first: <b>how do I know it works?</b> So the private projects measure themselves — an LLM assistant with deterministic retrieval so it doesn't guess; a benchmark that pits three ML approaches against each other and publishes the result I didn't like; a RAG study that compares methods instead of asserting one.</p>
+        <p>A lot of things run daily without me: they collect, score, and only speak up when something is interesting. <b>Automation isn't a by-product — it's how I work.</b></p>
       </div>
     </div>
   </div>
@@ -25,6 +29,13 @@ import NsMonogram from './NsMonogram.astro';
 <style>
   .about-sec {
     padding: 14vh 0;
+  }
+
+  .sec-sub {
+    margin: 14px 0 0;
+    color: var(--ink-dim);
+    font-size: 15px;
+    max-width: 60ch;
   }
 
   .about-grid {
@@ -42,29 +53,35 @@ import NsMonogram from './NsMonogram.astro';
     }
   }
 
-  .about-grid p {
+  .about-copy p {
     color: var(--ink-dim);
     font-size: 16px;
     line-height: 1.75;
     font-family: var(--mono);
+    margin: 0;
   }
 
-  .about-grid p + p {
+  .about-copy p + p {
     margin-top: 18px;
   }
 
-  .about-grid b {
+  /* paragraphs cascade in once the block is revealed */
+  .about-copy p {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 110ms);
+  }
+  .reveal.in .about-copy p { opacity: 1; transform: none; }
+
+  .about-copy b {
     color: var(--ink);
     font-weight: 500;
   }
 
-  .placeholder-note {
-    color: var(--ink-faint) !important;
-    font-size: 13px !important;
-  }
-
   .about-portrait {
-    position: relative;
+    position: sticky;
+    top: 110px;
     width: 100%;
     aspect-ratio: 1;
     max-width: 240px;
@@ -97,6 +114,10 @@ import NsMonogram from './NsMonogram.astro';
     width: 60%;
     height: auto;
     overflow: visible;
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    50% { transform: translateY(-4px) scale(1.02); }
   }
 
   .ap-meta {
@@ -109,5 +130,10 @@ import NsMonogram from './NsMonogram.astro';
     color: var(--ink-faint);
     font-family: var(--mono);
     z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-portrait :global(svg) { animation: none; }
+    .about-copy p { opacity: 1; transform: none; transition: none; }
   }
 </style>

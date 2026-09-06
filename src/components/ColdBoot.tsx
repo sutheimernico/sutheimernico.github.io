@@ -52,11 +52,28 @@ export default function ColdBoot() {
     }
 
     setFading(true);
-    // Wait for the CSS fade-out (0.45s skip, 0.8s auto), then unmount
-    fadeOutRef.current = setTimeout(() => setVisible(false), 500);
+    // Wait for the CSS fade-out (0.45s skip, 0.8s auto), then unmount and
+    // remember for this tab session so navigating back here doesn't replay it.
+    fadeOutRef.current = setTimeout(() => {
+      setVisible(false);
+      try {
+        sessionStorage.setItem('ns-booted', '1');
+        document.documentElement.dataset.booted = '1';
+      } catch {
+        /* storage unavailable — the boot simply plays again next time */
+      }
+    }, 500);
   }
 
   useEffect(() => {
+    // Already booted this session (flag set pre-paint in Base.astro) — the
+    // overlay is display:none via CSS; unmount without playing anything.
+    if (document.documentElement.dataset.booted) {
+      doneRef.current = true;
+      setVisible(false);
+      return;
+    }
+
     // Detect prefers-reduced-motion on the client only
     const reduce =
       typeof window !== 'undefined' &&

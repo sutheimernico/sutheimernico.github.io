@@ -20,6 +20,9 @@ export const projectSchema = z.object({
   reviewed: z.boolean().default(false),
   // One or two honest sentences shown as an aside on the detail page.
   fieldNote: z.string().optional(),
+  // "owner/repo" whose public GitHub Actions history proves the system runs
+  // itself; the detail page renders a live status line when present.
+  liveRepo: z.string().regex(/^[\w.-]+\/[\w.-]+$/).optional(),
 });
 
 export type Project = z.infer<typeof projectSchema>;

@@ -1,5 +1,20 @@
 ---
 import HeroMercury from './HeroMercury';
+
+interface Props {
+  /** Stack labels for the ticker band, most frequent first (from the collection). */
+  stack: string[];
+}
+const { stack } = Astro.props;
+
+// Rotating statement under the name. The first line is server-rendered; the
+// chrome script types through the rest. Keep each line short enough for one
+// row on desktop.
+const STATEMENTS = [
+  'I turn raw data into decisions.',
+  'I ship ML systems that measure themselves.',
+  'I put language models to work — with evidence.',
+];
 ---
 
 <header class="hero" id="top">
@@ -7,22 +22,25 @@ import HeroMercury from './HeroMercury';
 
   <div class="wrap hero-inner">
     <!-- Left column: copy -->
-    <div class="hero-copy">
-      <div class="eyebrow">Data &amp; BI Engineer</div>
+    <div class="hero-copy" data-stagger>
+      <div class="eyebrow">AI Engineer · Backend &amp; ML Systems</div>
 
       <!-- Forged metallic headline; data-text drives the shine-sweep ::after -->
       <div class="forged" data-text={"NICO\nSUTHEIMER"}>NICO<br>SUTHEIMER</div>
 
-      <div class="hero-role">I turn raw data into decisions.</div>
+      <p class="hero-role" data-typed={JSON.stringify(STATEMENTS)}>
+        <span class="typed-text">{STATEMENTS[0]}</span><span class="typed-cursor" aria-hidden="true">▍</span>
+      </p>
 
       <p class="hero-sub">
-        Building the after-sales BI platform at bekumoo — pipelines, warehouses,
-        and, lately, language models that reason over domain data.
+        I build systems that put models to work and then check whether they were right —
+        evaluation harnesses, honest statistics gates, retrieval that cites its sources,
+        pipelines that run themselves. Day job: the data platform at bekumoo.
       </p>
 
       <div class="hero-cta">
-        <a class="btn primary" href="#work">View the work</a>
-        <a class="btn" href="#contact">Get in touch</a>
+        <a class="btn primary" href="#work" data-magnetic>View the work</a>
+        <a class="btn" href="#contact" data-magnetic>Get in touch</a>
       </div>
     </div>
 
@@ -35,6 +53,14 @@ import HeroMercury from './HeroMercury';
     <span class="line"></span>
   </div>
 </header>
+
+<!-- Stack ticker: the tools that appear most across the projects, derived from
+     the content collection, so it stays true as projects are added. -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    {[...stack, ...stack].map((s) => <span class="tk">{s}<i>◆</i></span>)}
+  </div>
+</div>
 
 <style>
   /* ---- layout ---- */
@@ -85,11 +111,27 @@ import HeroMercury from './HeroMercury';
     }
   }
 
-  /* ---- copy column ---- */
+  /* ---- copy column: staggered entrance once the boot lifts ---- */
   .hero-copy {
     display: flex;
     flex-direction: column;
     gap: 22px;
+  }
+
+  .hero-copy > * {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: heroIn 0.7s var(--ease-out) forwards;
+    /* boot overlay lifts at ~3.4s on a fresh session; already-booted sessions
+       skip the wait via html[data-booted] */
+    animation-delay: calc(3.2s + var(--i, 0) * 90ms);
+  }
+  :global(html[data-booted]) .hero-copy > * {
+    animation-delay: calc(0.1s + var(--i, 0) * 90ms);
+  }
+
+  @keyframes heroIn {
+    to { opacity: 1; transform: none; }
   }
 
   /* .eyebrow, .wrap, .reveal live in global.css (shared shells) */
@@ -171,8 +213,9 @@ import HeroMercury from './HeroMercury';
     70%, 100% { background-position: -150% 0; }
   }
 
-  /* ---- role + sub ---- */
-  /* Accent voice line — mono italic, but sized to read as a statement, not a label. */
+  /* ---- role (typed) + sub ---- */
+  /* Accent voice line — mono italic, sized to read as a statement, not a label.
+     min-height reserves the row(s) so typing never shifts the layout. */
   .hero-role {
     font-family: var(--mono);
     font-style: italic;
@@ -180,12 +223,25 @@ import HeroMercury from './HeroMercury';
     letter-spacing: 0.04em;
     line-height: 1.4;
     color: var(--ink);
+    min-height: 1.4em;
+    margin: 0;
   }
+  @media (max-width: 640px) {
+    .hero-role { min-height: 2.8em; }
+  }
+
+  .typed-cursor {
+    color: var(--accent);
+    font-style: normal;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
 
   .hero-sub {
     color: var(--ink-dim);
     font-size: 15px;
-    max-width: 46ch;
+    max-width: 48ch;
+    margin: 0;
   }
 
   /* ---- CTAs ---- */
@@ -205,13 +261,16 @@ import HeroMercury from './HeroMercury';
     border: 1px solid var(--line);
     color: var(--ink);
     text-decoration: none;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    /* transform is driven by the magnetic pointer follow (chrome.ts) */
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s,
+      transform 220ms var(--ease-out);
   }
 
   .btn:hover {
     border-color: var(--accent-soft);
     color: var(--accent);
   }
+  .btn:active { transform: scale(0.97) !important; }
 
   .btn.primary {
     background: var(--accent);
@@ -260,12 +319,58 @@ import HeroMercury from './HeroMercury';
     50%       { opacity: 1;   transform: scaleY(1); }
   }
 
+  /* ---- stack ticker ---- */
+  .ticker {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+    padding: 12px 0;
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    gap: 0;
+    animation: tickerRun 46s linear infinite;
+  }
+  .ticker:hover .ticker-track { animation-play-state: paused; }
+  .tk {
+    display: inline-flex;
+    align-items: center;
+    gap: 22px;
+    padding-right: 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    white-space: nowrap;
+  }
+  .tk i {
+    font-style: normal;
+    font-size: 7px;
+    color: var(--accent-soft);
+  }
+  @keyframes tickerRun {
+    to { transform: translateX(-50%); }
+  }
+
   /* ---- reduced motion ---- */
   @media (prefers-reduced-motion: reduce) {
     .hero-aurora,
     .forged::after,
-    .scroll-cue .line {
+    .scroll-cue .line,
+    .typed-cursor,
+    .ticker-track {
       animation: none !important;
     }
+    .hero-copy > * {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .ticker-track { flex-wrap: wrap; width: auto; justify-content: center; row-gap: 8px; }
   }
 </style>

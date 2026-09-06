@@ -751,3 +751,272 @@ html[data-theme="daylight"] .mercury-spec {
 }
 
 /* === end constellation === */
+
+/* === view transitions === */
+/* Root crossfade kept short; the project title morphs between deck/index and
+   the detail page via matching view-transition-names. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-in-out, cubic-bezier(0.77, 0, 0.175, 1));
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* === status LED (index rows, live proof) === */
+.led {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  flex: 0 0 auto;
+}
+.live .led, .ok .led {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.8);
+  animation: ledPulse 2.4s ease-in-out infinite;
+}
+.wip .led { background: var(--wip); }
+.bad .led { background: #e0645a; }
+@keyframes ledPulse {
+  50% { box-shadow: 0 0 2px rgba(var(--accent-rgb), 0.3); opacity: 0.7; }
+}
+
+/* === project index (process table) === */
+.idx { margin-top: 36px; }
+
+.idx-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.idx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out), transform 120ms var(--ease-out);
+}
+.idx-chip:hover { border-color: var(--accent-soft); color: var(--ink); }
+.idx-chip:active { transform: scale(0.97); }
+.idx-chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.idx-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.idx-n {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--ink-faint) 25%, transparent);
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+.idx-chip[aria-pressed="true"] .idx-n { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); }
+
+/* shared column grid for header + rows */
+.idx-head,
+.idx-link {
+  display: grid;
+  grid-template-columns: 40px 104px minmax(0, 1.7fr) 150px minmax(0, 1.3fr) 52px 22px;
+  gap: 16px;
+  align-items: center;
+}
+.idx-head {
+  padding: 0 16px 10px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--line);
+}
+
+.idx-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.idx-row {
+  border-bottom: 1px solid var(--line-soft);
+  opacity: 0;
+  transform: translateY(8px);
+}
+/* rows print in sequence once the block is revealed (and again per filter) */
+.reveal.in .idx-row {
+  animation: rowIn 420ms var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 38ms);
+}
+@keyframes rowIn { to { opacity: 1; transform: none; } }
+
+.idx-link {
+  position: relative;
+  padding: 14px 16px;
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 13px;
+  border-left: 2px solid transparent;
+  transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+/* hover sweep: an accent wash that grows from the left edge */
+.idx-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.10), transparent 60%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-mid) var(--ease-out);
+  pointer-events: none;
+}
+.idx-link:hover, .idx-link:focus-visible { border-left-color: var(--accent); outline: none; }
+.idx-link:hover::before, .idx-link:focus-visible::before { transform: scaleX(1); }
+.idx-link:focus-visible .idx-name { text-decoration: underline; text-decoration-color: var(--accent); }
+
+.idx-id { color: var(--ink-faint); font-size: 11px; letter-spacing: 0.1em; }
+.idx-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.idx-status.live { color: var(--accent); }
+.idx-status.wip { color: var(--wip); }
+.idx-title { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.idx-name {
+  font-family: var(--disp);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.idx-link:hover .idx-name { color: var(--accent); }
+.idx-sum {
+  font-size: 12px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.idx-domain { font-size: 11px; letter-spacing: 0.08em; color: var(--ink-dim); }
+.idx-stack {
+  font-size: 11px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.idx-year { font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.idx-arrow {
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.idx-link:hover .idx-arrow, .idx-link:focus-visible .idx-arrow { opacity: 1; transform: none; }
+
+@media (max-width: 900px) {
+  .idx-head, .idx-link { grid-template-columns: 32px 96px minmax(0, 1fr) 22px; gap: 12px; }
+  .idx-c-domain, .idx-c-stack, .idx-c-year { display: none; }
+}
+@media (max-width: 520px) {
+  .idx-head, .idx-link { grid-template-columns: 84px minmax(0, 1fr) 18px; }
+  .idx-id { display: none; }
+  .idx-sum { white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .idx-row { opacity: 1; transform: none; }
+  .reveal.in .idx-row { animation: none; }
+  .led { animation: none !important; }
+}
+
+/* === deck: cursor tilt + glare (inner wrapper keeps the fan transform intact) === */
+.pcard { perspective: 900px; }
+.pc-tilt {
+  position: absolute;
+  inset: 0;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transform-style: preserve-3d;
+  transition: transform 180ms var(--ease-out);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.pcard .pc-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    220px 220px at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.10),
+    transparent 70%
+  );
+  transition: opacity var(--dur-mid) var(--ease-out);
+}
+.pcard:hover .pc-glare { opacity: 1; }
+html[data-theme="daylight"] .pcard .pc-glare {
+  background: radial-gradient(220px 220px at var(--mx, 50%) var(--my, 50%), rgba(0, 0, 0, 0.06), transparent 70%);
+}
+/* the card itself no longer pads — the inner wrapper does */
+.pcard { padding: 0; display: block; }
+
+/* === live proof line === */
+.liveproof {
+  display: inline-flex;
+  align-items: center;
+  margin: 22px 0 0;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+.liveproof a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.liveproof a:hover { color: var(--accent); border-bottom-color: var(--accent-soft); }
+.liveproof > .led, .liveproof a > .led { margin-right: 8px; }
+.liveproof.ok { color: var(--ink); }
+.liveproof.bad { color: #e0645a; }
+
+/* The boot intro plays once per tab session (flag set pre-paint in Base.astro);
+   afterwards the SSR overlay must never flash before the island unmounts it. */
+html[data-booted] .boot { display: none; }
+@media (max-width: 520px) {
+  /* the ID column is hidden on phones — hide its header label too */
+  .idx-head > span:first-child { display: none; }
+}

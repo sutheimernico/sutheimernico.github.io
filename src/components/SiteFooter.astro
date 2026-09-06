@@ -1,16 +1,27 @@
 ---
-// SiteFooter.astro
+const year = new Date().getFullYear();
 ---
 
-<footer>NS · Kinetic Terminal · built pipeline to pixel</footer>
+<footer>
+  <span>NS · Kinetic Terminal · built pipeline to pixel</span>
+  <span class="sep" aria-hidden="true">·</span>
+  <span>Astro + React islands, no tracking</span>
+  <span class="sep" aria-hidden="true">·</span>
+  <span>{year}</span>
+</footer>
 
 <style>
   footer {
     padding: 6vh 0 8vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
     text-align: center;
     color: var(--ink-faint);
     font-size: 12px;
     letter-spacing: 0.04em;
     font-family: var(--mono);
   }
+  .sep { color: var(--accent-soft); }
 </style>

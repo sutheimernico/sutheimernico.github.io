@@ -1,23 +1,34 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
 import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import ThemeSwitcher from '../../components/ThemeSwitcher';
+import LiveProof from '../../components/LiveProof';
+import { domainLabel } from '../../lib/domains';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((entry) => ({
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((entry, i) => ({
     params: { slug: entry.id },
-    props: { entry },
+    props: {
+      entry,
+      prev: i > 0 ? projects[i - 1] : null,
+      next: i < projects.length - 1 ? projects[i + 1] : null,
+    },
   }));
 }
 
 interface Props {
   entry: CollectionEntry<'projects'>;
+  prev: CollectionEntry<'projects'> | null;
+  next: CollectionEntry<'projects'> | null;
 }
 
-const { entry } = Astro.props;
+const { entry, prev, next } = Astro.props;
 const { Content } = await render(entry);
-const { title, status, year, stack, role, summary, github } = entry.data;
+const { title, status, year, stack, role, summary, github, domain, context, fieldNote, liveRepo } =
+  entry.data;
 
 // Status → badge label + class, mirroring ProjectDeck's mapping.
 const BADGE: Record<typeof status, { label: string; cls: string }> = {
@@ -32,43 +43,72 @@ const pageTitle = `${title} — Nico Sutheimer`;
 ---
 
 <Base title={pageTitle} description={summary}>
+  <Nav />
   <main class="detail" id="main">
     <div class="detail-wrap">
-      <a class="back" href="/#projects">
-        <span class="back-arrow" aria-hidden="true">←</span> back to work
+      <a class="back" href="/#index">
+        <span class="back-arrow" aria-hidden="true">←</span> back to the index
       </a>
 
-      <header class="detail-head">
+      <header class="detail-head" data-stagger>
         <div class="head-meta">
           <span class={`d-badge${badge.cls ? ` ${badge.cls}` : ''}`}>{badge.label}</span>
           <span class="head-year">{year}</span>
+          <span class="head-domain">{context === 'work' ? '@ bekumoo · ' : ''}{domainLabel(domain)}</span>
         </div>
-        <h1 class="detail-title">{title}</h1>
+        <h1 class="detail-title" transition:name={`p-${entry.id}`}>{title}</h1>
         <p class="detail-role">{role}</p>
 
         <ul class="detail-stack" aria-label="Stack">
           {stack.map((s) => <li class="chip">{s}</li>)}
         </ul>
 
+        {liveRepo && (
+          <LiveProof client:idle repo={liveRepo} fallback="self-operating via GitHub Actions" />
+        )}
+
         {github && (
-          <a class="gh-link" href={github} target="_blank" rel="noopener noreferrer">
+          <a class="gh-link" href={github} target="_blank" rel="noopener noreferrer" data-magnetic>
             View on GitHub <span class="gh-arrow" aria-hidden="true">↗</span>
           </a>
         )}
       </header>
 
+      {fieldNote && (
+        <aside class="field-note reveal">
+          <div class="fn-label">Field note</div>
+          <p>{fieldNote}</p>
+        </aside>
+      )}
+
       <article class="prose">
         <Content />
       </article>
 
+      <nav class="detail-nav" aria-label="Neighbouring projects">
+        {prev ? (
+          <a class="dn prev" href={`/projects/${prev.id}`}>
+            <span class="dn-k"><span aria-hidden="true">←</span> previous</span>
+            <span class="dn-t">{prev.data.title}</span>
+          </a>
+        ) : <span />}
+        {next ? (
+          <a class="dn next" href={`/projects/${next.id}`}>
+            <span class="dn-k">next <span aria-hidden="true">→</span></span>
+            <span class="dn-t">{next.data.title}</span>
+          </a>
+        ) : <span />}
+      </nav>
+
       <footer class="detail-foot">
-        <a class="back" href="/#projects">
-          <span class="back-arrow" aria-hidden="true">←</span> back to work
+        <a class="back" href="/#index">
+          <span class="back-arrow" aria-hidden="true">←</span> back to the index
         </a>
         <a class="to-top" href="#top">back to top ↑</a>
       </footer>
     </div>
   </main>
+  <ThemeSwitcher client:idle transition:persist="theme" />
 </Base>
 
 <style>
@@ -110,16 +150,27 @@ const pageTitle = `${title} — Nico Sutheimer`;
     border-radius: 4px;
   }
 
-  /* === header block === */
+  /* === header block: children cascade in on arrival === */
   .detail-head {
     margin-top: 36px;
     padding-bottom: 34px;
     border-bottom: 1px solid var(--line);
   }
+  .detail-head > * {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: headIn 0.55s var(--ease-out) forwards;
+    animation-delay: calc(80ms + var(--i, 0) * 70ms);
+  }
+  /* The title morphs in via the view transition — it must not also fade. */
+  .detail-head > .detail-title { opacity: 1; transform: none; animation: none; }
+  @keyframes headIn { to { opacity: 1; transform: none; } }
+
   .head-meta {
     display: flex;
     align-items: center;
     gap: 14px;
+    flex-wrap: wrap;
   }
   .d-badge {
     font-size: 10px;
@@ -136,10 +187,12 @@ const pageTitle = `${title} — Nico Sutheimer`;
     color: var(--wip);
     border-color: color-mix(in srgb, var(--wip) 50%, transparent);
   }
-  .head-year {
+  .head-year,
+  .head-domain {
     font-size: 12px;
     letter-spacing: 0.14em;
     color: var(--ink-faint);
+    text-transform: uppercase;
   }
 
   /* forged display title — large, tight, mono-display */
@@ -170,7 +223,7 @@ const pageTitle = `${title} — Nico Sutheimer`;
     list-style: none;
   }
 
-  /* GitHub link — clear button treatment */
+  /* GitHub link — clear button treatment (transform driven by data-magnetic) */
   .gh-link {
     display: inline-flex;
     align-items: center;
@@ -186,9 +239,9 @@ const pageTitle = `${title} — Nico Sutheimer`;
     border: 1px solid var(--accent-soft);
     background: color-mix(in srgb, var(--accent) 8%, transparent);
     transition:
-      background var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
       border-color var(--dur-fast) var(--ease-out),
-      transform var(--dur-fast) var(--ease-out);
+      transform 220ms var(--ease-out);
   }
   .gh-link .gh-arrow { transition: transform var(--dur-fast) var(--ease-out); }
   .gh-link:hover {
@@ -196,7 +249,32 @@ const pageTitle = `${title} — Nico Sutheimer`;
     border-color: var(--accent);
   }
   .gh-link:hover .gh-arrow { transform: translate(2px, -2px); }
+  .gh-link:active { transform: scale(0.97) !important; }
   .gh-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* === field note — one honest finding, set apart like a terminal comment === */
+  .field-note {
+    margin-top: 34px;
+    padding: 18px 22px 18px 26px;
+    border-left: 2px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.09), transparent 70%);
+    max-width: 70ch;
+  }
+  .fn-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .field-note p {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
 
   /* === prose / README body === */
   .prose {
@@ -311,13 +389,52 @@ const pageTitle = `${title} — Nico Sutheimer`;
     margin: 2em 0;
   }
 
+  /* === neighbours === */
+  .detail-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 64px;
+  }
+  .dn {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    text-decoration: none;
+    background: linear-gradient(165deg, var(--surface), var(--bg-warm));
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .dn.next { text-align: right; }
+  .dn:hover { border-color: var(--accent-soft); transform: translateY(-2px); }
+  .dn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .dn-k {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .dn-t {
+    font-family: var(--disp);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .dn:hover .dn-t { color: var(--accent); }
+  @media (max-width: 560px) {
+    .detail-nav { grid-template-columns: 1fr; }
+    .dn.next { text-align: left; }
+  }
+
   /* === footer === */
   .detail-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-top: 64px;
+    margin-top: 40px;
     padding-top: 28px;
     border-top: 1px solid var(--line);
   }
@@ -335,6 +452,8 @@ const pageTitle = `${title} — Nico Sutheimer`;
     outline-offset: 3px;
     border-radius: 4px;
   }
-  /* prefers-reduced-motion is handled globally (global.css neutralizes all
-     transitions/animations under the reduce query) — no scoped override needed. */
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail-head > * { animation: none; opacity: 1; transform: none; }
+  }
 </style>

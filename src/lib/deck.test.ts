@@ -3,7 +3,7 @@ import { deckGeom } from './deck';
 
 describe('deckGeom', () => {
   it('returns empty arrays for zero cards', () => {
-    expect(deckGeom(900, 0)).toEqual({ fan: [], scatter: [] });
+    expect(deckGeom(900, 0)).toEqual({ fan: [], scatter: [], z: [], hand: false });
   });
 
   it('returns one transform per card', () => {
@@ -40,6 +40,24 @@ describe('deckGeom', () => {
     // inner pair lands at -3 / +3 like the hand-placed prototype
     expect(rots[1]).toBeCloseTo(-3, 5);
     expect(rots[2]).toBeCloseTo(3, 5);
+  });
+
+  it('keeps the deck stacking (center in front) for four cards', () => {
+    const g = deckGeom(900, 4);
+    expect(g.hand).toBe(false);
+    expect(g.z).toEqual([2, 3, 3, 2]);
+  });
+
+  it('switches to a hand for five or more cards: even spacing, left-to-right stacking', () => {
+    const g = deckGeom(1124, 6);
+    expect(g.hand).toBe(true);
+    expect(g.z).toEqual([1, 2, 3, 4, 5, 6]);
+    const xs = g.fan.map((f) => parseFloat(f.match(/translate\((-?\d+\.\d+)px,/)![1]));
+    const gaps = xs.slice(1).map((x, i) => x - xs[i]);
+    // even spacing: every gap equals the first (within rounding)
+    gaps.forEach((gp) => expect(gp).toBeCloseTo(gaps[0], 0));
+    // the hand spreads wider than the four-card arc ever does
+    expect(Math.max(...xs)).toBeGreaterThan(320);
   });
 
   it('clamps the outer span to the prototype bounds', () => {
