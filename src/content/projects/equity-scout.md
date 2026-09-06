@@ -1,85 +1,82 @@
 ---
 title: "Equity Scout"
 order: 2
-status: research
+status: production
 year: "2026"
-stack: ["Python", "scikit-learn", "CatBoost", "FastAPI", "React"]
-summary: "A local research harness that compares systematic strategies honestly — costs always on, no alpha promised."
-role: "research assistant, not advice"
+stack: ["Python", "CatBoost", "FastAPI", "React", "SQLite", "Ollama"]
+summary: "An autonomously operating signal-evaluation system whose real product is its honesty gates — and the negative findings they keep producing."
+role: "honesty gates against self-deception"
 featured: true
 github: https://github.com/sutheimernico/equity-scout
 domain: ml
 context: personal
 reviewed: false
+fieldNote: "The live entry model claimed an AUC of 0.6195 from 220 out-of-sample rows; re-measured on 3,281 rows it scored 0.5152 — and it had been blocking better challengers for five weeks. Across 29 trained models none ever reached the project's own 0.55 gate, so nothing is promoted and the ML lanes trade nothing."
 ---
 
 ## What it is
 
-A local-first research platform for comparing systematic investing strategies and learning
-*when* a signal is worth following — not a trading bot and explicitly not advice. It runs a set
-of textbook strategies and a global stock screener side by side, evaluates everything after
-realistic costs, and puts a machine-learning meta-model on top that tries to learn the market
-regimes in which the primary signals actually pay off. The framing is fixed: this is process and
-risk education, the LLM layer *interprets*, it never forecasts or ranks. A personal research
-project, in progress.
+A local system that screens a global equity universe, scores candidate entries and runs paper
+lanes against those signals — and it runs itself: a daily chain at 18:00, nightly training at
+02:30, minute-level catalyst scans in the market window, a crypto lane around the clock. The
+trading is not the deliverable; the **measurement apparatus** is — nothing it claims about a signal
+counts until it clears a gate written down first. Decision support, never advice; no real money is
+ever routed.
 
 ## Architecture
 
-Six moving parts, each independently testable:
-
-- **Strategy engine** — six classic systematic strategies (DCA, volatility targeting, risk
-  parity, the Permanent Portfolio, dual momentum / GEM, defensive asset allocation) over a small
-  ETF basket, backtested with monthly rebalancing, turnover tracking, and costs.
-- **Equity screener funnel** — a global stock universe is pulled from yfinance, passed through a
-  data-quality gate, then scored with sector-relative, rank-based factors (value, quality,
-  momentum, growth, low-vol) and split into three risk buckets, with the per-stock score kept
-  transparent.
-- **ML meta-labeler** — triple-barrier meta-labels derived from the backtest trades; elastic-net
-  logistic and gradient-boosted (CatBoost) models learn regime features (volatility, trend,
-  breadth, drawdown) to predict when to follow the primary signal. Purged walk-forward validation
-  blocks look-ahead.
-- **Research loop** — a background search over the meta-model configuration space, gated by a
-  *rising* Deflated-Sharpe hurdle so that wider searching doesn't reward a lucky trial.
-- **Paper accounts** — multi-account state (JSON + SQLite) marked to market daily; nothing touches
-  real money.
-- **Dashboard** — a React + FastAPI front end with per-strategy equity curves, cost sweeps, the
-  ML and research tabs, and the screener drill-down, plus a local Ollama assistant (no external
-  API calls).
+- **Screener funnel** — a ~7,500-ticker global universe passes a data-quality and investability
+  gate (≥ 300 M € market cap *and* ≥ 1 M € daily turnover — size excludes, it never ranks), then
+  sector-relative factor scores split it into risk buckets.
+- **Lanes as separate books** — rule-based ETF sleeves in one meta-allocated paper depot plus five
+  short-term lanes, each with its own book, benchmark and kill gate.
+- **Predict-then-resolve ledger** — every live score enters an immutable ledger *before* the
+  outcome is knowable and is resolved later against real forward prices; a companion **non-trade
+  book** records what was rejected and why, and resolves that too.
+- **Evidence layer** — five free disclosure sources (congress filings, 13F, Form 4 insider buys,
+  news themes, tracked voices) annotate pitches but never touch selection.
+- **Operations** — a token-gated FastAPI + React cockpit that installs as a PWA; alerts fan out
+  over Web Push/VAPID, ntfy and Telegram so one dead channel never costs the others, and a GitHub
+  Actions workflow builds the Android APK as a Trusted Web Activity.
 
 ## Why it's built this way
 
-The hard problem in quant research isn't generating a strategy — it's not fooling yourself. Every
-decision here is a guard against self-deception. **Costs are always on** (and there's a sweep
-across cost levels) because a free-data edge usually evaporates once you charge for turnover — and
-seeing that happen is the point, not a bug. The **rising Deflated-Sharpe hurdle** exists because
-if you search enough configurations, one will look brilliant by chance; the hurdle climbs as the
-search widens so luck has to clear a higher bar — and the loop reports a **Probability of Backtest
-Overfitting** beside every champion, openly admitting when its own search is more likely finding
-luck than a real edge. The **honesty guardrails** — plain-language
-explanations on every metric, "research assistant, not advice" on every surface — are there
-because the failure mode of a tool like this is someone trusting it.
+An autonomous ML system that grades its own homework will lie to you, so the gates come first.
+**Costs are always on**: each depot fill is charged `max(10 bps, half the Corwin-Schultz spread
+estimate)`, and the crypto lane pays Kraken's real 80 bps taker fee per side. **Purged,
+date-grouped walk-forward** everywhere, promotion only on a strictly better out-of-sample AUC. A
+**Deflated-Sharpe hurdle that rises with every trial**, so a wider search cannot buy a
+better-looking champion, plus a weekly CSCV **Probability of Backtest Overfitting** check. And
+**kill gates are pre-registered**: the session lane was paused on 2026-08-17 when its entry rule
+was refuted, the gap-fade lane switched off after six days produced zero measurable observations.
 
 ## Implementation
 
-- **Own metrics library** rather than a third-party one — CAGR, Sharpe, Sortino, Calmar, and the
-  Deflated Sharpe Ratio — to force cost-inclusive, deterministic, reproducible reporting.
-- **State-free strategies.** Each strategy is a pure function returning target weights, with no
-  dependency on portfolio state, which keeps them deterministic and trivially testable.
-- **Regime features that blend price signals with free macro context** — volatility, trend,
-  breadth, and drawdown derived from prices, plus a market-volatility series pulled from FRED's
-  no-key CSV endpoint — so the model sees macro context while the system still needs no paid API
-  key.
-- Backed by a real test suite (well over a hundred tests) and run against live yfinance data; the
-  build gate is pytest + ruff.
+- **Live paper trading, not simulated fills.** The session lane routed bracket orders to an Alpaca
+  **paper** account; the gap between signal price and broker fill is the only *measured* slippage
+  here — 1–3 bps at roughly 5 s fill latency. The track record carries a labelled break at
+  2026-08-06, because everything before it used delayed bars and simulated fills.
+- **The negative findings stay.** 11 behavioural indicators tested over up to 19 years predict no
+  market return at all, and 0 of 63 incremental tests survive. The study's own recommendation:
+  build nothing from this map.
+- **The apparatus catches its own errors.** A published congress-trading result (−17.55 pp vs SPY,
+  t = −51.6) was **withdrawn** when a re-check found SPY subtracted twice: corrected it reads
+  −0.39 pp at t = −1.04 — undecidable, not negative — and the insider figure flipped from −5.76 pp
+  to +7.91 pp, no horizon surviving Bonferroni.
+- **2,707 Python tests** plus a frontend suite gate the build.
 
 ## Trade-offs & what I considered
 
-- **Research, not a product.** The backtest engine, the six strategies, and the meta-model are
-  built and validated; the continuous "self-improving" loop is live but exploratory — its training
-  data is still backtest-origin, so true forward learning lands only once forward-paper persistence
-  is merged. That's stated plainly rather than dressed up.
-- **Free data has holes.** The screener runs on live yfinance, which is genuinely incomplete
-  outside the US — a real limitation of the free-only constraint, not hidden.
-- **Lower reported numbers, on purpose.** Charging realistic costs everywhere makes the headline
-  figures smaller than a cost-free backtest would show. That's the honest number, and the honest
-  number is the deliverable.
+- **No edge is claimed, because none has been measured.** After seven weeks no lane has a
+  statistically robust positive expected value; the crypto lane's −452 $ was almost exactly its
+  taker fees; and a diversification study found **3.19 independent bets among 12 sleeves** — scaled
+  to market volatility the depot returns 12.63 % against SPY's 16.07 %. Two thirds of the return at
+  half the risk: a different product, not a better one, and the dashboard says so.
+- **Free data has holes.** yfinance is unofficial and incomplete outside the US, and the ML
+  training universe is today's watchlist backfilled to 2007 — survivorship-biased. Both caveats are
+  served live by the model endpoint, not buried in a README.
+- **Paper only, by rule.** A smaller public sibling,
+  [signal-trader-demo](https://github.com/sutheimernico/signal-trader-demo), carries the same
+  discipline into a standalone harness.
+
+<!-- sources: /home/nicosutheimer/private/equity-scout/README.md (cron chains and cadences, ~7.5k combined universe, investability gate 300 M € / 1 M € from liquidity.py section, risk buckets + score transparency, predict/score/resolve three-stage entry model, five evidence sources and their lags, Corwin-Schultz max(10 bps, half-spread) fill cost, rising DSR hurdle + weekly CSCV-PBO, Alpaca paper routing authorised 2026-08-04 for the session lane only and the labelled 2026-08-06 execution-regime break, token-gated dashboard + PWA + service worker, Web Push/VAPID + ntfy + Telegram fan-out, Bubblewrap TWA APK via GitHub Actions, diversification study 3.19 bets / 12.63 % vs SPY 16.07 %, honesty guardrails), docs/research/2026-08-11-champion-was-a-measurement-artifact.md (AUC 0.6195 on 220 rows vs 0.5152 on 3,281, rank-IC 0.1523 → 0.0035, five weeks of blocked challengers, 29 models, median 0.5162, max 0.5433, project gate AUC ≥ 0.55), docs/research/2026-08-11-w0-historical-check-behavioural-indicators.md (11 signals × 3 horizons over up to 19 years, no return hit, 0 of 63 incremental tests, 140 tests at α = 0.00036), docs/research/2026-08-27-diversification.md (Meucci 3.19 of 12, depot ×1.94 CAGR 12.63 % vs SPY 16.07 %, "two thirds of market return at half the risk"), docs/research/2026-08-17-congress-and-insider-long-horizon.md + AUTOPILOT_LOG.md Task 5 (retraction: −17.55 pp / t −51.6 → −0.39 pp / t −1.04, insider −5.76 pp → +7.91 pp, no horizon passes Bonferroni), docs/research/2026-08-11-server-latency-and-cost-analysis.md (slippage 1–3 bps, ~5 s fill latency), docs/sessions/2026-08-16_2235_no-trade-book-gapfade-session-pause.md (st_rejections non-trade book, session lane pause 2026-08-17, ORB refutation), docs/sessions/2026-08-31_0951_economics-review-four-plans.md (crypto −451.60 $ ≈ taker fees 548.34 $), docs/research/2026-09-06-autotrader-konzept-review.md (no bot with a robust positive expected value after seven weeks), PLAN.md Runde 2026-09-06 (five short-term lanes + Auto-Depot in the bot journal, Auto-Depot +1.99 % vs SPY +2.76 %), AUTOPILOT_LOG.md 2026-08-27 (Gate 2 707 pytest + 197 vitest; newest session doc 2026-09-06 reports Vitest 245), git log first commit 2026-06-24 (year), gh repo view sutheimernico/equity-scout → PUBLIC -->
