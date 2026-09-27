@@ -16,3 +16,9 @@ export function trackOffset(progress: number, trackScrollWidth: number, viewport
 export function currentPanel(progress: number, panelCount: number): number {
   return Math.min(Math.floor(progress * panelCount) + 1, panelCount);
 }
+
+/** Page scroll progress 0..1 (the progress hairline); 0 when the page cannot scroll. */
+export function scrollProgress(scrollY: number, scrollMax: number): number {
+  if (scrollMax <= 0) return 0;
+  return Math.min(Math.max(scrollY / scrollMax, 0), 1);
+}

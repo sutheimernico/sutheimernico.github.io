@@ -15,6 +15,8 @@
  *   nav: .solid past 60 px, aria-current on the section in view; progress bar
  */
 
+import { scrollProgress } from '../lib/scroll';
+
 const GLYPHS = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&$/\\<>';
 
 const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -40,10 +42,15 @@ function bindWindowOnce(): void {
   windowBound = true;
   let ticking = false;
   const req = () => {
+    // Read in the event, write in the frame. The scroll event fires before
+    // rAF callbacks, while layout is still clean; reading scrollY/scrollHeight
+    // inside the frame instead would land after the Descent loop's style
+    // writes and force a synchronous style + layout pass on every frame.
+    readScroll();
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      onScroll();
+      writeScroll();
       ticking = false;
     });
   };
@@ -51,14 +58,24 @@ function bindWindowOnce(): void {
   window.addEventListener('resize', req);
 }
 
-function onScroll(): void {
-  const y = window.scrollY;
+let lastY = 0;
+let lastMax = 0;
+
+function readScroll(): void {
+  lastY = window.scrollY;
+  lastMax = document.documentElement.scrollHeight - window.innerHeight;
+}
+
+function writeScroll(): void {
   const progress = document.getElementById('progress');
-  if (progress) {
-    const h = document.documentElement.scrollHeight - window.innerHeight;
-    progress.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
-  }
-  document.getElementById('nav')?.classList.toggle('solid', y > 60);
+  // scaleX, not width: a transform stays on the compositor, width re-lays out.
+  if (progress) progress.style.transform = `scaleX(${scrollProgress(lastY, lastMax)})`;
+  document.getElementById('nav')?.classList.toggle('solid', lastY > 60);
+}
+
+function onScroll(): void {
+  readScroll();
+  writeScroll();
 }
 
 /* ---------- stagger / decode / count ---------- */
