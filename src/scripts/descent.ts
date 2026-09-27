@@ -76,12 +76,19 @@ function mount(sec: HTMLElement): () => void {
   const stationDepths = [0, ...layout.panels, layout.gateOut];
 
   let vw = 0, vh = 0, mobile = false, railW = 0;
+  // Section geometry is cached here and the scroll position is read in the
+  // scroll event, so the per-frame loop never reads layout: a rect read inside
+  // rAF lands after CSS animations dirtied style and forces a sync recalc.
+  let secTop = 0, secH = 0, pageY = window.scrollY;
   const place = () => {
     vw = window.innerWidth;
     vh = window.innerHeight;
     mobile = vw <= 640;
     railW = rail?.offsetWidth ?? 0;
-    sec.style.height = `${rideScrollLength(layout.maxD, vh)}px`;
+    secH = rideScrollLength(layout.maxD, vh);
+    sec.style.height = `${secH}px`;
+    pageY = window.scrollY;
+    secTop = sec.getBoundingClientRect().top + pageY;
     let pi = 0, mi = 0;
     for (const it of items) {
       let t: string;
@@ -139,8 +146,7 @@ function mount(sec: HTMLElement): () => void {
   let probed = false;
 
   const readTarget = () => {
-    const r = sec.getBoundingClientRect();
-    const p = pinnedProgress({ top: r.top, height: r.height }, vh);
+    const p = pinnedProgress({ top: secTop - pageY, height: secH }, vh);
     target = trackEase(p) * layout.maxD;
     return p;
   };
@@ -225,7 +231,8 @@ function mount(sec: HTMLElement): () => void {
     raf = requestAnimationFrame(frame);
   };
   const onResize = () => { place(); wake(); };
-  window.addEventListener('scroll', wake, { passive: true });
+  const onScroll = () => { pageY = window.scrollY; wake(); };
+  window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onResize);
   const io = new IntersectionObserver(
     (entries) => {
@@ -254,7 +261,7 @@ function mount(sec: HTMLElement): () => void {
   return () => {
     if (raf !== null) cancelAnimationFrame(raf);
     if (roleTimer) clearTimeout(roleTimer);
-    window.removeEventListener('scroll', wake);
+    window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onResize);
     dots.forEach((e) => e.removeEventListener('click', onDot));
     io.disconnect();
