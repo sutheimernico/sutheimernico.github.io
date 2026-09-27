@@ -288,6 +288,14 @@ const pageTitle = `${title} — Nico Sutheimer`;
   .prose :global(p) { margin: 0 0 1.25em; }
   .prose :global(strong) { color: var(--ink); font-weight: 600; }
   .prose :global(em) { font-style: italic; }
+  /* Markdown screenshots: never wider than the column (no phone overflow). */
+  .prose :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 0 0.6em;
+    border: 1px solid var(--line);
+  }
 
   .prose :global(h2) {
     font-family: var(--disp);
