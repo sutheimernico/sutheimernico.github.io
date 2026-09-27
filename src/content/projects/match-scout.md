@@ -51,8 +51,9 @@ it could have hidden a leak worth 15 to 18 points. It was replaced by a market-t
 null that draws each outcome from the de-vigged closing probability; the corrected null centres
 on the mean closing-line value (−5.45 % against −5.36 %), and the observed result sits inside it.
 The second bug was subtler: the bootstrap confidence interval was computed on stake-invariant
-per-bet returns, so flat and Kelly staking reported bit-identical intervals. 130 tests at the
-last recorded gate; no raw licensed CSV is committed.
+per-bet returns, so flat and Kelly staking reported bit-identical intervals. The no-lookahead rule
+is now enforced inside the model fit instead of being trusted to the caller, and no raw licensed
+CSV is committed.
 
 **The measured answer.** First run on one league (971 bets): flat yield −4.7 %, interval
 straddling zero, closing-line value −5.4 % with a beat rate of 20.4 %. Expanded to all five
@@ -65,10 +66,14 @@ Dixon-Coles and 0.539 / 0.917 for the market — worse than uniform, beaten by t
 - **Narrow universe on purpose.** 1X2 and over/under 2.5 only, because those are the markets with
   free closing odds; both-teams-to-score was dropped for lack of them, and cup competitions run in
   shadow mode — predictions, no stake.
-- **The verdict is stated with its limits.** The trial log and the rising significance hurdle are
-  still open, so the finding is reported as "no edge under this untuned configuration" rather than
-  as a proof.
-- **Not yet running forward.** The paper loop and the scheduled pipeline are designed but unbuilt;
-  what exists is the backtest and the dashboard.
+- **The verdict is stated with its limits.** Every configuration ever run — including each
+  per-league slice — now goes into an append-only trial log, and the edge claim is deflated by the
+  number of logged trials, so looking at more slices raises the bar instead of lowering it. The
+  finding still reads "no edge under this untuned configuration", not a proof.
+- **Running forward, from day one.** A paper loop with an append-only, idempotent bet ledger
+  places bets under one frozen, logged configuration, only with odds known at least two hours
+  before kickoff. Its first 12 bets settled on 2026-09-27: down 105 € on 120 € of paper stakes — a
+  number that means nothing at n = 12 and is shown anyway. This round is on a feature branch, not
+  merged.
 
-<!-- sources: /home/nicosutheimer/private/match-scout/README.md (framing, honest-harness rules, scope), PROJECT.md (architecture, decisions of 2026-07-05), PLAN.md (Phase 4 acceptance: 971 bets, -4.7 %, CI [-13.0, +4.1], CLV -5.4 %, beat rate 20.4 %, baselines; Phase 5 acceptance: 563 OOS, Brier/log-loss ML 0.774/1.674 vs DC 0.563/0.952 vs market 0.539/0.917; open trial log), docs/adr/0002-placebo-null-and-kelly-ci-fixes.md (+18.8 % inflated null, market-truth null -5.45 % vs CLV -5.36 %, stake-invariant Kelly CI), AUTOPILOT_LOG.md (Top-5 expansion: 4,540 bets, -8.78 %, CI [-12.8, -4.8], CLV beat rate 22.4 %, per-league all negative; last logged gate total 130 tests) -->
+<!-- sources: /home/nicosutheimer/private/match-scout/README.md (framing, honest-harness rules, scope), PROJECT.md (architecture, decisions of 2026-07-05), PLAN.md (Phase 4 acceptance: 971 bets, -4.7 %, CI [-13.0, +4.1], CLV -5.4 %, beat rate 20.4 %, baselines; Phase 5 acceptance: 563 OOS, Brier/log-loss ML 0.774/1.674 vs DC 0.563/0.952 vs market 0.539/0.917; open trial log), docs/adr/0002-placebo-null-and-kelly-ci-fixes.md (+18.8 % inflated null, market-truth null -5.45 % vs CLV -5.36 %, stake-invariant Kelly CI), AUTOPILOT_LOG.md (Top-5 expansion: 4,540 bets, -8.78 %, CI [-12.8, -4.8], CLV beat rate 22.4 %, per-league all negative); branch feat/forward-proof @ 2d548ac (not merged): commits 78ea05d + 90e8aa7 (append-only trial log, edge claim deflated by logged trial count, D1 closed), 7ba2f7f (no-lookahead enforced in the fit), 4c99d4b + e3eacf0 (append-only idempotent paper ledger, forward loop), data/trial_log.jsonl (9 entries incl. per-league slices; forward config min_lead_hours 2.0), data/bankroll_snapshots.jsonl run 2026-09-27 (n_settled 12, total_staked 120.0, profit −105.0) -->

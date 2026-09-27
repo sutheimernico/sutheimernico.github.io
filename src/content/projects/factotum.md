@@ -33,10 +33,11 @@ Four cleanly separated layers:
   reference — a briefing index, a task id, a name fragment — to exactly one task, deterministically).
 - **LLM layer** — a thin interface with an Ollama implementation behind it (tests use a fake). The
   model does only bounded language work: summarise, prioritise. It proposes; the code decides.
-- **CLI** — a thin entry point with two commands: `factotum briefing` (read and render the
-  prioritised list) and `factotum do <ref>` (resolve a write action, show the proposal, and run it
-  only after explicit confirmation — it refuses to write at all when there's no interactive
-  terminal).
+- **CLI** — a thin entry point: `factotum briefing` (read and render the prioritised list, with a
+  "since the last briefing" section on top), `factotum digest` (the same pipeline written to a dated
+  Markdown file for the morning) and `factotum do <ref | instruction>` (resolve a write action, show
+  the proposal, and run it only after explicit confirmation — it refuses to write at all when
+  there's no interactive terminal).
 
 ## Why it's built this way
 
@@ -59,7 +60,15 @@ code has to carry the orchestration.
 - **No-egress is enforced, not just promised** — the local-model host is validated to be a
   loopback address, so even a mis-set environment variable can't quietly ship your tasks and files
   to a remote model. The guarantee lives in code, not in a README.
-- A focused test suite (fixtures and mocks, zero network dependency) covers connector parsing,
+- **What changed since last time.** Each briefing writes a small snapshot of the task list and the
+  next one diffs against it: new tasks, newly overdue ones, moved due dates, completed and vanished
+  ones. The snapshot holds task names, so it lives outside the repo, owner-only, never committed; a
+  corrupt snapshot costs the comparison, never the briefing.
+- **Retries only where they are safe.** Reads get exactly one retry on a dropped connection; writes
+  get none, because a request that failed in transit may still have been applied, and a blind retry
+  could complete a task twice — tests pin that. A throttled request says "rate limit reached"
+  instead of a bare HTTP 429.
+- A focused test suite (148 tests; fixtures and mocks, zero network dependency) covers connector parsing,
   prioritisation, reference resolution, action dispatch, the local-model summary with its
   deterministic offline fallback, and — importantly — the confirm-gate's refusal to execute
   unconfirmed; the gate is pytest.
@@ -72,8 +81,13 @@ code has to carry the orchestration.
   explicitly allowed. What remains is genuinely external: an Entra app for the optional Microsoft
   365 source, and the hosting call (it stays unpublished by design). Honest in-progress, not a
   finished tool.
-- **Deterministic reference resolution over natural-language intent** for v1. "Complete my report"
-  parsed by the model is a v2 idea; v1 resolves references by index, id, or name fragment because
-  that's safe and testable today.
+- **Natural language in, validated structure out.** `factotum do "complete my report"` lets the
+  local model map the instruction onto one of the two supported actions — constrained to a strict
+  JSON schema and checked against the task list just fetched, so a task id the model did not get
+  from that list can never become a proposal. Several plausible matches are shown instead of
+  guessed; with the model offline it asks for the explicit form rather than falling back to a
+  cloud model. Index, id and name fragment still work without any model.
 - **Reusable core, thin front end.** The logic lives independently of the CLI, so a later web UI
   would be a second front end rather than a rewrite — without over-building for it now.
+
+<!-- sources: /home/nicosutheimer/private/factotum README.md + AGENTS.md on branch feat/daily-driver @ 2d4d015 (not merged; layers, briefing ordering, filesystem allowlist and containment, loopback-only model host, confirm gate, free-text `do` via strict JSON schema validated against fetched tasks, "Seit letztem Briefing" snapshot in FACTOTUM_STATE_DIR 0600 never committed), commits 099cfee (free-text do, 2026-07-02), 112c79c (one read retry after 1 s on ConnectError/ReadTimeout, no write retries, AsanaRateLimitError message), cb3b192 (snapshot diff), 2d4d015 (`digest` command writes a dated Markdown file), RUNDE-2026-09-20.md results table (factotum: 148 tests green) -->

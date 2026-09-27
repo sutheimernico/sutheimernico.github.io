@@ -10,7 +10,7 @@ featured: false
 domain: ml
 context: personal
 reviewed: false
-fieldNote: "The taste model's AUC of 0.904 is leave-one-out on 75 votes with only 24 yes-cases — a real overfitting risk that has never been re-validated. The thumbs-up loop that would grow the anchor is still an empty table."
+fieldNote: "The taste model's AUC of 0.904 is leave-one-out on 69 votes with only 20 yes-cases — not the 75 and 24 the docs had claimed, because four yes-clicks were household appliances. A real overfitting risk: the vote loop that grows the anchor now exists, and a gate keeps the anchor frozen until 150 votes and an AUC of 0.85 are reached."
 ---
 
 ## What it is
@@ -25,10 +25,12 @@ price caps and the limits.
 
 ## Architecture
 
-Scripts, not a service: `scan.py` searches, judges fit, fetches images and scores taste into a
-SQLite store; `rescore_fit.py` re-judges from stored ad text without hitting the site again; the
-page builders render static HTML with four tabs (furniture, kitchen, fridge, buy-new) plus a
-one-column phone build from the same data. `taste.py` embeds ad photos with `clip-ViT-B-32` and
+Scripts plus one small server: `scan.py` searches, judges fit, fetches images and scores taste
+into a SQLite store; `rescore_fit.py` re-judges from stored ad text without hitting the site again;
+the page builders render static HTML with four tabs (furniture, kitchen, fridge, buy-new) plus a
+one-column phone build from the same data. A FastAPI app serves those pages with an index that
+marks stale ones, and adds the two things a static page cannot: a vote button on every card and a
+watch list for listings already contacted. `taste.py` embeds ad photos with `clip-ViT-B-32` and
 scores them against an anchor built from the votes. `passung.py` and a separate `kueche.py`
 implement two different notions of "fits".
 
@@ -59,7 +61,13 @@ implement two different notions of "fits".
   regex required a word the site does not print); 872 listings were stamped with the search radius
   itself, including cities far outside it; and a pile-height limit silently discarded every rug,
   visible only in a sample of the *rejected* hits.
-- 195 tests plus ruff; 10,058 listings and 114 runs in the store.
+- **The taste check is sampled by chance, not by the model.** Letting the light-biased anchor pick
+  the test listings would have forced a "no difference" result by construction; instead a seeded
+  random sample draws 12 light, 12 dark and 6 colour-neutral listings.
+- **The canary had been right all along.** Its first composed message named a search job with 2 of
+  6 broken pages since late August — a finding that had sat in a log nobody read.
+- 289 tests plus ruff (195 before the buying-loop round); 10,058 listings and 114 runs in the store
+  as of that round.
 
 ## Trade-offs & what I considered
 
@@ -67,8 +75,10 @@ implement two different notions of "fits".
   page says so. Requests are paced at 2.5 s, never parallel.
 - **Rotating a shelf is not modelled.** A rotation heuristic would let everything "fit" somehow,
   so a piece that would only work lying down is left in the unknown block.
-- **Nothing runs on a schedule yet.** All 114 scans were manual, no alert exists, and the served
-  page was still wired to an older output file — the reason this is honestly "in progress" and
-  not "production".
+- **Not switched on yet.** The served page had been wired to an older output file for four weeks;
+  that delivery is now repaired and verified page by page. The daily job and its alert are built
+  — the alert fires only when a listing fits *and* looks right, because fit alone meant 248 hits on
+  a single August scan day — but not registered, and the round lives on a feature branch that is
+  not merged. That is why this is honestly "in progress" and not "production".
 
-<!-- sources: /home/nicosutheimer/private/decor-scout/README.md (two judgements, measurement families, canary, kitchen cabinet metres, ~4 of 5 ads without measurements), docs/sessions/2026-08-10_0824_decor-scout-calibration-and-jobs.md (75 votes / 24 yes / AUC 0.904 leave-one-out, D1-D10, first scan), docs/sessions/2026-08-11_0012_massfenster-radius-und-tailnet.md (150 km, three defects, 41 tests at that point), docs/superpowers/plans/2026-08-30-ship-the-buying-loop.md (195 tests, 10,058 ads, 114 runs, votes table empty, stale served page, overfitting caveat), src/decor_scout/taste.py (clip-ViT-B-32) -->
+<!-- sources: /home/nicosutheimer/private/decor-scout/README.md (two judgements, measurement families, canary, kitchen cabinet metres, ~4 of 5 ads without measurements), docs/sessions/2026-08-10_0824_decor-scout-calibration-and-jobs.md (75 votes / 24 yes / AUC 0.904 leave-one-out, D1-D10, first scan), docs/sessions/2026-08-11_0012_massfenster-radius-und-tailnet.md (150 km, three defects, 41 tests at that point), docs/superpowers/plans/2026-08-30-ship-the-buying-loop.md (195 tests, 10,058 ads, 114 runs, votes table empty, stale served page, overfitting caveat), src/decor_scout/taste.py (clip-ViT-B-32) ; branch feat/buying-loop @ 28c35d0 (not merged): same plan, Outcome 2026-09-20 (289 pytest, was 195; FastAPI + uvicorn serving out/ with stale markers, all ten pages 200 incl. kuechen.html unreachable for four weeks; Merkliste + vote endpoints; alert threshold fit AND style, fit alone 248 hits on one August scan day; cron script built, not registered; taste-check sample 12 light / 12 dark / 6 neutral, fixed seed, not anchor-picked; anchor 73 clicks → 69 votes with 20 yes, 0.904 reproduced; canary: 2 of 6 broken pages after 2026-08-24), RUNDE-2026-09-20.md §2 (recalibration gate n≥150 / AUC≥0.85) -->

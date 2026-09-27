@@ -10,7 +10,7 @@ featured: false
 domain: agents
 context: personal
 reviewed: false
-fieldNote: "The ledger has a `posted` state and no row has ever reached it. Everything up to delivery is measured; what happens after the video leaves the machine is not — the pipeline is publish-blind by construction."
+fieldNote: "The ledger has a `posted` state and no row has ever reached it. Every push now carries two buttons, posted or discarded, collected by polling without a webhook — and the ledger still holds zero confirmed posts. Until someone taps, everything after the video leaves the machine stays unmeasured."
 ---
 
 ## What it is
@@ -54,18 +54,30 @@ local CPU-only model would have been the cheaper wrong answer.
   biography filter now runs fail-closed after a category query silently returned an error payload
   and filtered nothing. And Wikimedia answered every image request with 429 because the code
   requested unscaled originals instead of cached thumbnail sizes.
-- 243 tests plus ruff gate every commit; audio is normalised to a measured −15.0 LUFS with the
+- **A triple re-send was one line.** A buffer video pushed to the phone kept its `buffered`
+  status, so it was sent again — and the buffer piled up to 24 videos on one channel. Marking
+  everything that reaches the phone as delivered fixed both at the cause. The plan's literal fix
+  (skip evening production once the buffer is full) would have replaced about 24 evenings of
+  fresh videos with three-week-old ones, and was deliberately not built.
+- **Gates calibrated against logged evidence, not a formula.** The brightness gate had rejected
+  17 evening renders in five weeks; replayed against those real verdicts, the new per-channel
+  limits pass 11 of them, and the other 6 now go through a retry chain instead of ending the
+  evening in silence.
+- 306 tests plus ruff gate every commit (243 before the stabilisation round, which sits on a
+  feature branch that is not merged yet); audio is normalised to a measured −15.0 LUFS with the
   music bed side-chain-ducked under the voice.
 
 ## Trade-offs & what I considered
 
 - **Semi-automatic publishing** was chosen over browser automation. It costs two minutes a day
   and keeps the account alive.
-- **Publish-blind.** There is no analytics feedback loop, `delivered_at` is not stamped by the
-  regular run, and nothing verifies that a delivered video was ever posted. That is a known gap,
-  not a solved problem.
+- **Still publish-blind in practice.** The ways in exist now: the posted/discarded buttons, and an
+  importer for the creator-studio CSV export that maps rows to videos by date and caption
+  similarity and reports an ambiguous match instead of guessing. Neither has seen real input — no
+  button has been pressed, and no real export was available to test the importer against. A known
+  gap with a built path, not a solved problem.
 - **Topic selection takes the first fitting candidate, not the best.** Scripts already get a
   jury; trend topics do not. It is documented as the largest quality lever and deliberately left
   open, because it is a design decision rather than a bug fix.
 
-<!-- sources: /home/nicosutheimer/private/clip-scout/README.md, PROJECT.md (D1-D18, architecture, acceptance), PLAN.md (phases, H1-H2a), docs/sessions/2026-08-12_0032_tagesfutter-channel-and-throttling.md (243 tests, biography filter, Wikimedia 429, scheduled tasks 07:12/18:00/15:00, delivered_at gap), docs/adr/0004-libass-subtitles.md, state/clip_scout.db (ledger: 0 rows with status 'posted') -->
+<!-- sources: /home/nicosutheimer/private/clip-scout/README.md, PROJECT.md (D1-D18, architecture, acceptance), PLAN.md (phases, H1-H2a), docs/sessions/2026-08-12_0032_tagesfutter-channel-and-throttling.md (243 tests, biography filter, Wikimedia 429, scheduled tasks 07:12/18:00/15:00, delivered_at gap), docs/adr/0004-libass-subtitles.md, state/clip_scout.db read-only on 2026-09-27 (0 rows with status 'posted'; post_state: 87 unknown-legacy + 1 NULL, no button press), branch feat/stabilize-and-measure @ 2bdda01 (not merged): docs/superpowers/plans/2026-08-30-stabilize-and-measure.md Outcome 2026-09-20 (306 passed / 1 skipped, baseline 243/1; A1 17 brightness rejections 08-12..09-18, 11 of 17 now pass, 6 to retry chain; A2 root cause status stayed 'buffered', astro held 24 buffered videos, BUFFER_TARGET deviation ~24 evenings; B1 inline buttons via getUpdates, no webhook; C1 CSV importer ±3 days + caption similarity ≥ 0.60, ambiguous reported, no real export tested) -->
