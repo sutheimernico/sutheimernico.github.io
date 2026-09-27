@@ -24,7 +24,9 @@ first, any-gym as a labelled fallback.
 
 Beyond logging: training plans that merge into one editable session list, an exercise library,
 history with a calendar and per-exercise progression, a rest timer, personal-record detection, a
-plate calculator, weekly trends, and JSON export/import.
+plate calculator, weekly trends, and JSON export/import. Since v1.2 ("Trainingsbegleiter") it also
+coaches a little: a double-progression suggestion per exercise, a summary when a session ends, and
+a live session clock.
 
 ## Architecture
 
@@ -48,15 +50,24 @@ app testable at all — the interesting logic never sits inside a component.
 
 ## Implementation
 
-- **179 tests** (up from 62 in the v1.1 round, 2026-08-30) across domain, query layer and screens.
-  The 900-line data layer previously had none; adding integration tests against real SQLite came
-  before adding features.
+- **240 tests** in 20 suites (62 before the v1.1 round, 179 after it, 240 after v1.2) across
+  domain, query layer and screens. The 900-line data layer previously had none; adding integration
+  tests against real SQLite came before adding features.
+- **The history list was the one real hot spot.** Profiled against a synthetic three-year dataset
+  (624 sessions, 17,472 sets), its query took **2,281 ms**: three correlated sub-selects per
+  session, each scanning every set. Rewritten as one grouped pass it takes **24 ms** (one calendar
+  month: 71 → 16 ms) with identical rows, and a query-plan test fails if a correlated sub-select
+  comes back. With two months of real data the old cost was barely visible — it would have hit
+  around year one.
 - An N+1 read in the exercise history was collapsed into a single query and **pinned by a test
   that counts SQL statements**, so the regression cannot come back quietly.
 - The **rest timer is timestamp-based**, not a tick counter: putting the phone away for two
   minutes shows "Pause vorbei" instead of a frozen countdown.
 - **Records are claimed conservatively** — nothing is announced until an exercise has three
   sessions of history, and a tie is never a record.
+- The **progression hint** only speaks when it has grounds: it suggests the next loadable weight
+  once every working set last time hit the rep target, says "stay" otherwise, and stays quiet
+  without history or when last time was another gym. Nothing changes until "Übernehmen" is tapped.
 - The **plate calculator** answers "what do I load per side" or says "nicht exakt stellbar" with
   the neighbouring achievable weights, rather than rounding silently.
 - Weekly trends show untrained weeks as zero and never interpolate them.
@@ -64,15 +75,16 @@ app testable at all — the interesting logic never sits inside a component.
 ## Trade-offs & what I considered
 
 - **Not in any store.** It is installed as a self-built APK; the Play Store's developer fee buys
-  nothing for a single-user app. The v1.1 feature set is code-complete and gated but deliberately
-  not built onto the phone yet — builds happen after a device sign-off, a rule earned from
-  three-hour blind cloud builds.
+  nothing for a single-user app. The v1.1 and v1.2 feature sets are code-complete and gated but
+  deliberately not built onto the phone yet — both device smoke tests are still open, and builds
+  happen after a device sign-off, a rule earned from three-hour blind cloud builds.
 - **Backup honesty over backup theatre.** The rolling on-device backup (newest seven, restorable
   in-app because Android's document picker cannot reach the app's own files) protects against
   accidental deletes, not against losing the device. Manual JSON export covers that case.
 - **Cloud backup is designed, not built.** An optional Google Drive backup is blocked on an OAuth
   client and a dev build; until then, export/import is the migration path.
-- Icon and splash art are still the Expo template with branded colours — cosmetic debt, stated
-  rather than hidden.
+- **Measured and left alone:** the daily auto-backup takes 134 ms for 5 MB at three years of
+  data. Dropping the JSON indentation would roughly halve that, but the backup format is the safety
+  net and does not change in passing.
 
-<!-- sources: /home/nicosutheimer/private/reptic/README.md (features, stack, architecture, backup honesty wording, test harness), PROJECT.md (display name Repz vs internal Reptic, layering rule, needs-nico), PLAN.md (Phase 15 v1.1: "tests 62 → 179", 11 tasks, db split 911 → max 282 lines, statement-counting test, rest timer, records, plates, trends, virtualization; Needs Nico list), AUTOPILOT_LOG.md (EAS preview APK builds, versionCode 5, "no blind 3h EAS builds" rule), app.json (name "Repz", versionCode 5), docs/sessions/2026-08-30_1920_daily-gym-companion-v1-1.md (Play Store fee, OAuth blocker, device smoke test open), git remote -v (no remote → no github link) -->
+<!-- sources: /home/nicosutheimer/private/reptic/README.md (features, stack, architecture, backup honesty wording, test harness), PROJECT.md (display name Repz vs internal Reptic, layering rule, needs-nico), PLAN.md (Phase 12 real icon/splash "design D"; Phase 15 v1.1: "tests 62 → 179", db split 911 → max 282 lines, statement-counting test, rest timer, records, plates, trends; Phase 16 v1.2), docs/superpowers/plans/2026-09-27-v1.2-trainingsbegleiter.md on branch autopilot/work @ 81d0720 (Outcome: "240 passed / 240 in 20 suites (was 179 in 15)", Task 1 progression rules + "Übernehmen", Task 2 "2,281 ms → 24 ms", "71 → 16 ms", 624 sessions / 17,472 sets, query-plan test, "would have hit around year one", backup 134 ms for 5 MB left alone, versionCode stays 5 / no build; Deviations §1 icon already real; smoke test v1.2 open), AUTOPILOT_LOG.md ("no blind 3h EAS builds" rule), docs/sessions/2026-08-30_1920_daily-gym-companion-v1-1.md (Play Store fee, OAuth blocker), git remote -v (no remote → no github link) -->
