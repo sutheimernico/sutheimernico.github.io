@@ -4,13 +4,13 @@ order: 5
 status: research
 year: "2026"
 stack: ["Python", "RAG", "Qdrant", "BGE-M3", "Ollama", "ColQwen2"]
-summary: "A cycle-gated comparison of RAG retrieval techniques on a football-scouting corpus — re-ranking earns its cost, contextual retrieval does not."
+summary: "A closed, cycle-gated comparison of RAG retrieval techniques on a football-scouting corpus — re-ranking earns its cost, contextual retrieval does not."
 role: "one variable per cycle, verdicts published"
 featured: true
 domain: agents
 context: personal
 reviewed: false
-fieldNote: "Regenerating the results table from the raw eval JSON produced an nDCG@10 of 1.02 — mathematically impossible, because the metric credited DCG to every retrieved chunk covering the same ground-truth passage without de-duplicating. It is written up rather than silently patched: the fix moves every cycle's numbers and needs a full re-run."
+fieldNote: "Regenerating the results table from the raw eval JSON produced an nDCG@10 of 1.02 — mathematically impossible, because the metric credited every retrieved chunk covering the same ground-truth passage. After the fix, rescored from the stored runs, only the re-ranked configurations dropped (about −0.03): re-ranking is exactly what pulls several chunks of one source into the top ten. No verdict changed — but one stated reason did, and the write-up says so."
 ---
 
 ## What it is
@@ -19,7 +19,8 @@ A measured comparison study of retrieval techniques over a mixed football-scouti
 283 prose analysis articles, seven season stat tables and 84 self-rendered stat sheets, about
 **955,000 text tokens**. The deliverable is not "a RAG pipeline that runs" but a comparison table
 with per-question-type deltas, cost and latency for every technique. Everything runs locally on
-CPU, no paid APIs.
+CPU, no paid APIs. **The study is closed**: every text cycle has a verdict, the visual cycle is closed
+without one, and two optional cycles were declined against triggers written down in advance.
 
 ## Architecture
 
@@ -52,13 +53,21 @@ hand-transcribed version had already drifted — regenerating it corrected Preci
   fusion is dropped when a re-ranker is present, one component less for the same quality.
 - **Contextual retrieval: dropped.** About six hours of CPU context generation for 2,127 chunks plus
   100 minutes of re-encoding bought a bootstrap delta of exactly [0.00, 0.00]. A negative result,
-  documented as one.
+  documented as one — and one whose stated reason had to change: before the nDCG fix, contextual
+  looked 0.0030 *worse* under the re-ranker, after it 0.0021 *better*. Both are far below what 59
+  queries can resolve, so the honest reading is "no measurable difference in either direction",
+  not "measurably worse". The drop stands on cost alone.
+- **Re-ranking survives the metric fix.** Its nDCG@10 gain over plain dense retrieval shrank by a
+  third (0.5340 → 0.6157, +0.08) because part of it was the double-counting — and the keep/drop
+  calls never rested on nDCG anyway, but on Recall@5, MRR and paired bootstrap intervals, which the
+  bug did not touch.
 - **Grounding is worth measuring, not assuming.** Closed book, the generator gets **0.00** of the
   post-cutoff numbers right; with naive retrieval, 0.72 (n = 18).
 - **The bottleneck moved.** From cycle 3 on, retrieval kept improving while answer quality
   plateaued at 0.78 — the generator, not retrieval, is the end-to-end limit. That measurement is
   the documented reason the agentic and GraphRAG cycles were *declined* rather than built.
-- 88 tests gate the harness, the metrics and the renderers.
+- 92 tests gate the harness, the metrics and the renderers, including regression tests for the
+  de-duplicated nDCG.
 
 ## Trade-offs & what I considered
 
@@ -70,8 +79,11 @@ hand-transcribed version had already drifted — regenerating it corrected Preci
 - **CPU-honest latency.** Re-ranking takes retrieval from 0.38 s to **29.6 s** per query (30
   cross-encoder passes without a GPU). Reported as measured, with the caveat that it is not
   production-representative.
-- **The eval set's own weak points are on the record.** The golden set was annotated by an AI with
-  a 20 % human review sample, and on a 13-item manual check the judge agreed with the strict reading
-  only 7 times. Aggregates are usable; single verdicts are not.
+- **The eval set's own weak points are on the record.** The golden set was written and annotated
+  by the same AI that built the pipelines; a 20 % human review sample was prepared but never
+  completed, so it counts as not independently reviewed. On a 13-item manual check the judge agreed
+  with the strict reading only 7 times. Aggregates are usable; single verdicts are not.
+- **A metric bug was published for weeks.** It is written up in the final synthesis rather than
+  patched quietly — a study about honest measurement does not get to leave that out.
 
-<!-- sources: /home/nicosutheimer/private/scouting-rag/PROJECT.md (cycle table and verdicts, 59 golden queries and their types, chunking-agnostic ground truth, iron principles, n≈13-18, stack: Qdrant embedded, BGE-M3, rank_bm25, bge-reranker-v2-m3, ColQwen2, Ollama qwen2.5:7b / qwen2.5vl:7b / llama3.1:8b), README.md (deliverable framing, local CPU-only, no paid APIs), CORPUS.md (283 prose docs, 7 stat CSVs, 84 PNG stat sheets, 955,351 text tokens), results.md (Recall@5 0.60→0.67, semantic 0.87→1.00, MRR 0.52→0.63, failure@5 0.40→0.33, bootstrap 10,000 resamples and the cycle-3→4 CI [0.00,0.00], dense+rerank ≡ hybrid+rerank ablation, contextual cost ~6h for 2,127 chunks + ~100 min re-encode, closed-book number-hit 0.00 vs 0.72 at n=18, number-hit plateau 0.78 from cycle 3, latency 0.38s → 29.6s, cycle-5 Recall@5 0.15 (2/13) and the colpali_engine/transformers state-dict root cause, judge manual check 7/13 strict, nDCG@10 1.02 write-up), AUTOPILOT_LOG.md (88/88 tests green, 2026-07-02 cycle-5 run), docs/superpowers/plans/2026-07-21-close-the-study.md (nDCG bug location and fix scope, Precision@5 over-correction, golden-set 20% human review), git log first commit 2026-06-05 (year), git remote + gh repo view sutheimernico/RAG-Projekt → PRIVATE (no github link) -->
+<!-- sources: /home/nicosutheimer/private/scouting-rag/PROJECT.md (cycle table and verdicts, 59 golden queries and their types, chunking-agnostic ground truth, iron principles, n≈13-18, stack: Qdrant embedded, BGE-M3, rank_bm25, bge-reranker-v2-m3, ColQwen2, Ollama qwen2.5:7b / qwen2.5vl:7b / llama3.1:8b), README.md (deliverable framing, local CPU-only, no paid APIs), CORPUS.md (283 prose docs, 7 stat CSVs, 84 PNG stat sheets, 955,351 text tokens), results.md (Recall@5 0.60→0.67, semantic 0.87→1.00, MRR 0.52→0.63, failure@5 0.40→0.33, bootstrap 10,000 resamples and the cycle-3→4 CI [0.00,0.00], dense+rerank ≡ hybrid+rerank ablation, contextual cost ~6h for 2,127 chunks + ~100 min re-encode, closed-book number-hit 0.00 vs 0.72 at n=18, number-hit plateau 0.78 from cycle 3, latency 0.38s → 29.6s, cycle-5 Recall@5 0.15 (2/13) and the colpali_engine/transformers state-dict root cause, judge manual check 7/13 strict, nDCG@10 1.02 write-up), AUTOPILOT_LOG.md (2026-07-02 cycle-5 run), docs/superpowers/plans/2026-07-21-close-the-study.md (nDCG bug location and fix scope, Precision@5 over-correction); branch feat/close-the-study @ 9b45164: LOOP.md ("Status 2026-09-20: the study is closed"), eval/results/NDCG-FIX-IMPACT.md (rescored from stored artefacts; dense/hybrid unchanged, cycle3 dense+rerank 0.6507 → 0.6157, hybrid+rerank 0.6486 → 0.6149, cycle4 ctx+rerank 0.6477 → 0.6178; rerank still +0.08 over dense 0.5340 → 0.6157, gain shrank by a third; contextual worse by 0.0030 before vs better by 0.0021 after, sign flipped, not distinguishable from zero), results.md §Final synthesis (decision table, cycles 6/7 declined against pre-registered triggers, "It changes no verdict", verdicts carried by recall@5/MRR/bootstrap, "published wrong for weeks") and §Limitations 1 (20% review sample generated but never completed → not independently reviewed), README.md Honest limitations, tests/ on that branch (92 test functions), git log first commit 2026-06-05 (year), git remote + gh repo view sutheimernico/RAG-Projekt → PRIVATE (no github link) -->
