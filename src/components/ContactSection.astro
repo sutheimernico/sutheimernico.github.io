@@ -1,13 +1,13 @@
 ---
 // ContactSection.astro
-// linkedin handle is a placeholder — Nico to confirm real handle later
+// Private contact channels only; the employer address must not appear on the public site.
 ---
 
 <section id="contact" class="contact-sec">
   <div class="wrap">
     <div class="contact-header reveal">
       <div class="eyebrow contact-eyebrow">Get in touch</div>
-      <h2 class="sec-title">Let's build something that reads the data right.</h2>
+      <h2 class="sec-title" data-decode>Let's build something that reads the data right.</h2>
     </div>
     <div class="term reveal">
       <div class="term-bar">
@@ -16,14 +16,12 @@
         <span class="d"></span>
         <span class="t">nico@portfolio: ~/contact</span>
       </div>
-      <div class="term-body">
+      <div class="term-body" data-stagger>
         <div><span class="cm"># reach out — pick a channel</span></div>
-        <div><span class="pr">&gt;</span> mail&nbsp;&nbsp;&nbsp;<a href="mailto:sutheimer.nico@gmail.com">sutheimer.nico@gmail.com</a></div>
+        <div><span class="pr">&gt;</span> mail&nbsp;&nbsp;&nbsp;&nbsp;<a href="mailto:sutheimer.nico@gmail.com">sutheimer.nico@gmail.com</a></div>
         <div><span class="pr">&gt;</span> linkedin&nbsp;<a href="https://www.linkedin.com/in/nico-sutheimer-5b50a82b9/" rel="noopener noreferrer">in/nico-sutheimer-5b50a82b9</a></div>
-        <div><span class="pr">&gt;</span> github&nbsp;<a href="https://github.com/sutheimernico" rel="noopener noreferrer">github.com/sutheimernico</a></div>
-        <!-- LinkedIn is a placeholder: rendered as inert text (not a dead link) until Nico
-             confirms the real handle, then swap the span for an <a href="…">. -->
-        <div><span class="pr">&gt;</span> linkedin&nbsp;<span class="soon">in/nico-sutheimer <span class="soon-tag">(soon)</span></span></div>
+        <div><span class="pr">&gt;</span> github&nbsp;&nbsp;<a href="https://github.com/sutheimernico" rel="noopener noreferrer">github.com/sutheimernico</a></div>
+        <div><span class="pr">&gt;</span> source&nbsp;&nbsp;<a href="https://github.com/sutheimernico/sutheimernico.github.io" rel="noopener noreferrer">this site, as a repo</a></div>
         <div><span class="pr">&gt;</span> <span class="cur">_</span></div>
       </div>
     </div>
@@ -52,6 +50,7 @@
     overflow: hidden;
     max-width: 720px;
     margin: 0 auto;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
   }
 
   .term-bar {
@@ -88,6 +87,18 @@
     font-family: var(--mono);
   }
 
+  /* lines print in as the terminal scrolls into view — CSS only, visible without JS */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .term-body > div {
+        animation: lineIn 1ms linear both;
+        animation-timeline: view();
+        animation-range: entry calc(10% + var(--i, 0) * 6%) entry calc(45% + var(--i, 0) * 6%);
+      }
+    }
+  }
+  @keyframes lineIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+
   .pr {
     color: var(--accent);
   }
@@ -100,10 +111,11 @@
     color: var(--ink);
     text-decoration: none;
     border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, color 0.2s;
   }
 
   .term-body a:hover {
+    color: var(--accent);
     border-bottom-color: var(--accent);
   }
 
@@ -111,16 +123,6 @@
     outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 3px;
-  }
-
-  /* placeholder channel — inert, visibly not-yet-live, kept out of the tab order */
-  .soon {
-    color: var(--ink-dim);
-  }
-  .soon-tag {
-    color: var(--ink-faint);
-    font-size: 0.85em;
-    letter-spacing: 0.04em;
   }
 
   .cur {
@@ -133,8 +135,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cur {
-      animation: none;
-    }
+    .cur { animation: none; }
   }
 </style>

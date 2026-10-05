@@ -5,7 +5,8 @@
  * "Shift" button that cross-fades through all five dark palettes via rAF.
  *
  * Behaviour:
- * - Reads saved preference from localStorage('ns-theme2') on mount; defaults to 'shift'.
+ * - Reads saved preference from localStorage('ns-theme2') on mount; defaults to 'phosphor'
+ *   (Shift stays opt-in: its palette writes recalc styles page-wide ~20×/s).
  * - Sets html[data-theme] and persists changes back to localStorage.
  * - Shift mode: starts rAF loop that advances t by 0.0083 every 3rd frame, calling
  *   paletteAt(t) to derive CSS var values and applying them as inline styles on <html>.
@@ -37,9 +38,9 @@ function isValidId(v: unknown): v is ThemeId {
 function readSaved(): ThemeId {
   try {
     const raw = localStorage.getItem('ns-theme2');
-    return isValidId(raw) ? raw : 'shift';
+    return isValidId(raw) ? raw : 'phosphor';
   } catch {
-    return 'shift';
+    return 'phosphor';
   }
 }
 
@@ -59,7 +60,7 @@ function stopShiftVars(): void {
 }
 
 export default function ThemeSwitcher() {
-  const [active, setActive] = useState<ThemeId>('shift');
+  const [active, setActive] = useState<ThemeId>('phosphor');
 
   // rAF state kept in refs so the loop closure is stable.
   const rafRef = useRef<number | null>(null);
@@ -95,8 +96,8 @@ export default function ThemeSwitcher() {
     if (rafRef.current !== null) return; // already running
     const loop = () => {
       frameCountRef.current += 1;
-      if (frameCountRef.current % 3 === 0) {
-        tRef.current = (tRef.current + 0.0083) % 5; // 5 palettes
+      if (frameCountRef.current % 6 === 0) {
+        tRef.current = (tRef.current + 0.0166) % 5; // 5 palettes
         const palette = paletteAt(tRef.current);
         const root = document.documentElement;
         for (const [name, value] of Object.entries(palette)) {
@@ -148,6 +149,13 @@ export default function ThemeSwitcher() {
     const saved = readSaved();
     applyTheme(saved, /* skipFlash */ true);
 
+    // This island is transition:persist-ed, so it survives client-side
+    // navigation — but the ClientRouter swap wipes every <html> attribute,
+    // including data-theme and the inline vars the shift loop writes. Re-apply
+    // the current theme synchronously after each swap so nothing flashes.
+    const onAfterSwap = () => applyTheme(readSaved(), /* skipFlash */ true);
+    document.addEventListener('astro:after-swap', onAfterSwap);
+
     const onKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName ?? '';
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -160,6 +168,7 @@ export default function ThemeSwitcher() {
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('astro:after-swap', onAfterSwap);
       // Clean up rAF on unmount.
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);

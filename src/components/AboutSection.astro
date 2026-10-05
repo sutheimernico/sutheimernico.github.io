@@ -6,17 +6,19 @@ import NsMonogram from './NsMonogram.astro';
   <div class="wrap">
     <div class="reveal">
       <div class="eyebrow">About</div>
-      <h2 class="sec-title">Between the raw data and the decision.</h2>
+      <h2 class="sec-title" data-decode>Woher weiß ich, dass es funktioniert?</h2>
+      <p class="sec-sub">“How do I know it works?” — the first question I ask any AI system, and the one this whole portfolio tries to answer.</p>
     </div>
     <div class="about-grid reveal">
       <div class="about-portrait" aria-hidden="true">
         <NsMonogram />
         <span class="ap-meta">NS · identity</span>
       </div>
-      <div>
-        <p>I'm <b>Nico</b> — a data &amp; BI engineer building the after-sales analytics platform at <b>bekumoo</b>. I live in the layer between raw data and the decisions it should drive: orchestrating pipelines, modeling warehouses, and shipping the dashboards people actually open.</p>
-        <p>Lately I've been teaching <b>language models to reason over domain data</b> — a retrieval-augmented scouting assistant being the current playground. Solid in SQL, Python, TypeScript and Azure; frontend and React are my deliberate growth edge, and this site is part of that work.</p>
-        <p class="placeholder-note">— prototype copy, grounded but placeholder</p>
+      <div class="about-copy" data-stagger>
+        <p>I'm <b>Nico</b>, a <b>Fullstack Developer</b> at bekumoo Software GmbH in Osnabrück. I work on the company's analytics platform (Python and FastAPI in the backend, React and TypeScript in the frontend), on its own LLM-based chatbot, and I built and run an internal company platform on Azure, with infrastructure as code in Pulumi, CI/CD and SSO.</p>
+        <p>I joined bekumoo in 2023 as a dual-study student and started with Power BI and Azure Synapse reporting. Through my first university projects (for example the <a href="https://github.com/g-dev-net/HSOS-Programmierprojekt" rel="noopener noreferrer">programming team project</a>) I grew into data engineering and then into backend and frontend development. I finished my Bachelor in Wirtschaftsinformatik at Hochschule Osnabrück in 2026 and have been working as a developer since July.</p>
+        <p>I work with <b>Claude Code</b> every day, with my own setup of skills, agents, rules and context engineering. The point is quality: tests, reviews and understanding the code that ships, not vibe coding.</p>
+        <p>In my spare time I build data science and ML projects, LLM tools and agents, small games and mobile apps. They are on this site because they measure themselves: <b>how do I know it works?</b> is the first question I ask any system, and the one this portfolio tries to answer.</p>
       </div>
     </div>
   </div>
@@ -25,6 +27,13 @@ import NsMonogram from './NsMonogram.astro';
 <style>
   .about-sec {
     padding: 14vh 0;
+  }
+
+  .sec-sub {
+    margin: 14px 0 0;
+    color: var(--ink-dim);
+    font-size: 15px;
+    max-width: 60ch;
   }
 
   .about-grid {
@@ -42,29 +51,44 @@ import NsMonogram from './NsMonogram.astro';
     }
   }
 
-  .about-grid p {
+  .about-copy p {
     color: var(--ink-dim);
     font-size: 16px;
     line-height: 1.75;
     font-family: var(--mono);
+    margin: 0;
   }
 
-  .about-grid p + p {
+  .about-copy p + p {
     margin-top: 18px;
   }
 
-  .about-grid b {
+  /* paragraphs cascade in as they scroll into view — CSS only, visible without JS */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .about-copy p {
+        animation: pIn 1ms linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 45%;
+      }
+    }
+  }
+  @keyframes pIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .about-copy a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--accent-soft);
+    text-decoration: none;
+  }
+
+  .about-copy b {
     color: var(--ink);
     font-weight: 500;
   }
 
-  .placeholder-note {
-    color: var(--ink-faint) !important;
-    font-size: 13px !important;
-  }
-
   .about-portrait {
-    position: relative;
+    position: sticky;
+    top: 110px;
     width: 100%;
     aspect-ratio: 1;
     max-width: 240px;
@@ -97,6 +121,10 @@ import NsMonogram from './NsMonogram.astro';
     width: 60%;
     height: auto;
     overflow: visible;
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    50% { transform: translateY(-4px) scale(1.02); }
   }
 
   .ap-meta {
@@ -109,5 +137,9 @@ import NsMonogram from './NsMonogram.astro';
     color: var(--ink-faint);
     font-family: var(--mono);
     z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-portrait :global(svg) { animation: none; }
   }
 </style>

@@ -3,48 +3,63 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher';
-import ColdBoot from '../components/ColdBoot';
-import HeroSection from '../components/HeroSection.astro';
-import DataSpine from '../components/DataSpine';
-import ProjectDeck from '../components/ProjectDeck';
+import Descent from '../components/Descent.astro';
+import ProjectIndex from '../components/ProjectIndex';
 import Constellation from '../components/Constellation';
 import AboutSection from '../components/AboutSection.astro';
 import ContactSection from '../components/ContactSection.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { DOMAINS, topStack } from '../lib/domains';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const spineProjects = projects.map((p) => ({
-  title: p.data.title,
+
+const rideProjects = projects.map((p) => ({
   slug: p.id,
+  title: p.data.title,
   role: p.data.role,
   summary: p.data.summary,
   stack: p.data.stack,
+  status: p.data.status,
+  domain: p.data.domain,
+  context: p.data.context,
 }));
-const deckProjects = projects.map((p) => ({
-  title: p.data.title,
+const indexProjects = projects.map((p) => ({
   slug: p.id,
+  title: p.data.title,
   status: p.data.status,
   year: p.data.year,
   stack: p.data.stack,
   summary: p.data.summary,
+  domain: p.data.domain,
+  context: p.data.context,
+  featured: false, // every row carries its transition name — the ride panels have none
 }));
+
+const skills = topStack(projects.map((p) => p.data.stack), 16);
+const nLive = projects.filter((p) => p.data.status === 'production').length;
+const nWork = projects.filter((p) => p.data.context === 'work').length;
 ---
 <Base>
-  <ColdBoot client:load />
   <Nav />
 
   <main id="main">
-  <HeroSection />
+  <Descent projects={rideProjects} />
 
-  <DataSpine client:visible projects={spineProjects} />
-
-  <section class="deck-sec" id="projects">
+  <section class="index-sec" id="index">
     <div class="wrap">
-      <div class="reveal">
-        <div class="eyebrow">Selected Projects</div>
-        <h2 class="sec-title">Things that shipped — and things in flight.</h2>
+      <div class="reveal index-head">
+        <div>
+          <div class="eyebrow">Index</div>
+          <h2 class="sec-title" data-decode>Everything on the bench.</h2>
+        </div>
+        <dl class="index-stats" aria-label="Portfolio totals">
+          <div><dt>projects</dt><dd><span data-count={projects.length}>{projects.length}</span></dd></div>
+          <div><dt>in operation</dt><dd><span data-count={nLive}>{nLive}</span></dd></div>
+          <div><dt>domains</dt><dd><span data-count={DOMAINS.length}>{DOMAINS.length}</span></dd></div>
+          <div><dt>at work</dt><dd><span data-count={nWork}>{nWork}</span></dd></div>
+        </dl>
       </div>
-      <ProjectDeck client:visible projects={deckProjects} />
+      <ProjectIndex client:visible projects={indexProjects} />
     </div>
   </section>
 
@@ -52,9 +67,9 @@ const deckProjects = projects.map((p) => ({
     <div class="wrap">
       <div class="reveal">
         <div class="eyebrow">The Stack, Alive</div>
-        <h2 class="sec-title">A living graph of how I work.</h2>
+        <h2 class="sec-title" data-decode>A living graph of how I work.</h2>
       </div>
-      <Constellation client:visible />
+      <Constellation client:visible skills={skills} />
     </div>
   </section>
 
@@ -64,5 +79,40 @@ const deckProjects = projects.map((p) => ({
 
   <SiteFooter />
 
-  <ThemeSwitcher client:idle />
+  <ThemeSwitcher client:idle transition:persist="theme" />
 </Base>
+
+<style>
+  .index-sec { padding: 12vh 0 14vh; }
+
+  .index-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .index-stats {
+    display: flex;
+    gap: 28px;
+    margin: 0;
+    padding-bottom: 6px;
+  }
+  .index-stats div { display: flex; flex-direction: column-reverse; gap: 2px; }
+  .index-stats dt {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .index-stats dd {
+    margin: 0;
+    font-family: var(--disp);
+    font-size: clamp(22px, 2.6vw, 30px);
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

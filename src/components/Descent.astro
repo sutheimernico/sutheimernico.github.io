@@ -1,0 +1,151 @@
+---
+/**
+ * Descent — the landing ride. A sticky viewport inside a tall section; the
+ * camera dollies through the hero, an entry gate, one panel per project
+ * (alternating left/right) and an exit gate. Driven by src/scripts/descent.ts;
+ * geometry in src/lib/descent.ts; styles in src/styles/descent.css.
+ *
+ * Without JS (or with reduced motion) the section is one viewport tall and
+ * shows the hero; the index below lists every project.
+ */
+import { rideLayout, panelPlacement, markerPlacement, depthLabel } from '../lib/descent';
+import { domainLabel, type DomainId } from '../lib/domains';
+import type { ProjectStatus } from '../lib/projectSchema';
+
+export interface RideProject {
+  slug: string;
+  title: string;
+  role: string;
+  summary: string;
+  stack: string[];
+  status: ProjectStatus;
+  domain: DomainId;
+  context: 'personal' | 'work';
+}
+
+interface Props {
+  projects: RideProject[];
+}
+const { projects } = Astro.props;
+
+const L = rideLayout(projects.length);
+const N = projects.length;
+const pad = (n: number) => String(n).padStart(2, '0');
+const BADGE: Record<ProjectStatus, { label: string; cls: string }> = {
+  production: { label: 'Production', cls: 'live' },
+  'in-progress': { label: 'WIP', cls: 'wip' },
+  research: { label: 'Research', cls: 'wip' },
+  internal: { label: 'Internal', cls: '' },
+};
+// server-side placement at a typical desktop width; the script re-places on load/resize
+const VW0 = 1280;
+const place = (x: number, y: number, d: number, rotY = 0) =>
+  `transform:translate(-50%,-50%) translate3d(${x}px,${y}px,${-d}px)${rotY ? ` rotateY(${rotY}deg)` : ''}`;
+const stations = ['SURFACE', ...projects.map((p) => p.title.toUpperCase()), 'END OF TRACK · INDEX BELOW'];
+const stationDepths = [0, ...L.panels, L.gateOut];
+const NAME = ['NICO', 'SUTHEIMER'];
+---
+
+<section class="ride-sec" id="work" data-ride data-stations={JSON.stringify(stations)}>
+  <div class="viewport">
+    <div class="stage">
+      <div class="floor" aria-hidden="true"><div class="floor-grid" data-floor><div class="cline"></div></div></div>
+      <div class="tglow" aria-hidden="true"></div>
+
+      <div class="world" data-world>
+        <!-- station 0: hero -->
+        <div class="zp hero-a" data-d={L.heroA} data-k="hero" style={place(0, 0, L.heroA)}>
+          <div class="eyebrow ride-eyebrow">
+            <span class="role-wrap"><span class="role" data-role>Fullstack Developer</span><span class="role-cur" aria-hidden="true"></span></span>
+          </div>
+          <h1 class="name" aria-label="Nico Sutheimer">
+            {NAME.map((row, r) => (
+              <span class="row" aria-hidden="true">
+                {row.split('').map((ch, i) => (
+                  <span class="ltr" style={`animation-delay:${(0.45 + (r * 4 + i) * 0.042).toFixed(3)}s`}>{ch}</span>
+                ))}
+              </span>
+            ))}
+          </h1>
+        </div>
+        <div class="zp hero-b" data-d={L.heroB} data-k="hero" style={place(0, 0, L.heroB)}>
+          <p class="tagline">I turn <b>raw data</b> into <b>decisions</b> — and check whether they were right.</p>
+          <p class="hero-meta">fullstack <span class="sep">·</span> data <span class="sep">·</span> agents <span class="sep">·</span> evaluation</p>
+        </div>
+
+        <!-- entry gate -->
+        <div class="zp gate" data-d={L.gateIn} data-k="gate" aria-hidden="true" style={place(0, 0, L.gateIn)}>
+          <i class="tl"></i><i class="tr"></i><i class="bl2"></i><i class="br"></i>
+          <span class="glabel">dir ~/projects · {N} entries</span>
+        </div>
+
+        <!-- depth markers -->
+        {L.markers.map((d, i) => {
+          const m = markerPlacement(i, VW0);
+          return (
+            <div class="zp mk" data-d={d} data-k="mk" aria-hidden="true" style={place(m.x, m.y, d)}>
+              <span class="plus">+</span>{depthLabel(d)}M
+            </div>
+          );
+        })}
+
+        <!-- one panel per project -->
+        {projects.map((p, i) => {
+          const d = L.panels[i];
+          const pl = panelPlacement(i, VW0);
+          const b = BADGE[p.status];
+          return (
+            <a
+              class="zp panel"
+              href={`/projects/${p.slug}`}
+              data-d={d}
+              data-k="panel"
+              tabindex="-1"
+              style={`${place(pl.x, pl.y, d, pl.rotY)};opacity:0`}
+              aria-label={`Open project: ${p.title}`}
+            >
+              <span class="p-head">
+                <span class="led" aria-hidden="true"></span>
+                <span class="path">&gt; cd ~/projects/{p.slug}</span>
+                <span class={`badge${b.cls ? ` ${b.cls}` : ''}`}>{b.label}</span>
+              </span>
+              <span class="p-body">
+                <span class="p-idx"><b>{pad(i + 1)} / {pad(N)}</b> · {p.context === 'work' ? '@ bekumoo' : domainLabel(p.domain)}</span>
+                <span class="p-title">{p.title}</span>
+                <span class="p-role">{p.role}</span>
+                <span class="p-sum">{p.summary}</span>
+                <span class="p-stack">{p.stack.slice(0, 5).map((s) => <span class="chip">{s}</span>)}</span>
+                <span class="p-line"><span class="dollar">$ </span><span class="typed">open {p.slug} →</span><span class="cur" aria-hidden="true"></span></span>
+              </span>
+            </a>
+          );
+        })}
+
+        <!-- exit gate -->
+        <div class="zp gate" data-d={L.gateOut} data-k="gate" aria-hidden="true" style={place(0, 0, L.gateOut)}>
+          <i class="tl"></i><i class="tr"></i><i class="bl2"></i><i class="br"></i>
+          <span class="glabel">end of track · {depthLabel(L.gateOut)}M · index below ↓</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bootlog" aria-hidden="true">
+      <div>&gt; cam.rig ....... <span class="ok">OK</span></div>
+      <div>&gt; track {depthLabel(L.maxD)}M ... <span class="ok">LOCKED</span></div>
+      <div>&gt; descent ....... <span class="ok">READY</span></div>
+    </div>
+
+    <div class="cue" data-cue aria-hidden="true">scroll to descend <span class="arrow">▾</span></div>
+
+    <div class="hud-bot" aria-hidden="true">
+      <div class="g-depth">DEPTH <b data-depth>0000</b>M <span class="max">/ {depthLabel(L.maxD)}M</span></div>
+      <div class="rail" data-rail>
+        {stationDepths.map((d, j) => (
+          <button type="button" class={`sdot${j === 0 ? ' here' : ''}`} data-dot={j} style={`left:${((d / L.maxD) * 100).toFixed(2)}%`} tabindex="-1"></button>
+        ))}
+        <div class="needle" data-needle></div>
+      </div>
+      <div class="g-stn" data-stn><b>STN 00</b> · SURFACE</div>
+    </div>
+  </div>
+</section>

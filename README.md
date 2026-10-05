@@ -6,11 +6,14 @@ an animated "Shift" mode), deliberate motion design, no generic template aesthet
 
 ## Status
 
-Live at **https://sutheimernico.github.io/** — Astro + React islands landing page (cold boot,
-hero, scroll-driven data spine, project deck, skill constellation, about/contact) plus a
-per-project detail page at `/projects/<slug>`. Projects are an `astro:content` collection —
-see `CLAUDE.md` → "Adding a project" for the how-to. Still open: visual/motion browser
-verification pass and Nico's content pass (bio prose, LinkedIn handle).
+Live at **https://sutheimernico.github.io/** — the landing is **Descent**, a scroll-driven
+camera ride: the name in 3D space, then one window per project approaching left and right as
+you dolly past, a HUD depth gauge, an exit gate — followed by a filterable process-table index
+of every project, the skill constellation, about and contact. Each project has a detail page at
+`/projects/<slug>` with field note, live-proof line and prev/next; client-side navigation with
+view transitions. Projects are an `astro:content` collection — see `CLAUDE.md` → "Adding a
+project" for the how-to. Content is drafted by Claude and flagged `reviewed: false` until Nico
+signs it off.
 
 ## Stack
 

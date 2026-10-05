@@ -4,6 +4,7 @@ import { projectSchema } from './projectSchema';
 const valid = {
   title: 'After-Sales BI Platform', order: 1, status: 'production',
   year: '2024', stack: ['Azure','dbt'], summary: 'x', role: 'the backbone', featured: true,
+  domain: 'data',
 };
 
 describe('projectSchema', () => {
@@ -16,10 +17,22 @@ describe('projectSchema', () => {
   it('requires a numeric order', () => {
     expect(projectSchema.safeParse({ ...valid, order: 'first' }).success).toBe(false);
   });
-  it('defaults featured to true when omitted', () => {
+  it('defaults featured to false when omitted (flagships opt in)', () => {
     const { featured, ...rest } = valid;
-    const parsed = projectSchema.parse(rest);
-    expect(parsed.featured).toBe(true);
+    expect(projectSchema.parse(rest).featured).toBe(false);
+  });
+  it('requires a known domain', () => {
+    const { domain, ...rest } = valid;
+    expect(projectSchema.safeParse(rest).success).toBe(false);
+    expect(projectSchema.safeParse({ ...valid, domain: 'crypto' }).success).toBe(false);
+  });
+  it('defaults context to personal and reviewed to false', () => {
+    const parsed = projectSchema.parse(valid);
+    expect(parsed.context).toBe('personal');
+    expect(parsed.reviewed).toBe(false);
+  });
+  it('accepts an optional fieldNote', () => {
+    expect(projectSchema.parse({ ...valid, fieldNote: 'note' }).fieldNote).toBe('note');
   });
   it('parses without a github field (optional)', () => {
     expect(projectSchema.safeParse(valid).success).toBe(true);

@@ -1,34 +1,27 @@
 ---
 import NsMonogram from './NsMonogram.astro';
+// Absolute hashes so the same nav works on the start page and one click deep.
+// Scroll state (.solid) and the active-section marker are driven by
+// src/scripts/chrome.ts; this component is pure markup.
+const LINKS = [
+  ['#work', 'Work'],
+  ['#index', 'Index'],
+  ['#skills', 'Skills'],
+  ['#about', 'About'],
+  ['#contact', 'Contact'],
+] as const;
 ---
 
-<nav id="nav" aria-label="Site navigation">
-  <a class="nav-mark" href="#top" aria-label="Nico Sutheimer — home">
+<nav id="nav" aria-label="Site navigation" transition:persist="nav">
+  <a class="nav-mark" href="/#top" aria-label="Nico Sutheimer — home">
     <NsMonogram combined />
     <span>NS</span>
   </a>
 
   <div class="nav-links" aria-label="Page sections">
-    <a href="#work">Work</a>
-    <a href="#projects">Projects</a>
-    <a href="#skills">Skills</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
+    {LINKS.map(([href, label]) => <a href={`/${href}`}>{label}</a>)}
   </div>
 </nav>
-
-{/* Inline script: add .solid when user scrolls past 60 px. */}
-<script is:inline>
-  (function () {
-    var nav = document.getElementById('nav');
-    if (!nav) return;
-    function tick() {
-      nav.classList.toggle('solid', window.scrollY > 60);
-    }
-    window.addEventListener('scroll', tick, { passive: true });
-    tick();
-  })();
-</script>
 
 <style>
   nav {
@@ -40,7 +33,7 @@ import NsMonogram from './NsMonogram.astro';
     justify-content: space-between;
     padding: 16px 28px;
     border-bottom: 1px solid transparent;
-    transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, backdrop-filter 0.3s;
   }
 
   nav.solid {
@@ -63,7 +56,9 @@ import NsMonogram from './NsMonogram.astro';
   /* The SVG inherits currentColor from parent — accent via global `a` colour */
   .nav-mark :global(svg) {
     color: var(--accent);
+    transition: transform var(--dur-mid) var(--ease-out);
   }
+  .nav-mark:hover :global(svg) { transform: rotate(-8deg) scale(1.08); }
 
   .nav-links {
     display: flex;
@@ -73,14 +68,28 @@ import NsMonogram from './NsMonogram.astro';
   }
 
   .nav-links a {
+    position: relative;
+    padding: 4px 0;
     color: var(--ink-dim);
     text-decoration: none;
     transition: color 0.2s;
   }
 
-  .nav-links a:hover {
-    color: var(--accent);
+  /* active-section marker: a hairline that grows from the left */
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-mid) var(--ease-out);
   }
+
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a[aria-current="true"] { color: var(--ink); }
+  .nav-links a[aria-current="true"]::after { transform: scaleX(1); }
 
   .nav-links a:focus-visible,
   .nav-mark:focus-visible {

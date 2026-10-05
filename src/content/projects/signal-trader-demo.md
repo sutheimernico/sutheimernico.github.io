@@ -1,13 +1,16 @@
 ---
 title: "Signal Trader"
-order: 4
+order: 18
 status: research
 year: "2026"
 stack: ["Python", "LightGBM", "vectorbt", "FastAPI", "React"]
 summary: "An honest paper-only backtest harness — point-in-time data, costs always on, failed experiments left visible."
 role: "an honest harness, not an edge"
-featured: true
+featured: false
 github: https://github.com/sutheimernico/signal-trader-demo
+domain: ml
+context: personal
+reviewed: false
 ---
 
 ## What it is
@@ -77,5 +80,3 @@ is taken seriously.
   deliberate, non-negotiable constraint, not a missing feature.
 - **Dual engines cost duplication.** Maintaining two backtest paths is more work than one, paid
   willingly because the disagreement between them is the realism signal.
-
-_(draft — Nico to refine)_
