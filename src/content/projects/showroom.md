@@ -7,6 +7,7 @@ stack: ["Three.js", "GLSL", "GSAP", "Lenis", "Playwright"]
 summary: "A lab of scroll-driven 3D web scenes built with no build step — and an honest lesson about verifying graphics on a software renderer."
 role: "software-rendered, GPU check pending"
 featured: false
+github: https://github.com/sutheimernico/showroom
 domain: product
 context: personal
 reviewed: false
@@ -57,7 +58,5 @@ Three findings are worth more than the scenes themselves:
   environment are labelled non-representative, and the record is clear about what it cost —
   a scene marked done was later rejected on a real display as "flat boxes with painted-on
   puddles". Two rebuild plans are written and unexecuted.
-- **Local only, deliberately.** No remote, no hosting, no tracking — public hosting is a separate
+- **Source only, deliberately.** The repository is public, but there is no hosting and no tracking — public hosting is a separate
   later decision.
-
-<!-- sources: /home/nicosutheimer/private/showroom/PROJECT.md (the bar, constraints, stack: Three.js r185 / GSAP 3.13 / Lenis 1.3 / CDN importmap / no build, CC0 asset policy, gallery), PLAN.md (23-concept table with 6 touched, progress log: instanceMatrix trap, MSAA/SwiftShader measurement, NaN black rectangles on real GPU not reproducible under SwiftShader/llvmpipe, scroll-harness gates), docs/superpowers/plans/2026-07-21-unblock-and-curate.md ("only 4 genuinely finished", 02 rejected as "flat boxes with painted-on puddles", 2 rebuild plans unexecuted, "SwiftShader-only verification has proven unreliable as an acceptance filter — 2 of 5 scenes marked done needed real rework"), tools/shot.mjs (Playwright harness), git remote -v (no remote → no github link) -->

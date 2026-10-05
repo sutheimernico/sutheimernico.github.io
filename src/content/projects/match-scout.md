@@ -7,6 +7,7 @@ stack: ["Python", "Dixon-Coles", "LightGBM", "pandas", "React 19"]
 summary: "A measurement harness for football prediction: Dixon-Coles and a LightGBM challenger against the closing line — the answer was no edge."
 role: "a negative result, fully measured"
 featured: false
+github: https://github.com/sutheimernico/match-scout
 domain: ml
 context: personal
 reviewed: false
@@ -75,5 +76,3 @@ Dixon-Coles and 0.539 / 0.917 for the market — worse than uniform, beaten by t
   before kickoff. Its first 12 bets settled on 2026-09-27: down 105 € on 120 € of paper stakes — a
   number that means nothing at n = 12 and is shown anyway. This round is on a feature branch, not
   merged.
-
-<!-- sources: /home/nicosutheimer/private/match-scout/README.md (framing, honest-harness rules, scope), PROJECT.md (architecture, decisions of 2026-07-05), PLAN.md (Phase 4 acceptance: 971 bets, -4.7 %, CI [-13.0, +4.1], CLV -5.4 %, beat rate 20.4 %, baselines; Phase 5 acceptance: 563 OOS, Brier/log-loss ML 0.774/1.674 vs DC 0.563/0.952 vs market 0.539/0.917; open trial log), docs/adr/0002-placebo-null-and-kelly-ci-fixes.md (+18.8 % inflated null, market-truth null -5.45 % vs CLV -5.36 %, stake-invariant Kelly CI), AUTOPILOT_LOG.md (Top-5 expansion: 4,540 bets, -8.78 %, CI [-12.8, -4.8], CLV beat rate 22.4 %, per-league all negative); branch feat/forward-proof @ 2d548ac (not merged): commits 78ea05d + 90e8aa7 (append-only trial log, edge claim deflated by logged trial count, D1 closed), 7ba2f7f (no-lookahead enforced in the fit), 4c99d4b + e3eacf0 (append-only idempotent paper ledger, forward loop), data/trial_log.jsonl (9 entries incl. per-league slices; forward config min_lead_hours 2.0), data/bankroll_snapshots.jsonl run 2026-09-27 (n_settled 12, total_staked 120.0, profit −105.0) -->

@@ -7,6 +7,7 @@ stack: ["Python", "MCP", "FastAPI", "React", "Claude Code", "Ollama"]
 summary: "An agentic OS: a kernel that runs AI agents as supervised processes with PIDs, budgets and capability-gated syscalls, live on screen."
 role: "real processes, replayable evidence"
 featured: true
+github: https://github.com/sutheimernico/hugin
 domain: agents
 context: personal
 reviewed: false
@@ -72,5 +73,3 @@ of hiding it.
   a floor under child budgets — cost nothing when the caller is Claude.
 - **No auth, loopback only** — accepted for a single-user tool; and the isolation is only as
   strong as the symlinked credential file it shares.
-
-<!-- sources: /home/nicosutheimer/private/hugin/README.md (848 events / 51 turns / 231 s, 462 events / 242 s scout run, 356 pytest + 234 vitest, 24 event kinds, seven syscalls, 127.0.0.1, five planner attempts), PLAN.md (v1 feature-complete 2026-09-06, milestones 0-5 = tasks 1-30), docs/adr/0002-claude-headless-isolation.md (--bare rejects subscription login, ~40k → ~6.4k tokens per turn), docs/adr/0003-small-model-tolerance.md (five kernel accommodations, zero completed multi-agent runs, program:scout escape hatch), docs/adr/0001-mcp-transport.md (Streamable HTTP at /mcp, per-process bearer token), git remote -v (no remote → no github link) -->

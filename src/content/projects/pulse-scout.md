@@ -7,6 +7,7 @@ stack: ["Python", "Ollama", "SQLite", "FastAPI", "React PWA"]
 summary: "A local, zero-cost daily AI and tech digest for the phone: ~600 items in, five that matter out, and every sentence the model writes is checked against its source before it ships."
 role: "a small model, fact-checked sentence by sentence"
 featured: false
+github: https://github.com/sutheimernico/pulse-scout
 domain: agents
 context: personal
 reviewed: false
@@ -88,5 +89,3 @@ own job out of their own digest.
   "only 1 of 5 slots".
 - **The acceptance criterion is behavioural:** five consecutive mornings actually read on the phone.
   That observation is prepared, not done.
-
-<!-- sources: /home/nicosutheimer/private/pulse-scout on branch autopilot/work @ 7bd9344 — README.md (Status 2026-09-27: stage 1 built and running, 20:30 timer, PWA offline verified in headless Chromium not on the phone), PROJECT.md (non-negotiables, measured 18,1 tok/s intake + 4,5 tok/s generation, tier scope derived from real repos, three-slot cap), docs/superpowers/plans/2026-09-20-pulse-scout-v1.md §9 (T18 first digest, "Ruhiger Tag: nur 1 von 5 Plätzen"; live-source fixes: HN newest-20, three dead Nitter mirrors, ThoughtWorks 2.722 entries back to 2008, 6.193 unwindowed → 570) and §10 (fact-check design; 119 labelled sentences; 7b prompt v2: 36/37 caught, 13/62 dropped, held-out 4/5; 1.5b: 2/37; "optimistic" caveats incl. only 9 real unfaithful sentences; production run 594 → 40 → 5, 158 s / 184 s / 67 s, 750 s total, 2 of 9 shipped sentences vague distortions; correction: only "slow" → "stop" was wrong; found-not-fixed list; 359 pytest + 20 vitest; T23 five days prepared, not done), data/sources.toml (60 [[source]] entries, header "Every entry below was confirmed by a live fetch", "Verified broken" section), docs/superpowers/specs/2026-08-07-pulse-scout-design.md (D2 local vs hosted cost), no git remote configured -> no github field -->

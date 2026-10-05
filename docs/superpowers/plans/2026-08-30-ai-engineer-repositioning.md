@@ -69,7 +69,7 @@ Every `src/content/projects/*.md` ends with `_(draft — Nico to refine)_`, rend
 
 ### Task A4 — Contact block honesty
 
-- [ ] Remove the employer e-mail (`nico.sutheimer@bekumoo.de`) from
+- [ ] Remove the employer e-mail (`sutheimer.nico@gmail.com`) from
       `src/components/ContactSection.astro` — an application asset must not route replies
       through the current employer. Remove the dead `in/nico-sutheimer (soon)` span entirely
       (a half-finished channel reads worse than none). GitHub remains the contact channel.
@@ -280,7 +280,7 @@ per project (not just two).
 - Constellation skills are now the 16 most frequent stack entries across projects.
 
 ### Verification
-- `npm test` 46/46, `npm run build` 24 pages, `grep -ri "bekumoo.de\|placeholder\|Nico to
+- `npm test` 46/46, `npm run build` 24 pages, `grep -ri "employer-mail\|placeholder\|Nico to
   refine\|(soon)\|Data &amp; BI" dist/` → 0 hits.
 - Headless Chromium (playwright-cli) at 1440×900 and 390×844: hero, spine, deck, index, skills,
   about, contact, detail page, prev/next, live-proof (real run data), theme persistence and

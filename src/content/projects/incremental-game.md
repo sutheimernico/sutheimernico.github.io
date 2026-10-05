@@ -53,5 +53,3 @@ and migrations, polish, retention, ship), roughly 22 hours, each phase ending in
   so it is a v2 decision if v1 proves boring.
 - **Offline credit is linear with autobuyers paused**, so offline equals online exactly and a
   chunking-equivalence test can guard it.
-
-<!-- sources: /home/nicosutheimer/private/incremental-game/PLAN.md (only file in the folder; "Status: draft, waiting for go", date 2026-09-01, working title Data Center Tycoon and swappable theme S1.1, float64 / 1e15 ceiling S1.2, flat topology S1.3, offline linear with autobuyers paused S1.4, state outside React with useSyncExternalStore at 10 Hz / 20 Hz sim S1.5 + S4.2, layout and dependency rule S4.1, harness and bot policies S5, pacing targets and balance-guard tests S2.4 / S2.6 / S6, phase plan 0-8 with ~22 h total S7), no git repository, no source files -> no github field -->

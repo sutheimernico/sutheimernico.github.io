@@ -7,6 +7,7 @@ stack: ["Python", "MediaPipe", "InsightFace", "scikit-learn", "OpenCV"]
 summary: "A staged webcam CV system: multi-face tracking, 468-point mesh, ArcFace identity — plus a lip-reading v1 built on the same landmarks."
 role: "clean seams, unproven on a real face"
 featured: false
+github: https://github.com/sutheimernico/face-scout
 domain: ml
 context: personal
 reviewed: false
@@ -75,5 +76,3 @@ vocabulary is closed, the speaker is one person and the camera never changes.
   samples per class and a heavy dependency were not justified before any data existed.
 - **CPU-first and local-only**, which caps throughput and keeps identity on a throttle — an
   accepted cost for a system handling biometric data.
-
-<!-- sources: /home/nicosutheimer/private/face-scout/README.md (pipeline diagram, throttle=every 10 frames, sticky identity, MediaPipe 468 landmarks, InsightFace buffalo_l/ArcFace/onnxruntime CPU, lips record/train/eval/run, roadmap incl. Phase 3 future, privacy/gitignore), PROJECT.md (staging rationale, constraints, stack), PLAN.md + AUTOPILOT_LOG.md (74 tests green, ruff clean, milestone completion 2026-07-05), docs/adr/0001-lip-reading-approach.md (SOTA non-transfer argument, options considered incl. deferred temporal NN, "~80-95%" as literature expectation, viseme error floor), docs/superpowers/plans/2026-07-20-real-world-proof.md ("The defining gap: zero real-world proof", all 74 tests use fakes/synthetic arrays, accuracy "literature extrapolation, never measured", ~1300 LOC, Protocol seams, plan awaiting go), git remote -v (no remote → no github link) -->

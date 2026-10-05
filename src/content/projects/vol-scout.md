@@ -7,6 +7,7 @@ stack: ["Python", "HAR-RV", "LightGBM", "Chronos-2", "arch (GARCH)", "pandas"]
 summary: "A rolling-origin study asking whether ML and foundation models beat HAR-RV at forecasting equity volatility. Forecasts exist, the verdict does not."
 role: "study set up, verdict not in yet"
 featured: false
+github: https://github.com/sutheimernico/vol-scout
 domain: ml
 context: personal
 reviewed: false
@@ -69,5 +70,3 @@ app. Until those exist, the study has forecasts but no findings.
   information set, but a limit worth naming.
 - **One dominant market regime** in the out-of-sample window; the robustness set mitigates that, it
   does not solve it.
-
-<!-- sources: /home/nicosutheimer/private/vol-scout/PROJECT.md (research question, constraints incl. no PnL claim, data policy 10 tickers ~16y committed, milestone status M1-M3 done, M4 partial, M5/M6 open), docs/superpowers/specs/2026-07-20-vol-scout-design.md (contender table incl. hand-implemented HAR-RV and arch GARCH, horizons h=1/h=22, Parkinson primary + GK/squared returns, QLIKE/RMSE/MZ, DM with HLN, editorial tie rule, honest limitations 1-5), docs/superpowers/plans/2026-07-20-vol-scout-v1.md (forward tiling rationale for resumability, h=22 overlap 17 of 22 days, error column / failure-as-result, resumable append helper), src/vol_scout/backtest.py (OOS_START = "2018-01-02", STEP_TRADING_DAYS = 5, HORIZONS = (1, 22)), results/forecasts.csv (38,108 rows: random_walk/har_rv/garch/lgbm 8,500 each, chronos2 4,108; 10 tickers; origins 2018-01-02..2026-06-10), tests/*.py (105 `def test_` functions; poison-sentinel tests in test_models.py), no git remote configured -> no github field -->

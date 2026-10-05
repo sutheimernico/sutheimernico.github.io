@@ -89,5 +89,3 @@ code has to carry the orchestration.
   cloud model. Index, id and name fragment still work without any model.
 - **Reusable core, thin front end.** The logic lives independently of the CLI, so a later web UI
   would be a second front end rather than a rewrite — without over-building for it now.
-
-<!-- sources: /home/nicosutheimer/private/factotum README.md + AGENTS.md on branch feat/daily-driver @ 2d4d015 (not merged; layers, briefing ordering, filesystem allowlist and containment, loopback-only model host, confirm gate, free-text `do` via strict JSON schema validated against fetched tasks, "Seit letztem Briefing" snapshot in FACTOTUM_STATE_DIR 0600 never committed), commits 099cfee (free-text do, 2026-07-02), 112c79c (one read retry after 1 s on ConnectError/ReadTimeout, no write retries, AsanaRateLimitError message), cb3b192 (snapshot diff), 2d4d015 (`digest` command writes a dated Markdown file), RUNDE-2026-09-20.md results table (factotum: 148 tests green) -->

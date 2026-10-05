@@ -7,6 +7,7 @@ stack: ["React Native", "Expo", "TypeScript", "SQLite", "Jest"]
 summary: "A local-first Android gym tracker I actually train with: fully offline, a pure testable domain core, and screen tests that run against real SQLite."
 role: "offline by design, tested on real SQLite"
 featured: false
+github: https://github.com/sutheimernico/reptic
 domain: product
 context: personal
 reviewed: false
@@ -15,7 +16,7 @@ fieldNote: "The automatic daily backup lives in the app's own document directory
 
 ## What it is
 
-A private gym-tracking app for Android, built to replace an ad-hoc Notes workflow. Single user,
+A personal gym-tracking app for Android, built to replace an ad-hoc Notes workflow. Single user,
 no accounts, no backend, no network calls: every session lives in a local SQLite database on the
 device. The one feature the notes app could never give me is **last time, per set** — the weight
 from the previous session is pre-filled and editable, reps are typed fresh, and a grey reference
@@ -86,5 +87,3 @@ app testable at all — the interesting logic never sits inside a component.
 - **Measured and left alone:** the daily auto-backup takes 134 ms for 5 MB at three years of
   data. Dropping the JSON indentation would roughly halve that, but the backup format is the safety
   net and does not change in passing.
-
-<!-- sources: /home/nicosutheimer/private/reptic/README.md (features, stack, architecture, backup honesty wording, test harness), PROJECT.md (display name Repz vs internal Reptic, layering rule, needs-nico), PLAN.md (Phase 12 real icon/splash "design D"; Phase 15 v1.1: "tests 62 → 179", db split 911 → max 282 lines, statement-counting test, rest timer, records, plates, trends; Phase 16 v1.2), docs/superpowers/plans/2026-09-27-v1.2-trainingsbegleiter.md on branch autopilot/work @ 81d0720 (Outcome: "240 passed / 240 in 20 suites (was 179 in 15)", Task 1 progression rules + "Übernehmen", Task 2 "2,281 ms → 24 ms", "71 → 16 ms", 624 sessions / 17,472 sets, query-plan test, "would have hit around year one", backup 134 ms for 5 MB left alone, versionCode stays 5 / no build; Deviations §1 icon already real; smoke test v1.2 open), AUTOPILOT_LOG.md ("no blind 3h EAS builds" rule), docs/sessions/2026-08-30_1920_daily-gym-companion-v1-1.md (Play Store fee, OAuth blocker), git remote -v (no remote → no github link) -->

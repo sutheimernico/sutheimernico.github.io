@@ -63,5 +63,3 @@ leaked token alone still cannot forge an approval, because the `request_id` gate
   because the cosmetic API calls share a `try` with the decision print; a single transient error
   ends the poll instead of retrying inside the remaining budget; the HTTP wrappers have no failure
   tests of their own.
-
-<!-- sources: /home/nicosutheimer/private/tap-approve/README.md (hook flow, 45 tests, ruff clean, dry-run scenarios, safety model, "MVP code complete, not yet wired up", org-gated Channels rationale), AUTOPILOT_LOG.md (TDD task sequence 2-7, hardening pass 34->45 tests, matcher correction, disableAllHooks, dry-run harness), docs/superpowers/specs/2026-06-30-tap-approve-design.md (PermissionRequest contract, fail-safe stdout rule, single-recipient/allowlist goals), docs/superpowers/plans/2026-07-21 re-targeting plan (150s poll budget inside 180s hook timeout, stdlib-only, verdict-loss bug, no retry in budget, untested HTTP wrappers, allowed-root env var, use case removed by bypass mode, pre-flight still open), git remote check: github.com/sutheimernico/tap-approve is PRIVATE -> no github field -->

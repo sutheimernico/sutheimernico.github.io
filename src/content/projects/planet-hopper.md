@@ -7,6 +7,7 @@ stack: ["Three.js", "TypeScript", "Vite", "Vitest", "WebAudio"]
 summary: "A 3D slingshot-gravity browser game whose physics core is pure, deterministic and unit-tested without a GPU — ghost replays and daily seeds with no backend, 150 kB gzip."
 role: "deterministic core, no fake preview"
 featured: false
+github: https://github.com/sutheimernico/planet-hopper
 domain: product
 context: personal
 reviewed: false
@@ -91,6 +92,4 @@ Three Fiber or Babylon.js, for direct control of the game loop and a small bundl
 - **Frustration avoided by design**: planets always capture, hazards are suns and void drift, and
   there is no mid-flight thrust — v1 is a pure slingshot.
 - **Deployment is wired but inert** — a GitHub Pages workflow exists (its action pins are
-  unverified until a first real run), but there is no public remote, so nothing is live.
-
-<!-- sources: /home/nicosutheimer/private/planet-hopper on branch autopilot/work @ eb0882b — README.md (status v1.1 "ghost & shine", 144 tests, verification table: bot 10/10 hops captured with real mouse drags, 0 console errors, screenshot caption SwiftShader 1280×720 2026-09-27), docs/superpowers/plans/2026-07-21-ghost-and-shine.md Outcome 2026-09-27 (tasks 1–11, 18 commits, tests 80 → 144; top-K golden test 2000 sets + 3000-step flight bit-identical, 0.184 → 0.032 ms = 5.8×; RUN_RESETTABLES registry; session drains events once per frame; reachability 50 seeds × 40 gaps = 2000/2000, 32 directions × 5 powers, 2× spacing 0/200 unreachable, guard = 450 wu void gap; replay cap 50 launches, hashed per-tick determinism incl. JSON round-trip, 1e-12 diverges; daily seed FNV-1a over UTC date, ?seed= links; four runtime bugs incl. "362 fps" at ~10 fps and the ghost?.advance freeze; CDP profile main thread ~97 % idle, dist() inlining = noise, not committed; bundle 11.43 + 50.92 + 87.52 = 149.87 kB gzip, +1.2 kB over 145.40, acceptance not met; SwiftShader 6–10 fps; open: theme A–D, GPU session, audio mix, name, remote), docs/screenshots/flight.jpg (copied to src/assets/projects/planet-hopper-flight.jpg), PROJECT.md (architecture, non-negotiables), git remote -v (no remote → no github link) -->
+  unverified until a first real run), so the hosted version is not live yet.

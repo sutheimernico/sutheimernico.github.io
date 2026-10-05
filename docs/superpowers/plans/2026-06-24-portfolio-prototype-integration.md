@@ -415,7 +415,7 @@ git commit -m "feat: NS monogram, nav, and theme switcher with animated shift mo
 **Files:** Create `src/components/AboutSection.astro`, `ContactSection.astro`, `SiteFooter.astro`; Modify `index.astro`.
 
 - [ ] **Step 1:** `AboutSection.astro` — bio copy + the on-brand monogram portrait block (`NsMonogram` + scanlines, NOT the rainbow wheel). Port from prototype `.about-*`.
-- [ ] **Step 2:** `ContactSection.astro` — terminal card with mail/github/linkedin (real handles: `nico.sutheimer@bekumoo.de`, `github.com/sutheimernico`; linkedin placeholder until Nico confirms). Port `.term`.
+- [ ] **Step 2:** `ContactSection.astro` — terminal card with mail/github/linkedin (real handles: `sutheimer.nico@gmail.com`, `github.com/sutheimernico`; linkedin placeholder until Nico confirms). Port `.term`.
 - [ ] **Step 3:** `SiteFooter.astro` — minimal footer line.
 - [ ] **Step 4:** `npm run dev` → all render and recolor. `npm run build` passes.
 - [ ] **Step 5: Commit** `feat: add about, contact, and footer sections`.

@@ -7,6 +7,7 @@ stack: ["Python", "Ollama", "RAG", "FastAPI", "React", "Typer"]
 summary: "A local real-estate knowledge assistant where the model routes and explains but never computes — every number comes from tested Python."
 role: "the model routes, the code computes"
 featured: false
+github: https://github.com/sutheimernico/estate-scout
 domain: agents
 context: personal
 reviewed: false
@@ -89,6 +90,4 @@ confidence value instead of being filled in.
   vacancy data was found, so the region block reports "provider missing" instead of inventing one.
 - **Deliberately deferred and still open:** chat history in SQLite (no second use case yet) and a
   nightly re-score digest. The hardening and scoring rounds live on a feature branch that is not
-  merged, and the repo has no remote.
-
-<!-- sources: /home/nicosutheimer/private/estate-scout/README.md (numbers from tested code, local-only via Ollama, no scraping, honest-harness framing), PROJECT.md (stage list, layout, core design constraint), PLAN.md (phases 0-5 done: 29/43/61/78 tests, live qwen2.5:7b annuity round-trip surfacing the tool's own number; phases 6-7 done, phases 8-9 unchecked; "Needs Nico": merge, remote, deferred portfolio coupling), AUTOPILOT_LOG.md (97 tests green at phase 7 complete), docs/adr/0001-stage2-data-source.md (no scraping: terms of service, bot protection, no free API, DSGVO; enrichment seams degrade to unavailable), git remote -v (no remote → no github link) ; branch feat/stage1-hardening @ 1039b60 (not merged): docs/superpowers/plans/2026-07-07-stage1-hardening-and-ux.md Outcome 2026-09-20 (18/18 tasks; live qwen2.5:7b run, 181209.86 rendered as "181.210,86 EUR", free-text check open), docs/superpowers/plans/2026-07-20-stage2-scoring-and-shine.md Outcome 2026-09-20 (12 of 14 tasks; 205 pytest, was 97; coverage 95.2 %, floor 94 set below measured 94.99 %; scoring blocks yield/price/region, renormalised weights, confidence over 4 raw signals, 17 scoring tests; drilldown UI; BORIS-NI WFS keyless, median residential zone; Bundesbank rate 24 h cache, labelled live/cache/static_fallback, not a finance/ default; Lingen 300 000 € / 100 m²: land value 190, ratio 15.789, price block 0, total 34/100, Datenlage 2/4; price block 40 %; region provider none; Task 14 nightly digest open) -->
+  merged.

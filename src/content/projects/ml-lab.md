@@ -16,9 +16,9 @@ fieldNote: "A local 7B model drove the analyst loop live for about three hours a
 ## What it is
 
 Three self-contained benchmarks, built to answer questions whose honest answer is often "no
-difference": **tabular-showdown** (a tabular foundation model vs a properly tuned GBDT),
-**timeseries-showdown** (zero-shot forecasting foundation models vs classical baselines), and
-**agentic-analyst** (an LLM that writes an analysis report, plus a judge that recomputes every
+difference": **[tabular-showdown](https://github.com/sutheimernico/tabular-showdown)** (a tabular foundation model vs a properly tuned GBDT),
+**[timeseries-showdown](https://github.com/sutheimernico/timeseries-showdown)** (zero-shot forecasting foundation models vs classical baselines), and
+**[agentic-analyst](https://github.com/sutheimernico/agentic-analyst)** (an LLM that writes an analysis report, plus a judge that recomputes every
 number in it). Each ships committed result artifacts, a Streamlit app over them, and a limits
 section.
 
@@ -73,5 +73,3 @@ artifact.
   the multi-series cross-learning these models are actually built for.
 - **The judge does not catch everything**, and says so: evidence that genuinely queries the real
   data but a different population is only partly caught by a conservative heuristic.
-
-<!-- sources: /home/nicosutheimer/private/ml-lab/tabular-showdown/README.md (per-size paired table: +0.1000 at n=200, +0.0033 at n=2000, +0.0014 CI [-0.0045,+0.0072] at n=5000; LogReg 0.882 vs TabPFN 0.884 vs LightGBM 0.784 at n=200; ~4 orders of magnitude predict gap; 10 seeds / 5 seeds; frozen 4,000-row eval split), timeseries-showdown/README.md (9 configs, 20 rolling windows, MASE 0.658/0.667 vs 0.713/0.698, DM/HLN p=0.30 / p=0.004 / p=0.086, coverage caveats, single-series caveat), agentic-analyst/README.md (255 planted lies, precision 100 % / recall 98.4 % / FPR 0 %, four ±5 % misses inside abs_tol=0.01, qwen2.5:7b 3 attempts x 20 iterations ~57-61 min, no schema-valid report, ROC-AUC ~0.829 vs 0.8105, "what the judge does NOT catch"), timeseries-showdown/AUTOPILOT_LOG.md (172 tests green), agentic-analyst/AUTOPILOT_LOG.md (165 tests green), REVIEW.md (WP-B1 tie-by-default, WP-B2 mis-tuned calibration), no git repo → no github link -->

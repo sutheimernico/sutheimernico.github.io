@@ -68,5 +68,3 @@ opacity only.
   point is a site that doesn't read as a generic AI/template build.
 - **A lot of motion for a portfolio.** Indulgent on purpose — it is the one place where the
   frontend is allowed to show off, and it doubles as my React and CSS practice ground.
-
-<!-- sources: this repository (src/, README.md, AGENTS.md, CLAUDE.md, the 2026-09-06 v2 plan). -->
