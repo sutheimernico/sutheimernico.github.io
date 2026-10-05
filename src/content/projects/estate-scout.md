@@ -22,7 +22,8 @@ property: the model understands the question and picks a tool, but every number 
 payment, purchase side costs, affordability, rental yield — is produced by tested Python. It runs
 entirely on one machine through Ollama, with no paid APIs and no listing scraping. Stage 1, the
 assistant, is complete and was verified against a live local model; Stage 2, a scoring funnel,
-now has its transparent scoring engine and drilldown UI — on a feature branch, not merged.
+now has its transparent scoring engine and drilldown UI. The code is merged to `main` and the
+repository is being made public.
 
 ## Architecture
 
@@ -89,5 +90,4 @@ confidence value instead of being filled in.
 - **Honest gaps over convenient numbers.** No keyless machine interface for regional population and
   vacancy data was found, so the region block reports "provider missing" instead of inventing one.
 - **Deliberately deferred and still open:** chat history in SQLite (no second use case yet) and a
-  nightly re-score digest. The hardening and scoring rounds live on a feature branch that is not
-  merged.
+  nightly re-score digest. The hardening and scoring rounds are merged to `main`.

@@ -74,5 +74,5 @@ Dixon-Coles and 0.539 / 0.917 for the market — worse than uniform, beaten by t
 - **Running forward, from day one.** A paper loop with an append-only, idempotent bet ledger
   places bets under one frozen, logged configuration, only with odds known at least two hours
   before kickoff. Its first 12 bets settled on 2026-09-27: down 105 € on 120 € of paper stakes — a
-  number that means nothing at n = 12 and is shown anyway. This round is on a feature branch, not
-  merged.
+  number that means nothing at n = 12 and is shown anyway. Since 2026-09-27 the loop runs twice a day from a local cron, and the
+  repository is public.

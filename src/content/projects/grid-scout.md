@@ -67,10 +67,10 @@ window rolls, the headline figures move without anyone editing them.
 - 74 Python tests plus 11 site tests gate the live pipeline; a fresh-clone verification confirms
   the whole system reproduces from scratch.
 
-## Next — built on a branch, not live yet
+## Next — finished on a branch, awaiting merge
 
-A second round is finished and tested but **not pushed**, so none of it is on the live site until
-it is merged (on the branch: 135 Python and 38 site tests):
+A second round is finished and tested but **not merged into `main` yet**, so none of it is on the live site until
+it is (on the branch: 135 Python and 38 site tests):
 
 - **A forward-test ledger** — the step from backtest to living proof. Every morning before the
   day-ahead auction the model records tomorrow's forecast; the ledger scores it once prices are

@@ -1,7 +1,7 @@
 ---
 title: "Clip Scout"
 order: 13
-status: production
+status: in-progress
 year: "2026"
 stack: ["Python", "Claude CLI", "edge-tts", "FFmpeg", "SQLite", "FastAPI"]
 summary: "A daily pipeline that writes, narrates and renders German short-form videos from licensed imagery — and stops one step short of posting."
@@ -20,7 +20,7 @@ persona-targeted script, sources real licensed imagery, synthesises a voiceover 
 timings, renders a subtitled 9:16 video of 61–115 seconds, runs hard QA gates, and delivers the
 finished package to a phone. It never posts: **posting stays a manual two-minute step**, because
 TikTok does not permit unaudited automated publishing and a banned account ends the project
-before it starts. Two channels run on Windows scheduled tasks — astronomy at 07:12 and 18:00, a
+before it starts. Two channels are set up on Windows scheduled tasks (currently paused, see below) — astronomy at 07:12 and 18:00, a
 trend channel at 15:00.
 
 ## Architecture
@@ -68,6 +68,10 @@ local CPU-only model would have been the cheaper wrong answer.
   music bed side-chain-ducked under the voice.
 
 ## Trade-offs & what I considered
+
+- **Paused since 2026-09-21.** All three scheduled Windows tasks were found disabled on 2026-09-27;
+  the last run ended cleanly and there is no code fault. Whether the pause was intended is not
+  documented, so this page does not claim the channels are running.
 
 - **Semi-automatic publishing** was chosen over browser automation. It costs two minutes a day
   and keeps the account alive.

@@ -15,10 +15,10 @@ fieldNote: "The taste model's AUC of 0.904 is leave-one-out on 69 votes with onl
 
 ## What it is
 
-A scout for second-hand furniture on a German classifieds site inside a 150 km radius in
+A scout for second-hand furniture on a German classifieds site within a region of
 north-west Germany. It answers two questions per listing and keeps them apart:
-**does it fit** (measurements parsed out of the ad text, checked against the furnishing plan of
-a specific flat) and **does it look right** (CLIP image similarity to the listings that were
+**does it fit** (measurements parsed out of the ad text, checked against the dimensions of the
+space it is meant for) and **does it look right** (CLIP image similarity to the listings that were
 personally voted up). A shelf that looks perfect but is 40 cm too wide sinks in the ranking — it
 does not disappear. One JSON wish list is the single source of truth for the search jobs, the
 price caps and the limits.
@@ -66,7 +66,7 @@ implement two different notions of "fits".
   random sample draws 12 light, 12 dark and 6 colour-neutral listings.
 - **The canary had been right all along.** Its first composed message named a search job with 2 of
   6 broken pages since late August — a finding that had sat in a log nobody read.
-- 289 tests plus ruff (195 before the buying-loop round); 10,058 listings and 114 runs in the store
+- 290 tests plus ruff (195 before the buying-loop round); 10,058 listings and 114 runs in the store
   as of that round.
 
 ## Trade-offs & what I considered
@@ -75,8 +75,9 @@ implement two different notions of "fits".
   page says so. Requests are paced at 2.5 s, never parallel.
 - **Rotating a shelf is not modelled.** A rotation heuristic would let everything "fit" somehow,
   so a piece that would only work lying down is left in the unknown block.
-- **Not switched on yet.** The served page had been wired to an older output file for four weeks;
-  that delivery is now repaired and verified page by page. The daily job and its alert are built
-  — the alert fires only when a listing fits *and* looks right, because fit alone meant 248 hits on
-  a single August scan day — but not registered, and the round lives on a feature branch that is
-  not merged. That is why this is honestly "in progress" and not "production".
+- **Running, but not on main.** The served page had been wired to an older output file for four
+  weeks; that delivery is repaired and verified page by page. Since 2026-09-27 the daily scan runs
+  from a cron entry at 07:19 (the installer had a bug that kept it from registering, now fixed), and
+  the alert fires only when a listing fits *and* looks right, because fit alone meant 248 hits on a
+  single August scan day. The buying-loop round still lives on a feature branch that is not merged,
+  and the repo is private. That is why this is honestly "in progress" and not "production".

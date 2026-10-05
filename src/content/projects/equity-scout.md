@@ -63,7 +63,7 @@ was refuted, the gap-fade lane switched off after six days produced zero measura
   t = −51.6) was **withdrawn** when a re-check found SPY subtracted twice: corrected it reads
   −0.39 pp at t = −1.04 — undecidable, not negative — and the insider figure flipped from −5.76 pp
   to +7.91 pp, no horizon surviving Bonferroni.
-- **2,707 Python tests** plus a frontend suite gate the build.
+- **3,434 Python tests** (as of 2026-09-27) plus a frontend suite gate the build.
 
 ## Trade-offs & what I considered
 
