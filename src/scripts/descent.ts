@@ -25,7 +25,7 @@ interface Item {
 }
 
 const TAU = 95;
-const ROLES = ['AI Engineer', 'Fullstack Engineer', 'ML Engineer', 'Data Platform Engineer'];
+const ROLES = ['Fullstack Developer', 'AI Engineer', 'ML Engineer', 'Data Platform Engineer'];
 
 let teardown: (() => void) | null = null;
 

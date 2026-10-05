@@ -1,7 +1,5 @@
 ---
 import NsMonogram from './NsMonogram.astro';
-// Copy: Claude draft 2026-09-06 (grounded in Nico's LinkedIn About text) — Nico
-// reviews wording before merge. No metrics, no confidential details.
 ---
 
 <section id="about" class="about-sec">
@@ -17,10 +15,10 @@ import NsMonogram from './NsMonogram.astro';
         <span class="ap-meta">NS · identity</span>
       </div>
       <div class="about-copy" data-stagger>
-        <p>I'm <b>Nico</b> — an engineer who builds software that actually uses AI in operation, not as a demo. My centre of gravity is <b>backend and data platforms</b> in Python and TypeScript, and the integration of <b>language models into systems someone has to rely on</b>.</p>
-        <p>I started with a dual degree in business informatics: three years of practice alongside the theory, so I didn't begin at zero after graduating. Today I work on a data platform at <b>bekumoo</b> — from modelling in dbt through FastAPI services on Azure to the React frontend.</p>
-        <p>What separates this from plain application development is the question I ask first: <b>how do I know it works?</b> So the private projects measure themselves — an LLM assistant with deterministic retrieval so it doesn't guess; a benchmark that pits three ML approaches against each other and publishes the result I didn't like; a RAG study that compares methods instead of asserting one.</p>
-        <p>A lot of things run daily without me: they collect, score, and only speak up when something is interesting. <b>Automation isn't a by-product — it's how I work.</b></p>
+        <p>I'm <b>Nico</b>, a <b>Fullstack Developer</b> at bekumoo Software GmbH in Osnabrück. I work on the company's analytics platform (Python and FastAPI in the backend, React and TypeScript in the frontend), on its own LLM-based chatbot, and I built and run an internal company platform on Azure, with infrastructure as code in Pulumi, CI/CD and SSO.</p>
+        <p>I joined bekumoo in 2023 as a dual-study student and started with Power BI and Azure Synapse reporting. Through my first university projects (for example the <a href="https://github.com/g-dev-net/HSOS-Programmierprojekt" rel="noopener noreferrer">programming team project</a>) I grew into data engineering and then into backend and frontend development. I finished my Bachelor in Wirtschaftsinformatik at Hochschule Osnabrück in 2026 and have been working as a developer since July.</p>
+        <p>I work with <b>Claude Code</b> every day, with my own setup of skills, agents, rules and context engineering. The point is quality: tests, reviews and understanding the code that ships, not vibe coding.</p>
+        <p>In my spare time I build data science and ML projects, LLM tools and agents, small games and mobile apps. They are on this site because they measure themselves: <b>how do I know it works?</b> is the first question I ask any system, and the one this portfolio tries to answer.</p>
       </div>
     </div>
   </div>
@@ -76,6 +74,12 @@ import NsMonogram from './NsMonogram.astro';
     }
   }
   @keyframes pIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .about-copy a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--accent-soft);
+    text-decoration: none;
+  }
 
   .about-copy b {
     color: var(--ink);

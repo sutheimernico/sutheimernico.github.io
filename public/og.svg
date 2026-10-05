@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Nico Sutheimer — AI Engineer">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Nico Sutheimer — Fullstack Developer">
   <!--
     OG / social-share card. 1200x630. Kinetic Terminal direction.
     Self-contained: hex values inlined (CSS vars don't resolve in OG renderers),
@@ -65,13 +65,13 @@
     <text x="468" y="318" font-size="76" font-weight="600" letter-spacing="-1" fill="#E9E7DE">Nico Sutheimer</text>
 
     <!-- role — accent mono italic, matches .detail-role -->
-    <text x="470" y="372" font-size="30" font-style="italic" letter-spacing="1" fill="#45E08A">AI Engineer &#183; Backend &amp; ML Systems</text>
+    <text x="470" y="372" font-size="30" font-style="italic" letter-spacing="1" fill="#45E08A">Fullstack Developer &#183; Python &amp; TypeScript</text>
 
     <!-- accent hairline rule -->
     <rect x="470" y="408" width="64" height="3" fill="#45E08A" />
 
     <!-- one-line positioning, dim ink -->
-    <text x="470" y="466" font-size="24" letter-spacing="0.5" fill="#9DA69C">Building data platforms end to end</text>
+    <text x="470" y="466" font-size="24" letter-spacing="0.5" fill="#9DA69C">Fullstack, data and LLM systems</text>
     <text x="470" y="500" font-size="24" letter-spacing="0.5" fill="#9DA69C">— pipeline to pixel.</text>
   </g>
 </svg>
