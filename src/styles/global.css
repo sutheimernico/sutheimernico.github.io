@@ -305,6 +305,17 @@ html[data-theme="daylight"] body::before { opacity: 0.12; }
 
 .skills-sec { padding: 14vh 0 16vh; }
 
+/* The project index below the ride is off-screen for the whole camera ride, yet its ~30
+   scroll-driven row reveals and pulsing leds were restyled on every ride frame.
+   content-visibility skips it until it nears the viewport. contain-intrinsic-size is the
+   CONTENT-box height (measured 2026-10-06, padding excluded) so anchors below it land
+   right before its first render; `auto` remembers the real size afterwards. Skills, About
+   and Contact stay out: they are short, and an estimate error there shifts #about/#contact. */
+.index-sec { content-visibility: auto; contain-intrinsic-size: auto 2480px; }
+@media (max-width: 1100px) { .index-sec { contain-intrinsic-size: auto 2525px; } }
+@media (max-width: 900px) { .index-sec { contain-intrinsic-size: auto 2580px; } }
+@media (max-width: 640px) { .index-sec { contain-intrinsic-size: auto 6690px; } }
+
 .const-wrap {
   position: relative;
   height: 480px;
@@ -372,8 +383,10 @@ html[data-theme="daylight"] body::before { opacity: 0.12; }
 }
 .wip .led { background: var(--wip); }
 .bad .led { background: #e0645a; }
+/* opacity only: a box-shadow keyframe repaints its whole layer every frame, and these
+   leds sit in the root layer next to the ride */
 @keyframes ledPulse {
-  50% { box-shadow: 0 0 2px rgba(var(--accent-rgb), 0.3); opacity: 0.7; }
+  50% { opacity: 0.55; }
 }
 
 /* === project index (process table) === */
