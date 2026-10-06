@@ -141,6 +141,7 @@ function mount(sec: HTMLElement): () => void {
   let lastDepth = '';
   let cueHidden = false;
   let inView = true;
+  let lastScrollT = -1e9;
   // perf probe: first ~90 frames of real scrolling decide whether to trim effects
   const probe: number[] = [];
   let probed = false;
@@ -179,7 +180,16 @@ function mount(sec: HTMLElement): () => void {
       if (it.k === 'panel') {
         const s = panelState(rel);
         if (s.active && !it.active) { it.active = true; it.el.classList.add('on'); }
-        else if (it.active && !it.typing) { it.typing = true; it.el.classList.add('typing'); }
+        else if (it.active && !it.typing) {
+          it.typing = true;
+          it.el.classList.add('typing');
+          // ended, or cancelled because the panel was culled mid-typing: either way it counts as typed
+          const el = it.el;
+          const done = () => el.classList.add('typed-done');
+          const typed = el.querySelector('.typed');
+          typed?.addEventListener('animationend', done, { once: true });
+          typed?.addEventListener('animationcancel', done, { once: true });
+        }
         if (s.passed !== it.passed) { it.passed = s.passed; it.el.classList.toggle('passed', s.passed); }
         const reach = s.reach && !it.gone;
         if (reach !== it.reach) {
@@ -198,9 +208,11 @@ function mount(sec: HTMLElement): () => void {
     if (s !== station) {
       station = s;
       if (stnEl) {
-        // innerHTML builds a fresh <b>, so its flash animation restarts on its own —
-        // no class re-trigger and no forced reflow inside the frame
-        stnEl.innerHTML = `<b>STN ${String(s).padStart(2, '0')}</b> · ${stnLabels[s] ?? ''}`;
+        // a fresh <b> restarts its flash animation on its own — no class re-trigger and
+        // no forced reflow inside the frame; labels are project titles, so text, not HTML
+        const b = document.createElement('b');
+        b.textContent = `STN ${String(s).padStart(2, '0')}`;
+        stnEl.replaceChildren(b, ` · ${stnLabels[s] ?? ''}`);
         stnEl.classList.add('flash');
       }
       dots.forEach((e, j) => e.classList.toggle('here', j === s));
@@ -220,6 +232,9 @@ function mount(sec: HTMLElement): () => void {
 
     // keep animating while anything is still settling; otherwise sleep until the next scroll
     const settling = Math.abs(target - cam) > 0.05 || bt < 1 || imp > 0;
+    // hit-testing comes back as soon as the wheel stops, not when the camera has settled,
+    // so a click during the settle tail still lands on the panel
+    if (t - lastScrollT > 120) sec.classList.remove('moving');
     if (settling && inView) raf = requestAnimationFrame(frame);
     else { running = false; sec.classList.remove('moving'); }
   };
@@ -227,12 +242,16 @@ function mount(sec: HTMLElement): () => void {
   const wake = () => {
     if (running || !inView) return;
     running = true;
-    sec.classList.add('moving');
     lastT = performance.now();
     raf = requestAnimationFrame(frame);
   };
   const onResize = () => { place(); wake(); };
-  const onScroll = () => { pageY = window.scrollY; wake(); };
+  const onScroll = () => {
+    pageY = window.scrollY;
+    lastScrollT = performance.now();
+    if (inView) sec.classList.add('moving'); // off-screen there is no frame loop to clear it
+    wake();
+  };
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onResize);
   const io = new IntersectionObserver(

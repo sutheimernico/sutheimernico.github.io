@@ -305,20 +305,16 @@ html[data-theme="daylight"] body::before { opacity: 0.12; }
 
 .skills-sec { padding: 14vh 0 16vh; }
 
-/* The sections below the ride are off-screen for the whole camera ride, yet their
-   scroll-driven reveals and pulsing leds were restyled and repainted on every ride frame.
-   content-visibility skips them until they near the viewport; the intrinsic sizes are
-   measured heights (2026-10-06) so anchor jumps land correctly before first render, and
-   `auto` remembers the real size afterwards. */
-.index-sec, .skills-sec, .about-sec, .contact-sec { content-visibility: auto; }
-.index-sec { contain-intrinsic-size: auto 2700px; }
-.skills-sec { contain-intrinsic-size: auto 900px; }
-.about-sec { contain-intrinsic-size: auto 1120px; }
-.contact-sec { contain-intrinsic-size: auto 720px; }
-@media (max-width: 640px) {
-  .index-sec { contain-intrinsic-size: auto 6900px; }
-  .about-sec { contain-intrinsic-size: auto 1950px; }
-}
+/* The project index below the ride is off-screen for the whole camera ride, yet its ~30
+   scroll-driven row reveals and pulsing leds were restyled on every ride frame.
+   content-visibility skips it until it nears the viewport. contain-intrinsic-size is the
+   CONTENT-box height (measured 2026-10-06, padding excluded) so anchors below it land
+   right before its first render; `auto` remembers the real size afterwards. Skills, About
+   and Contact stay out: they are short, and an estimate error there shifts #about/#contact. */
+.index-sec { content-visibility: auto; contain-intrinsic-size: auto 2480px; }
+@media (max-width: 1100px) { .index-sec { contain-intrinsic-size: auto 2525px; } }
+@media (max-width: 900px) { .index-sec { contain-intrinsic-size: auto 2580px; } }
+@media (max-width: 640px) { .index-sec { contain-intrinsic-size: auto 6690px; } }
 
 .const-wrap {
   position: relative;

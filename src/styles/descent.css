@@ -62,6 +62,9 @@ html.perf-lite .tglow { display: none; }
 /* display:none, not visibility:hidden — a hidden 3D element still keeps its compositor
    layer and is walked by pre-paint, layerization and hit-testing every frame */
 .zp.gone { display: none; }
+/* …except the hero: leaving display:none restarts its one-shot boot animations
+   (letters, eyebrow, tagline), which would replay every time you scroll back up */
+.zp.gone[data-k="hero"] { display: block; visibility: hidden; }
 
 /* --- station 0: hero --- */
 .hero-a { text-align: center; width: max-content; max-width: 96vw; }
@@ -152,7 +155,11 @@ html.perf-lite .panel.on { box-shadow: none; }
 @keyframes blink { 50% { opacity: 0; } }
 /* only the panel the camera is at keeps a blinking cursor: two dozen always-on blink
    animations inside the 3D stage each force their own layer and cost frame budget */
-.panel:not(.on) .cur, .panel.passed .p-line .cur { animation: none; }
+.panel:not(.on) .p-line .cur { animation: none; opacity: 0; } /* waiting panels show just "$" */
+.panel:not(.reach) .p-line .cur, .panel.passed .p-line .cur { animation: none; }
+/* once typed, the command stays typed: coming back out of display:none must not replay it */
+.panel.typed-done .p-line .typed { animation: none; clip-path: inset(-4px -4px -4px 0); }
+.panel.typed-done .p-line .cur { animation-delay: 0s; }
 
 /* --- depth markers + gates --- */
 .mk { font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); white-space: nowrap; }
