@@ -17,12 +17,19 @@ html.no-ride .ride-sec { height: 100vh; }
 .viewport::after {
   content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
   background: radial-gradient(120% 95% at 50% 46%, transparent 55%, rgba(4, 5, 4, 0.55) 100%);
+  /* own layer: the HUD digits change every frame and would otherwise repaint this
+     full-viewport gradient with them */
+  will-change: transform;
 }
 html[data-theme="daylight"] .viewport::after {
   background: radial-gradient(120% 95% at 50% 46%, transparent 60%, rgba(60, 62, 50, 0.25) 100%);
 }
 
 .stage { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 46%; }
+/* while the camera moves nothing in the 3D stage is clickable anyway; skipping it keeps the
+   browser's post-scroll hover hit-test from walking every 3D layer on each frame */
+.ride-sec.moving .stage,
+.ride-sec.moving .panel.reach { pointer-events: none; }
 .world { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
 
 /* floor grid — camera-fixed, the texture slides to fake infinite travel */
@@ -52,7 +59,9 @@ html.perf-lite .tglow { display: none; }
 
 /* every element placed in depth */
 .zp { position: absolute; left: 50%; top: 50%; pointer-events: none; backface-visibility: hidden; }
-.zp.gone { visibility: hidden; }
+/* display:none, not visibility:hidden — a hidden 3D element still keeps its compositor
+   layer and is walked by pre-paint, layerization and hit-testing every frame */
+.zp.gone { display: none; }
 
 /* --- station 0: hero --- */
 .hero-a { text-align: center; width: max-content; max-width: 96vw; }
@@ -141,6 +150,9 @@ html.perf-lite .panel.on { box-shadow: none; }
 @keyframes curOn { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 .cur { display: inline-block; width: 0.62em; height: 1.05em; background: var(--accent); vertical-align: text-bottom; animation: blink 1.1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
+/* only the panel the camera is at keeps a blinking cursor: two dozen always-on blink
+   animations inside the 3D stage each force their own layer and cost frame budget */
+.panel:not(.on) .cur, .panel.passed .p-line .cur { animation: none; }
 
 /* --- depth markers + gates --- */
 .mk { font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); white-space: nowrap; }
@@ -182,6 +194,7 @@ html.perf-lite .panel.on { box-shadow: none; }
   border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
   background: linear-gradient(0deg, color-mix(in srgb, var(--bg) 78%, transparent), transparent);
   font-size: 11px; letter-spacing: 0.14em; font-family: var(--mono);
+  will-change: transform; /* isolates the per-frame depth/needle repaints to this strip */
 }
 @keyframes hudBot { from { opacity: 0; transform: translateY(10px); } }
 .g-depth { color: var(--ink-dim); white-space: nowrap; }

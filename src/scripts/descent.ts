@@ -198,9 +198,9 @@ function mount(sec: HTMLElement): () => void {
     if (s !== station) {
       station = s;
       if (stnEl) {
+        // innerHTML builds a fresh <b>, so its flash animation restarts on its own —
+        // no class re-trigger and no forced reflow inside the frame
         stnEl.innerHTML = `<b>STN ${String(s).padStart(2, '0')}</b> · ${stnLabels[s] ?? ''}`;
-        stnEl.classList.remove('flash');
-        void stnEl.offsetWidth;
         stnEl.classList.add('flash');
       }
       dots.forEach((e, j) => e.classList.toggle('here', j === s));
@@ -221,12 +221,13 @@ function mount(sec: HTMLElement): () => void {
     // keep animating while anything is still settling; otherwise sleep until the next scroll
     const settling = Math.abs(target - cam) > 0.05 || bt < 1 || imp > 0;
     if (settling && inView) raf = requestAnimationFrame(frame);
-    else running = false;
+    else { running = false; sec.classList.remove('moving'); }
   };
 
   const wake = () => {
     if (running || !inView) return;
     running = true;
+    sec.classList.add('moving');
     lastT = performance.now();
     raf = requestAnimationFrame(frame);
   };
@@ -265,6 +266,7 @@ function mount(sec: HTMLElement): () => void {
     window.removeEventListener('resize', onResize);
     dots.forEach((e) => e.removeEventListener('click', onDot));
     io.disconnect();
+    sec.classList.remove('moving');
     root.classList.remove('ride-live');
   };
 }
