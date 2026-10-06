@@ -175,7 +175,12 @@ function mount(sec: HTMLElement): () => void {
         it.op = op;
         it.el.style.opacity = op.toFixed(3);
         const gone = op <= 0.02; // a 2 % ghost is invisible but still costs a layer
-        if (gone !== it.gone) { it.gone = gone; it.el.classList.toggle('gone', gone); }
+        if (gone !== it.gone) {
+          it.gone = gone;
+          it.el.classList.toggle('gone', gone);
+          // culled mid-typing counts as typed, so it doesn't retype on the way back
+          if (gone && it.typing) it.el.classList.add('typed-done');
+        }
       }
       if (it.k === 'panel') {
         const s = panelState(rel);
@@ -183,12 +188,8 @@ function mount(sec: HTMLElement): () => void {
         else if (it.active && !it.typing) {
           it.typing = true;
           it.el.classList.add('typing');
-          // ended, or cancelled because the panel was culled mid-typing: either way it counts as typed
           const el = it.el;
-          const done = () => el.classList.add('typed-done');
-          const typed = el.querySelector('.typed');
-          typed?.addEventListener('animationend', done, { once: true });
-          typed?.addEventListener('animationcancel', done, { once: true });
+          el.querySelector('.typed')?.addEventListener('animationend', () => el.classList.add('typed-done'), { once: true });
         }
         if (s.passed !== it.passed) { it.passed = s.passed; it.el.classList.toggle('passed', s.passed); }
         const reach = s.reach && !it.gone;
