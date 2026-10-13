@@ -3,7 +3,7 @@ title: "Analytics Platform"
 order: 6
 status: production
 year: "2026"
-stack: ["Python", "FastAPI", "React", "TypeScript"]
+stack: ["Python", "FastAPI", "React", "TypeScript", "dbt"]
 summary: "My day job: backend and frontend work on my company's analytics platform, from the API layer to the screens people use every day."
 role: "fullstack, day job"
 featured: true
@@ -24,8 +24,9 @@ React/TypeScript frontend.
 - **Backend.** Python and FastAPI services that serve data to the application.
 - **Frontend.** React and TypeScript, with the focus on getting numbers on screen in a way people
   can trust and read.
-- **The path in between.** Changes usually touch both layers, so I work across the whole route
-  from data to screen instead of owning one slice of it.
+- **The path in between.** New data products run from the dbt model through the serving API to
+  the screen. Changes usually touch every layer, so I work across the whole route
+  instead of owning one slice of it.
 
 ## Why this page is short
 
