@@ -8,6 +8,9 @@ import { DEFAULT_THEME } from '../lib/themes';
 const {
   title = 'Nico Sutheimer — Fullstack Developer',
   description = 'Fullstack developer in Osnabrück working with Python, FastAPI, React and TypeScript — plus LLM tools, agents and ML projects that are tested and measured instead of assumed.',
+  // Only the /descent design lab opts into the heavy chrome (scanline overlay, blurred nav);
+  // every other page renders the lite variant so scrolling stays on the compositor.
+  ride = false,
 } = Astro.props;
 
 const SITE_NAME = 'Nico Sutheimer';
@@ -18,7 +21,7 @@ const ogImage = new URL('/og.png', Astro.site).href;
 const THEME_COLOR = '#0E0F0D';
 ---
 <!doctype html>
-<html lang="en" data-theme={DEFAULT_THEME}>
+<html lang="en" data-theme={DEFAULT_THEME} class:list={[{ lite: !ride }]}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -82,14 +85,18 @@ const THEME_COLOR = '#0E0F0D';
 
   <script>
     import { initChrome } from '../scripts/chrome';
-    import { initDescent, destroyDescent } from '../scripts/descent';
     // page-load fires on the initial load and after every client-side navigation;
-    // the ride's rAF loop is torn down before the old page is swapped out.
-    document.addEventListener('astro:page-load', () => {
+    // the ride's rAF loop is torn down before the old page is swapped out. The ride
+    // script is only fetched on the page that has a ride.
+    let destroyDescent: (() => void) | null = null;
+    document.addEventListener('astro:page-load', async () => {
       initChrome();
-      initDescent();
+      if (!document.querySelector('[data-ride]')) return;
+      const ride = await import('../scripts/descent');
+      ride.initDescent();
+      destroyDescent = ride.destroyDescent;
     });
-    document.addEventListener('astro:before-swap', destroyDescent);
+    document.addEventListener('astro:before-swap', () => destroyDescent?.());
   </script>
 </body>
 </html>

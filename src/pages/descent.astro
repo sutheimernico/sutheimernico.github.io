@@ -39,7 +39,11 @@ const skills = topStack(projects.map((p) => p.data.stack), 16);
 const nLive = projects.filter((p) => p.data.status === 'production').length;
 const nWork = projects.filter((p) => p.data.context === 'work').length;
 ---
-<Base>
+<Base
+  ride
+  title="Descent — a 3D scroll landing · Nico Sutheimer"
+  description="Design lab: the previous landing of this portfolio, a scroll-driven camera ride through every project. Kept as a frontend showcase."
+>
   <Nav />
 
   <main id="main">

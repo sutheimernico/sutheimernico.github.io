@@ -275,6 +275,21 @@ html[data-theme="daylight"] body::before { opacity: 0.12; }
 }
 /* === end global page chrome === */
 
+/* === lite chrome (every page except the /descent design lab) ===
+   Measured 2026-10-13 at 4x CPU throttle: the ride landing held ~30 fps while scrolling.
+   Besides the ride itself, these are the costs that scale with scroll on a plain page:
+   a blur that re-samples everything under the fixed nav each frame, a fixed overlay
+   composited over the whole viewport, and infinite animations that keep the compositor
+   producing frames even when nothing moves. */
+html.lite body::before { display: none; }
+html.lite #nav.solid {
+  backdrop-filter: none;
+  background-color: color-mix(in srgb, var(--bg) 94%, transparent);
+}
+html.lite .idx-row .led,
+html.lite .about-portrait svg { animation: none; }
+html.lite .idx-row { animation: none; }
+
 
 
 /* === shared shells (used by every section) === */
