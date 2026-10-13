@@ -30,3 +30,7 @@ React index and the static list. Full-page screenshots show empty sections below
 an artifact of scroll-driven reveals in fullPage capture; viewport screenshots per section are fine.
 
 Open: the theme switcher is only on `/descent` now (the saved theme still applies everywhere).
+
+Follow-up 2026-10-13 (Nico): the "Selected work" section (featured cards + design-lab card) was
+removed. The hero leads straight into the index, which lists the Descent ride like any other
+project; the nav lost its "Work" link.

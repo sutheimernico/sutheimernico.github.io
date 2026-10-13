@@ -18,10 +18,8 @@ interface Props {
     domain: DomainId;
     context: 'personal' | 'work';
   }[];
-  /** Slugs whose title already carries the view-transition name elsewhere on the page. */
-  skipTransitionFor?: string[];
 }
-const { projects, skipTransitionFor = [] } = Astro.props;
+const { projects } = Astro.props;
 
 const STATUS: Record<ProjectStatus, { label: string; cls: string }> = {
   production: { label: 'live', cls: 'live' },
@@ -72,12 +70,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
               {s.label}
             </span>
             <span class="idx-title">
-              <span
-                class="idx-name"
-                style={skipTransitionFor.includes(p.slug) ? undefined : `view-transition-name: p-${p.slug}`}
-              >
-                {p.title}
-              </span>
+              <span class="idx-name" style={`view-transition-name: p-${p.slug}`}>{p.title}</span>
               <span class="idx-sum">{p.summary}</span>
             </span>
             <span class="idx-domain idx-c-domain">{p.context === 'work' ? '@ bekumoo' : domainLabel(p.domain)}</span>
