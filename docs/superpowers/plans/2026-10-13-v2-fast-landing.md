@@ -34,3 +34,8 @@ Open: the theme switcher is only on `/descent` now (the saved theme still applie
 Follow-up 2026-10-13 (Nico): the "Selected work" section (featured cards + design-lab card) was
 removed. The hero leads straight into the index, which lists the Descent ride like any other
 project; the nav lost its "Work" link.
+
+Follow-up 2026-10-13 (Nico): "Index" renamed to **Projects** (`#projects`, nav, detail back
+link). The Skills chapter replaced domain counts + stack chips with six fullstack-first areas
+(`lib/skills.ts`): what I do, tools, and the projects that show it, derived from the project
+stacks (work entries first). `analytics-platform.md` gained `dbt` in its stack (as on the CV).

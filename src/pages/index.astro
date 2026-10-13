@@ -3,7 +3,7 @@
  * Landing v2 — static HTML and CSS only. No React runtime, no canvas, no per-frame
  * script: the scroll-driven 3D ride that used to live here moved to /descent (design lab)
  * because it held ~30 fps on a throttled CPU. Motion here is a one-off load sequence plus
- * hover states, all transform/opacity. The ride itself is listed in the index as a project.
+ * hover states, all transform/opacity. The ride itself is listed under Projects.
  */
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
@@ -12,7 +12,7 @@ import ProjectList from '../components/ProjectList.astro';
 import AboutSection from '../components/AboutSection.astro';
 import ContactSection from '../components/ContactSection.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import { DOMAINS, topStack } from '../lib/domains';
+import { SKILL_AREAS, evidenceFor } from '../lib/skills';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 
@@ -27,11 +27,14 @@ const listProjects = projects.map((p) => ({
   context: p.data.context,
 }));
 
-const skills = topStack(projects.map((p) => p.data.stack), 18);
-const domainCounts = DOMAINS.map((d) => ({
-  ...d,
-  n: projects.filter((p) => p.data.domain === d.id).length,
+const evidenceProjects = projects.map((p) => ({
+  slug: p.id,
+  title: p.data.title,
+  order: p.data.order,
+  stack: p.data.stack,
+  context: p.data.context,
 }));
+const areas = SKILL_AREAS.map((a) => ({ ...a, ...evidenceFor(a, evidenceProjects, 4) }));
 ---
 <Base>
   <Nav />
@@ -47,7 +50,7 @@ const domainCounts = DOMAINS.map((d) => ({
           into the React frontend. After hours I build things that have to prove they work.
         </p>
         <div class="h-cta">
-          <a class="btn primary" href="#index">See the work</a>
+          <a class="btn primary" href="#projects">See the projects</a>
           <a class="btn" href="#contact">Get in touch</a>
           <a class="btn" href="/lebenslauf-nico-sutheimer.pdf" download>CV (PDF, German)</a>
         </div>
@@ -57,11 +60,12 @@ const domainCounts = DOMAINS.map((d) => ({
       </div>
     </header>
 
-    <section class="index-sec" id="index">
+    <section class="index-sec" id="projects">
       <div class="wrap">
         <div class="reveal">
-          <div class="eyebrow">Index</div>
-          <h2 class="sec-title">Everything on the bench.</h2>
+          <div class="eyebrow">Projects</div>
+          <h2 class="sec-title">Everything I've built.</h2>
+          <p class="sec-lede">Day job and side projects in one list. Filter by area, open any row for the full write-up.</p>
         </div>
         <ProjectList projects={listProjects} />
       </div>
@@ -71,20 +75,35 @@ const domainCounts = DOMAINS.map((d) => ({
       <div class="wrap">
         <div class="reveal">
           <div class="eyebrow">Skills</div>
-          <h2 class="sec-title">Four kinds of work, one stack.</h2>
+          <h2 class="sec-title">Fullstack, with data at the core.</h2>
+          <p class="sec-lede">
+            From the dbt model through the API to the screen. Six areas I work in, each with the
+            projects that show it. The counts come from the project list, not from a self-rating.
+          </p>
         </div>
-        <ul class="domains">
-          {domainCounts.map((d) => (
-            <li>
-              <span class="d-n">{d.n}</span>
-              <span class="d-label">{d.label}</span>
-              <span class="d-blurb">{d.blurb}</span>
+        <ul class="areas">
+          {areas.map((a) => (
+            <li class="area">
+              <div class="a-head">
+                <h3 class="a-label">{a.label}</h3>
+                <span class="a-count">{a.count} {a.count === 1 ? 'project' : 'projects'}</span>
+              </div>
+              <p class="a-blurb">{a.blurb}</p>
+              <ul class="a-tools" aria-label={`${a.label} tools`}>
+                {a.tools.map((t) => <li class="chip">{t}</li>)}
+              </ul>
+              {a.shown.length > 0 && (
+                <p class="a-proof">
+                  <span class="a-proof-cap">shown in</span>
+                  {a.shown.map((p) => (
+                    <a href={`/projects/${p.slug}`}>
+                      {p.title}{p.context === 'work' && <span class="a-work">@ bekumoo</span>}
+                    </a>
+                  ))}
+                </p>
+              )}
             </li>
           ))}
-        </ul>
-        <p class="stack-cap">Most used across all projects</p>
-        <ul class="stack">
-          {skills.map((s) => <li class="chip">{s}</li>)}
         </ul>
       </div>
     </section>
@@ -213,42 +232,80 @@ const domainCounts = DOMAINS.map((d) => ({
   /* ---------- index ---------- */
   .index-sec { padding: 10vh 0 12vh; }
 
+  .sec-lede {
+    margin: 16px 0 0;
+    max-width: 62ch;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+
   /* ---------- skills ---------- */
-  .skills-sec { padding: 10vh 0 12vh; }
-  .domains {
+  .skills-sec { padding: 10vh 0 12vh; border-top: 1px solid var(--line-soft); }
+  .areas {
     list-style: none;
-    margin: 40px 0 0;
+    margin: 44px 0 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-top: 1px solid var(--line);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
   }
-  @media (max-width: 900px) { .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 520px) { .domains { grid-template-columns: 1fr; } }
-  .domains li {
+  @media (max-width: 1000px) { .areas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .areas { grid-template-columns: 1fr; } }
+  .area {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 22px 22px 24px 0;
-    border-bottom: 1px solid var(--line-soft);
+    gap: 14px;
+    padding: 24px 24px 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent-soft);
+    border-radius: 12px;
+    background: var(--surface);
   }
-  .d-n {
+  .a-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .a-label {
+    margin: 0;
     font-family: var(--disp);
-    font-size: 34px;
+    font-size: 19px;
     font-weight: 600;
-    line-height: 1;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .a-count {
+    flex: 0 0 auto;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--accent);
     font-variant-numeric: tabular-nums;
   }
-  .d-label { font-family: var(--disp); font-size: 15px; font-weight: 600; color: var(--ink); }
-  .d-blurb { font-size: 13px; line-height: 1.6; color: var(--ink-dim); max-width: 32ch; }
-  .stack-cap {
-    margin: 40px 0 14px;
-    font-size: 11px;
+  .a-blurb { margin: 0; font-size: 14px; line-height: 1.65; color: var(--ink-dim); }
+  .a-tools { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .a-tools .chip { font-size: 11.5px; color: var(--ink); }
+  .a-proof {
+    margin: auto 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    font-size: 12.5px;
+  }
+  .a-proof-cap {
+    width: 100%;
+    font-size: 10px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--ink-faint);
   }
-  .stack { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-  .stack .chip { font-size: 12px; padding: 6px 13px; }
+  .a-proof a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .a-proof a:hover { color: var(--accent); border-bottom-color: var(--accent-soft); }
+  .a-proof a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .a-work { margin-left: 6px; font-size: 10.5px; color: var(--accent-soft); }
 </style>
