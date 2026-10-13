@@ -1,0 +1,123 @@
+---
+/**
+ * ProjectList — the complete project index as static HTML. Same markup and styles as the
+ * ProjectIndex island (global .idx-* classes), but filtering is a few lines of vanilla JS
+ * toggling `hidden`, so the landing ships no React runtime. Without JS every row shows.
+ */
+import { DOMAINS, domainLabel, filterCounts, type DomainId, type FilterId } from '../lib/domains';
+import type { ProjectStatus } from '../lib/projectSchema';
+
+interface Props {
+  projects: {
+    slug: string;
+    title: string;
+    status: ProjectStatus;
+    year: string;
+    stack: string[];
+    summary: string;
+    domain: DomainId;
+    context: 'personal' | 'work';
+  }[];
+  /** Slugs whose title already carries the view-transition name elsewhere on the page. */
+  skipTransitionFor?: string[];
+}
+const { projects, skipTransitionFor = [] } = Astro.props;
+
+const STATUS: Record<ProjectStatus, { label: string; cls: string }> = {
+  production: { label: 'live', cls: 'live' },
+  'in-progress': { label: 'building', cls: 'wip' },
+  research: { label: 'research', cls: 'wip' },
+  internal: { label: 'internal', cls: 'int' },
+};
+const counts = filterCounts(projects);
+const chips: { id: FilterId; label: string }[] = [
+  { id: 'all', label: 'All' },
+  ...DOMAINS.map((d) => ({ id: d.id, label: d.label })),
+  { id: 'work', label: '@ bekumoo' },
+];
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<div class="idx" data-plist>
+  <div class="idx-bar" role="group" aria-label="Filter projects" hidden data-plist-bar>
+    {chips.map((c) => (
+      <button type="button" class="idx-chip" aria-pressed={c.id === 'all' ? 'true' : 'false'} data-filter={c.id}>
+        {c.label}
+        <span class="idx-n">{counts[c.id]}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="idx-head" aria-hidden="true">
+    <span>id</span>
+    <span>status</span>
+    <span>project</span>
+    <span class="idx-c-domain">domain</span>
+    <span class="idx-c-stack">stack</span>
+    <span class="idx-c-year">year</span>
+    <span></span>
+  </div>
+
+  <p class="sr-only" aria-live="polite" data-plist-live></p>
+
+  <ol class="idx-list">
+    {projects.map((p, i) => {
+      const s = STATUS[p.status];
+      return (
+        <li class="idx-row" data-domain={p.domain} data-context={p.context}>
+          <a class="idx-link" href={`/projects/${p.slug}`}>
+            <span class="idx-id">{pad(i + 1)}</span>
+            <span class={`idx-status ${s.cls}`}>
+              <i class="led" aria-hidden="true"></i>
+              {s.label}
+            </span>
+            <span class="idx-title">
+              <span
+                class="idx-name"
+                style={skipTransitionFor.includes(p.slug) ? undefined : `view-transition-name: p-${p.slug}`}
+              >
+                {p.title}
+              </span>
+              <span class="idx-sum">{p.summary}</span>
+            </span>
+            <span class="idx-domain idx-c-domain">{p.context === 'work' ? '@ bekumoo' : domainLabel(p.domain)}</span>
+            <span class="idx-stack idx-c-stack">{p.stack.slice(0, 4).join(' · ')}</span>
+            <span class="idx-year idx-c-year">{p.year}</span>
+            <span class="idx-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      );
+    })}
+  </ol>
+</div>
+
+<script>
+  import { matchesFilter, type DomainId, type FilterId } from '../lib/domains';
+
+  // Bundled scripts run once per full load; with the ClientRouter the list must be
+  // re-wired after every swap, hence page-load instead of top-level code.
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-plist]');
+    if (!root) return;
+    const bar = root.querySelector<HTMLElement>('[data-plist-bar]')!;
+    const live = root.querySelector<HTMLElement>('[data-plist-live]')!;
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('.idx-row'));
+    const buttons = Array.from(bar.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+    bar.hidden = false; // chips only make sense once the script can act on them
+
+    const apply = (filter: FilterId) => {
+      let shown = 0;
+      for (const row of rows) {
+        const ok = matchesFilter(
+          { domain: row.dataset.domain as DomainId, context: row.dataset.context as 'personal' | 'work' },
+          filter,
+        );
+        row.hidden = !ok;
+        if (ok) shown += 1;
+      }
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === filter)));
+      live.textContent = `${shown} of ${rows.length} projects shown`;
+    };
+    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter as FilterId)));
+  });
+</script>
