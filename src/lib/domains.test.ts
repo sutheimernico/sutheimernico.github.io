@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DOMAINS, DOMAIN_IDS, domainLabel, matchesFilter, topStack } from './domains';
+import { DOMAINS, DOMAIN_IDS, domainLabel, filterCounts, matchesFilter, topStack } from './domains';
 
 describe('domains', () => {
   it('every domain id has metadata', () => {
@@ -23,5 +23,15 @@ describe('domains', () => {
     expect(topStack(stacks, 3)).toEqual(['Python', 'React', 'Astro']);
     expect(topStack(stacks, 10)).toHaveLength(4);
     expect(topStack([], 5)).toEqual([]);
+  });
+
+  it('filterCounts counts every chip, work orthogonal to domain', () => {
+    const c = filterCounts([
+      { domain: 'ml', context: 'personal' },
+      { domain: 'data', context: 'work' },
+      { domain: 'ml', context: 'work' },
+    ]);
+    expect(c).toEqual({ all: 3, work: 2, agents: 0, ml: 2, data: 1, product: 0 });
+    expect(filterCounts([]).all).toBe(0);
   });
 });

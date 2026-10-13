@@ -50,3 +50,14 @@ export function topStack(stacks: string[][], limit: number): string[] {
     .slice(0, limit)
     .map(([s]) => s);
 }
+
+/** Number of projects each index filter chip would show. */
+export function filterCounts(projects: Filterable[]): Record<FilterId, number> {
+  const c = { all: projects.length, work: 0 } as Record<FilterId, number>;
+  for (const d of DOMAINS) c[d.id] = 0;
+  for (const p of projects) {
+    c[p.domain] += 1;
+    if (p.context === 'work') c.work += 1;
+  }
+  return c;
+}
