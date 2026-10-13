@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { DOMAINS, domainLabel, matchesFilter, type DomainId, type FilterId } from '../lib/domains';
+import { DOMAINS, domainLabel, filterCounts, matchesFilter, type DomainId, type FilterId } from '../lib/domains';
 import type { ProjectStatus } from '../lib/projectSchema';
 
 export interface IndexProject {
@@ -37,15 +37,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 export default function ProjectIndex({ projects }: Props) {
   const [filter, setFilter] = useState<FilterId>('all');
 
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { all: projects.length, work: 0 };
-    for (const d of DOMAINS) c[d.id] = 0;
-    for (const p of projects) {
-      c[p.domain] += 1;
-      if (p.context === 'work') c.work += 1;
-    }
-    return c;
-  }, [projects]);
+  const counts = useMemo(() => filterCounts(projects), [projects]);
 
   const rows = projects.filter((p) => matchesFilter(p, filter));
 
