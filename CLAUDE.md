@@ -15,8 +15,10 @@ it before touching code.
   `#45E08A`, not stock neon `#33FF66`). Six switchable accent themes — **phosphor** (default),
   petrol, amethyst, solar, molten, daylight — plus an animated **"Shift" mode** that cross-fades
   through the dark palettes (opt-in since 2026-09-06: its per-frame palette writes cost too much
-  next to the ride). **Landing = "Descent"** (Nico's choice 2026-07-02, rebuilt 2026-09-06 after
-  the Kinetic-Terminal-only landing was rejected): the scroll-driven camera ride from
+  next to the ride). **Landing = static v2** since 2026-10-13 (Nico: the ride stuttered on load
+  and scroll; measured ~30 fps at 4x CPU throttle vs 60 fps for v2). The previous landing,
+  **"Descent"** (Nico's choice 2026-07-02, rebuilt 2026-09-06), lives on unchanged at `/descent`
+  as a design-lab project (`src/content/projects/descent.md`): the scroll-driven camera ride from
   `prototype/descent/variant-b.src.html` (branch `feat/descent-prototype`) with **projects as
   the stations**. Spec: `docs/superpowers/specs/2026-07-02-descent-portfolio-design.md`
   (skill-station level and chambers were NOT built — projects ride directly). Section styling

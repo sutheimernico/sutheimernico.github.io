@@ -9,7 +9,13 @@ Global personal rules: `~/.claude/CLAUDE.md`.
   interaction only where JS state/effects are needed** (current islands: `ThemeSwitcher`,
   `ProjectIndex`, `Constellation`, `LiveProof`). Default move: a new section is an `.astro`
   component; reach for a `.tsx` island only when it genuinely needs runtime JS.
-- **The landing is the Descent ride** (`components/Descent.astro` + `scripts/descent.ts` +
+- **The landing (`pages/index.astro`) is static v2**: no React islands, no canvas, no per-frame
+  script — keep it that way; measure with a throttled scroll before adding motion. Only
+  `/descent` passes `ride` to `Base.astro`; every other page gets `html.lite` (no scanline
+  overlay, no nav blur, no infinite row animations) and never downloads `scripts/descent.ts`.
+  The index there is `ProjectList.astro` (static rows + vanilla filter); `ProjectIndex.tsx`,
+  `Constellation.tsx` and `ThemeSwitcher.tsx` remain for `/descent`.
+- **The `/descent` design lab is the Descent ride** (`components/Descent.astro` + `scripts/descent.ts` +
   `lib/descent.ts` + `styles/descent.css`): a sticky viewport inside a tall section, the camera
   dollies through the hero, an entry gate, one panel per project (alternating left/right) and an
   exit gate; a HUD gauge reads the depth. Rules from the approved prototype: transform/opacity
