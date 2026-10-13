@@ -24,6 +24,11 @@ boot sequence, headings that resolve out of terminal noise, a typed statement, a
 a filterable process-table index of every project, and view transitions that morph a project
 title from the card into its detail page.
 
+Since October 2026 the landing is plain static HTML again. The scroll-driven 3D ride that
+used to open the site held about 30 fps on a throttled CPU, so it moved to
+[/descent](/descent/) as a design lab and the landing dropped React, the canvas graph and
+every per-frame script; the same throttled scroll now holds 60 fps.
+
 ## Architecture
 
 - **Astro for static output.** The whole site renders to static HTML at build time and deploys
