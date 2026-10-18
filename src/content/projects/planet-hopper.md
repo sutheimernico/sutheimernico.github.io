@@ -91,7 +91,7 @@ Three Fiber or Babylon.js, for direct control of the game loop and a small bundl
   the test must flag.
 - **Frustration avoided by design**: planets always capture, hazards are suns and void drift, and
   there is no mid-flight thrust — v1 is a pure slingshot.
-- **One settings click from live.** The Pages workflow ran on `main`: install, gate and build
-  were green, and only the deploy step failed (404) because Pages was never enabled for the
-  repository. Touch input itself is verified headless (390×844, at device pixel ratios 1 and 2);
+- **Playable at [sutheimernico.github.io/planet-hopper](https://sutheimernico.github.io/planet-hopper/).**
+  The first Pages run on `main` had install, gate and build green and only the deploy step
+  failing (404), because Pages was never enabled for the repository; it went live on 2026-10-18. Touch input itself is verified headless (390×844, at device pixel ratios 1 and 2);
   how it feels on a real phone stays open.
