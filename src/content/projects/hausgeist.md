@@ -33,11 +33,13 @@ the adapters' topic schemas come from vendor documentation and are unverified on
 ## Architecture
 
 Device protocols are not reimplemented: Zigbee devices come in through Zigbee2MQTT, Shelly and
-Nuki speak MQTT natively, and only the Govee lights need an adapter of my own (their documented
-LAN API; not built yet). Everything funnels over an MQTT bus into a FastAPI backend that holds the
-device model, rules, schedules and notifications; the bus sits behind a seam, so the simulator and
-a real broker are interchangeable. The frontend is React + TypeScript as an installable PWA,
-reached remotely over Tailscale. Everything is meant to run in Docker Compose on a laptop first,
+Nuki speak MQTT natively, and only the Govee lights need an adapter of my own: a Bluetooth LE
+spike (power, brightness, colour, white, scenes, music mode) sits behind a transport seam, but has
+not been clicked through on the real panel yet. Everything funnels over an MQTT bus into a FastAPI
+backend that holds the device model; rules, schedules and notifications are planned, not built. The
+bus sits behind a seam, so the simulator and a real broker are interchangeable. Today the UI is a
+single device page; the installable React + TypeScript PWA, reached remotely over Tailscale, is
+planned. Everything is meant to run in Docker Compose on a laptop first,
 so a later move to a small dedicated machine is a copy, not a port.
 
 ## Why it's built this way
@@ -57,7 +59,7 @@ so a later move to a small dedicated machine is a copy, not a port.
 ## Implementation
 
 - **Simulator first, as decided in ADR 0002.** Everything above the bus can be exercised without a
-  single device; simulated devices must be labelled as such.
+  single device; simulated devices are labelled as such in the API and on the page.
 - One device model with typed capabilities; adapters translate vendor topics and payloads into it
   and translate commands back out.
 - A decision register with dated entries sits next to the code — for example that Govee ceiling
