@@ -71,7 +71,7 @@ own job out of their own digest.
   the same again; a publication window plus a persistent seen-set cuts that to about 570.
 - **60 sources, each confirmed by a live fetch**; verified-broken URLs stay listed in the same file
   so nobody re-adds them.
-- 359 Python tests and 20 frontend tests; lint, type check and build clean.
+- 364 Python tests and 20 frontend tests; lint, type check and build clean.
 
 ## Trade-offs & what I considered
 
@@ -85,6 +85,10 @@ own job out of their own digest.
 - **Known weaknesses, named rather than hidden:** headlines drift to English on longer inputs, the
   second body sentence is usually filler (the check drops it, so cards get shorter), and the number
   check rejects German decimals ("2,8" for "2.8").
+- **A timer that mostly worked, and one that waited 40 hours.** Between 09-28 and 10-15 the timer
+  produced 17 of 18 digests. From 10-16 a run waited about 40 h on a shared, busy local model: an
+  unbounded-wait bug. The fix, on a branch and not yet merged, is a 2-hour wall-clock run budget
+  and items handed back when a run fails.
 - **No fabricated digest.** A run that produces nothing usable fails visibly; a quiet day says
   "only 1 of 5 slots".
 - **The acceptance criterion is behavioural:** five consecutive mornings actually read on the phone.
