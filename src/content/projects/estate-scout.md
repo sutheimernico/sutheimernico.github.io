@@ -1,7 +1,7 @@
 ---
 title: "Estate Scout"
 order: 11
-status: in-progress
+status: research
 year: "2026"
 stack: ["Python", "Ollama", "RAG", "FastAPI", "React", "Typer"]
 summary: "A local real-estate knowledge assistant where the model routes and explains but never computes — every number comes from tested Python."
@@ -22,8 +22,10 @@ property: the model understands the question and picks a tool, but every number 
 payment, purchase side costs, affordability, rental yield — is produced by tested Python. It runs
 entirely on one machine through Ollama, with no paid APIs and no listing scraping. Stage 1, the
 assistant, is complete and was verified against a live local model; Stage 2, a scoring funnel,
-now has its transparent scoring engine and drilldown UI. The code is merged to `main` and the
-repository is being made public.
+now has its transparent scoring engine and drilldown UI. The repository is public; the newest
+hardening commits (below) sit on a branch until they are merged. It is listed as research rather
+than in-progress because the finding that matters is the method, not a finished product: the
+assistant is complete, the funnel's price heuristic rests on a single live data point.
 
 ## Architecture
 
@@ -61,8 +63,9 @@ confidence value instead of being filled in.
 ## Implementation
 
 - The finance core was written test-first against hand-computed references — 29 tests before
-  anything else existed; 205 tests now (97 before the hardening and scoring rounds), with a
-  coverage floor of 94 % set at the integer *below* the measured 94.99 %, not rounded up. The
+  anything else existed; 236 tests now (97 before the hardening and scoring rounds), with a
+  coverage floor of 95 % (it was 94 %, set at the integer *below* the measured 94.99 %, not
+  rounded up). The
   scoring engine alone has 17 tests with hand-computed reference values.
 - Every external dependency sits behind a seam with a fake (embeddings, chat, land value, regional
   signals), so no test touches the network.
@@ -70,8 +73,10 @@ confidence value instead of being filled in.
   tool with correct arguments and surfaced a monthly payment straight out of `finance/` — the
   number came from the code, the sentence from the model. The same run also showed the limit: the
   model quoted a second tool figure in its prose and garbled it (181,209.86 became "181.210,86").
-  Prompt rules do not bind free text; a code-level check that prose numbers match tool results is
-  still open, and a tool-trace panel in the chat makes every call inspectable meanwhile.
+  Prompt rules do not bind free text, so a code-level check now closes that gap:
+  `assistant/number_check.py` flags any number in the prose that no tool result produced (API
+  field `unverified_numbers`, a CLI warning, a chat alert) and catches exactly that live case,
+  181.210,86 against 181.209,86. A tool-trace panel in the chat makes every call inspectable too.
 - Golden retrieval queries pin that the expected knowledge document comes back for a given
   question.
 
@@ -85,9 +90,12 @@ confidence value instead of being filled in.
   for a real listing (300,000 € for 100 m² in a small Lower Saxony town), the price block compares
   3,000 €/m² of living space with 190 €/m² of land — a ratio of 15.8, so the block scores 0, and
   would score 0 almost everywhere outside expensive urban land markets. The thresholds were
-  implemented as specified and the finding is written up as needing a decision before that block
-  carries 40 % of a score anyone acts on.
+  first implemented as specified; the price block's bounds have since been recalibrated to 3..20
+  from that finding. That is my own heuristic fitted to one data point, so the block still
+  deserves scepticism before anyone acts on a score it carries 40 % of.
 - **Honest gaps over convenient numbers.** No keyless machine interface for regional population and
   vacancy data was found, so the region block reports "provider missing" instead of inventing one.
-- **Deliberately deferred and still open:** chat history in SQLite (no second use case yet) and a
-  nightly re-score digest. The hardening and scoring rounds are merged to `main`.
+- **Deliberately deferred and still open:** chat history in SQLite (no second use case yet). The
+  nightly re-score digest exists as a script plus systemd units, but is not installed. The
+  hardening and scoring rounds are merged to `main`; the number check and the recalibration are
+  on a branch.
