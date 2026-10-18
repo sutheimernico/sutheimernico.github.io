@@ -10,7 +10,7 @@ featured: false
 domain: agents
 context: personal
 reviewed: false
-fieldNote: "45 tests green, ruff clean — and it has never been run against a real bot. A later code review also found the use case had moved: the directory tree it guards now runs without permission prompts at all, so the tool is code-complete for a situation that stopped existing."
+fieldNote: "64 tests green, ruff clean — and it has never been run against a real bot. A later code review also found the use case had moved: the directory tree it guards now runs without permission prompts at all, so the tool is code-complete for a situation that stopped existing."
 ---
 
 ## What it is
@@ -44,7 +44,7 @@ leaked token alone still cannot forge an approval, because the `request_id` gate
 
 ## Implementation
 
-- Built test-first across seven tasks; **45 tests**, Telegram I/O injected or mocked, ruff clean.
+- Built test-first across seven tasks; **64 tests** after the finish pass, Telegram I/O injected or mocked, ruff clean.
 - A dry-run harness drives the real `main()` through all nine failure-table scenarios against a fake
   transport and doubles as a test file, so a change can be sanity-checked without a bot.
 - Re-reading the hook docs corrected two things the spec had wrong: the matcher for this event is a
@@ -59,7 +59,8 @@ leaked token alone still cannot forge an approval, because the `request_id` gate
 - **The use case moved.** The allowlisted tree later switched to a permission-bypass mode, so there
   are no prompts left to relay there. Re-pointing the allowed root at repos that still prompt is an
   env var, not a code change; the plan for it exists and is unexecuted.
-- **Known defects, documented not hidden:** a Telegram flake *after* the tap can lose the verdict
-  because the cosmetic API calls share a `try` with the decision print; a single transient error
-  ends the poll instead of retrying inside the remaining budget; the HTTP wrappers have no failure
-  tests of their own.
+- **Known defects, documented first, then fixed:** a Telegram flake *after* the tap could lose the
+  verdict because the cosmetic API calls shared a `try` with the decision print; a single transient
+  error ended the poll instead of retrying inside the remaining budget; the HTTP wrappers had no
+  failure tests of their own. All three are fixed in the finish pass (on a branch, not merged
+  yet); the tool is still unrun against a real bot.

@@ -83,7 +83,7 @@ Three Fiber or Babylon.js, for direct control of the game loop and a small bundl
 ## Trade-offs & what I considered
 
 - **Headless has a hard ceiling.** Software rendering runs at 6–10 fps at 1280×720 — explicitly
-  not a GPU number. Game feel, looks, touch ergonomics, the audio mix and real fps stay open for a
+  not a GPU number. Game feel, looks, touch ergonomics on a real phone, the audio mix and real fps stay open for a
   session on real hardware, together with the choice between four visual themes and the name.
 - **Reachability is now tested, not assumed.** A search over orbit angle, 32 directions and five
   launch powers finds every one of 2,000 gaps (50 seeds × 40) reachable. Doubling the spacing
@@ -91,5 +91,7 @@ Three Fiber or Babylon.js, for direct control of the game loop and a small bundl
   the test must flag.
 - **Frustration avoided by design**: planets always capture, hazards are suns and void drift, and
   there is no mid-flight thrust — v1 is a pure slingshot.
-- **Deployment is wired but inert** — a GitHub Pages workflow exists (its action pins are
-  unverified until a first real run), so the hosted version is not live yet.
+- **One settings click from live.** The Pages workflow ran on `main`: install, gate and build
+  were green, and only the deploy step failed (404) because Pages was never enabled for the
+  repository. Touch input itself is verified headless (390×844, at device pixel ratios 1 and 2);
+  how it feels on a real phone stays open.
