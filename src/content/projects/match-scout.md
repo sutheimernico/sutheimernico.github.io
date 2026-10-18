@@ -73,6 +73,14 @@ Dixon-Coles and 0.539 / 0.917 for the market — worse than uniform, beaten by t
   finding still reads "no edge under this untuned configuration", not a proof.
 - **Running forward, from day one.** A paper loop with an append-only, idempotent bet ledger
   places bets under one frozen, logged configuration, only with odds known at least two hours
-  before kickoff. Its first 12 bets settled on 2026-09-27: down 105 € on 120 € of paper stakes — a
-  number that means nothing at n = 12 and is shown anyway. Since 2026-09-27 the loop runs twice a day from a local cron, and the
+  before kickoff. Its first 12 bets settled on 2026-09-27: down 105 units on 120 units of paper
+  stakes — a number that meant nothing at n = 12 and was shown anyway. By 2026-10-16, 86 bets had
+  settled at a yield of −25.8 % (95 % CI −52 % to +3 %), only 22 % beat the closing line, and on 47
+  settled predictions the market's Brier score was better than the model's — the forward loop
+  confirms the backtest: no edge. The loop runs twice a day from a local cron on a laptop, so slots
+  are missed whenever the machine sleeps; a missed placement slot is lost, not caught up. The
   repository is public.
+- **Diagnostics instead of a headline.** Calibration (the model is over-confident at the top:
+  said 93 %, happened 75 %), a closing-line-value deep dive per odds band and month, and a subgroup
+  explorer that renders its multiple-comparisons warning inside the component, not as a footnote —
+  on a branch, not merged yet.

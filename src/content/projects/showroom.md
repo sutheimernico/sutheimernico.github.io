@@ -57,6 +57,6 @@ Three findings are worth more than the scenes themselves:
 - **The honest blocker: this was tuned on a software renderer.** Frame-rate numbers from that
   environment are labelled non-representative, and the record is clear about what it cost —
   a scene marked done was later rejected on a real display as "flat boxes with painted-on
-  puddles". Two rebuild plans are written and unexecuted.
+  puddles". Two rebuild plans are written: the alley rebuild is partly executed (2 of 7 tasks), the Apex one not started.
 - **Source only, deliberately.** The repository is public, but there is no hosting and no tracking — public hosting is a separate
   later decision.

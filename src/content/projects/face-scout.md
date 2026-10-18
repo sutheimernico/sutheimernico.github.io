@@ -11,7 +11,7 @@ github: https://github.com/sutheimernico/face-scout
 domain: ml
 context: personal
 reviewed: false
-fieldNote: "74 tests are green and every one of them uses fakes or synthetic arrays. No test has ever run the real models on a real image, and the lip-reading accuracy quoted in the ADR is extrapolated from literature, not measured here. That gap is the project's headline, not a footnote."
+fieldNote: "86 tests are green, all on fakes or synthetic data; a webcam-free `selfcheck` proves the wiring on synthetic faces. No test has ever run the real models on a real image, and the lip-reading accuracy quoted in the ADR is extrapolated from literature, not measured here. That gap is the project's headline, not a footnote."
 ---
 
 ## What it is
@@ -55,7 +55,7 @@ vocabulary is closed, the speaker is one person and the camera never changes.
 
 ## Implementation
 
-- **74 tests** plus ruff over roughly 1,300 lines; the camera and display paths stay thin on
+- **86 tests**, all on fakes or synthetic data, plus ruff over roughly 1,300 lines; the camera and display paths stay thin on
   purpose because they cannot be unit-tested.
 - Evaluation is **session-aware**: whole recording sessions are held out, so frames from one
   sitting cannot leak between train and validation and inflate the score.
@@ -67,8 +67,10 @@ vocabulary is closed, the speaker is one person and the camera never changes.
 - **"Imports cleanly" is not "works", and the repo is explicit about it.** A written plan names
   the defining gap: no test instantiates the real MediaPipe or InsightFace models on a real image,
   no lip-reading clip has ever been recorded, and the `--video` path has never seen real footage.
-  The fix — real-inference tests on fixture media and a *measured* accuracy report — is planned
-  and not yet executed.
+  The planned fix — real-inference tests on fixture media and a *measured* accuracy report — hit a
+  blocker: real MediaPipe cannot even load in the WSL build sandbox (`libGLESv2.so.2` is missing).
+  A webcam-free `selfcheck` is the honest substitute: it proves the wiring end to end on
+  synthetic faces, and its output is labelled SYNTHETIC. No accuracy number has been measured.
 - **The accuracy number is borrowed, not earned.** The ~80–95 % expectation for a 10–30 word
   vocabulary comes from comparable landmark-only work in the ADR; this system has produced no
   accuracy figure of its own.

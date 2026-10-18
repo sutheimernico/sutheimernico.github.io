@@ -18,7 +18,7 @@ A personal task assistant that answers "what should I be doing today?" by readin
 tasks and selected local files, then prioritising them into a single briefing — and that can act
 on those tasks, but only after you explicitly confirm each action. The hard constraint that shapes
 everything: your content never leaves the machine toward an AI vendor. All the reasoning runs
-on-device against a local model. In progress, and deliberately never published.
+on-device against a local model. In progress. It is designed local-only; whether the existing remote stays is open.
 
 ## Architecture
 
@@ -37,7 +37,8 @@ Four cleanly separated layers:
   "since the last briefing" section on top), `factotum digest` (the same pipeline written to a dated
   Markdown file for the morning) and `factotum do <ref | instruction>` (resolve a write action, show
   the proposal, and run it only after explicit confirmation — it refuses to write at all when
-  there's no interactive terminal).
+  there's no interactive terminal). Options such as `--due`, `--new` and `--section` select the
+  action; a batch form (`do 1 2 3 --complete`) handles several tasks at once.
 
 ## Why it's built this way
 
@@ -68,7 +69,7 @@ code has to carry the orchestration.
   get none, because a request that failed in transit may still have been applied, and a blind retry
   could complete a task twice — tests pin that. A throttled request says "rate limit reached"
   instead of a bare HTTP 429.
-- A focused test suite (148 tests; fixtures and mocks, zero network dependency) covers connector parsing,
+- A focused test suite (226 tests, 98.7 % coverage; fixtures and mocks, zero network dependency) covers connector parsing,
   prioritisation, reference resolution, action dispatch, the local-model summary with its
   deterministic offline fallback, and — importantly — the confirm-gate's refusal to execute
   unconfirmed; the gate is pytest.
@@ -78,14 +79,19 @@ code has to carry the orchestration.
 - **Both paths work; v1 is feature-complete behind inputs only I can provide.** The prioritised
   briefing now runs through the local model (with a deterministic fallback when it's offline), and
   the allowlist-scoped filesystem reader is wired in — inert by default until a directory is
-  explicitly allowed. What remains is genuinely external: an Entra app for the optional Microsoft
-  365 source, and the hosting call (it stays unpublished by design). Honest in-progress, not a
+  explicitly allowed. Systemd units for the morning digest exist but are not activated. What
+  remains is genuinely external: an Entra app for the optional Microsoft 365 source, and the
+  question of whether the existing GitHub remote stays. Honest in-progress, not a
   finished tool.
 - **Natural language in, validated structure out.** `factotum do "complete my report"` lets the
-  local model map the instruction onto one of the two supported actions — constrained to a strict
+  local model map the instruction onto one of the supported actions — constrained to a strict
   JSON schema and checked against the task list just fetched, so a task id the model did not get
   from that list can never become a proposal. Several plausible matches are shown instead of
   guessed; with the model offline it asks for the explicit form rather than falling back to a
   cloud model. Index, id and name fragment still work without any model.
+- **Five write actions, one gate.** Complete, comment, set due date, create task and move to
+  section each carry a risk tier and all pass through the same confirm gate. The only relaxation
+  is the batch form: a per-run auto-confirm that is never stored and applies to tier-0
+  completes only. Ambiguous references are disambiguated interactively.
 - **Reusable core, thin front end.** The logic lives independently of the CLI, so a later web UI
   would be a second front end rather than a rewrite — without over-building for it now.

@@ -10,7 +10,7 @@ featured: false
 domain: agents
 context: personal
 reviewed: false
-fieldNote: "Pointed at real data for the first time, the \"waiting on you\" feed found 139 open asks across 17 projects — and ten parser gaps no fixture had shown, from a folder holding three repos without being one to \"Not a blocker.\" being counted as a blocker. Each gap is now pinned by a sanitized fixture or a named test. The collectors for external systems have still never seen a live system."
+fieldNote: "Pointed at real data for the first time, the \"waiting on you\" feed found 139 open asks across 17 projects — a number that later turned out to be inflated (see below) — and ten parser gaps no fixture had shown, from a folder holding three repos without being one to \"Not a blocker.\" being counted as a blocker. Each gap is now pinned by a sanitized fixture or a named test. The collectors for external systems have still never seen a live system."
 ---
 
 ## What it is
@@ -66,13 +66,16 @@ and any mocked value carries a visible "Demo-Daten" badge.
 - Phases 4–7 — the React cockpit, the three actions with a closed whitelist, an audit log and a
   confirm dialog, the app-window shell and the agent-report inbox contract.
 - Second round — the private-project collectors, the feed, history, delta briefing and the toast:
-  **381 backend and 65 frontend tests**, all hermetic.
-- **Live proof, read-only:** against the real project folder the feed collected 139 asks from 17
-  projects in 0.16 s and rendered in headless Chromium with zero console errors. Real data broke
+  **382 backend and 65 frontend tests**, all hermetic.
+- **Live proof, read-only:** against the real project folder the feed collected what looked like
+  139 asks from 17 projects (on 2026-09-27) in 0.16 s and rendered in headless Chromium with zero console errors. Real data broke
   the fixture-grade code ten times — projects documented only in a PROJECT.md, three repos inside
   one folder that were invisible, the same ask restated in two files, "Not a blocker." ranked as a
   blocker, a UI that waited more than 60 s on a cold local model before showing any tile, and a
   German PowerShell answering in cp850 and crashing the toast. All ten are fixed and pinned.
+- **An eleventh gap, found on a re-count.** The 139 was wrong: the feed counted 52 plan build steps
+  as asks and one staging clone twice. Fixed, the real figure is 140 asks across 13 projects. The
+  headline number of a live proof was itself a data-quality bug.
 - No test touches a live network, a real orchestrator or a real model; the build loop was
   explicitly forbidden from calling the target systems, which is why live verification is an open
   human step rather than something that quietly happened.

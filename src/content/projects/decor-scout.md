@@ -66,7 +66,7 @@ implement two different notions of "fits".
   random sample draws 12 light, 12 dark and 6 colour-neutral listings.
 - **The canary had been right all along.** Its first composed message named a search job with 2 of
   6 broken pages since late August — a finding that had sat in a log nobody read.
-- 290 tests plus ruff (195 before the buying-loop round); 10,058 listings and 114 runs in the store
+- 293 tests plus ruff (195 before the buying-loop round); 10,058 listings and 114 runs in the store
   as of that round.
 
 ## Trade-offs & what I considered
@@ -76,8 +76,9 @@ implement two different notions of "fits".
 - **Rotating a shelf is not modelled.** A rotation heuristic would let everything "fit" somehow,
   so a piece that would only work lying down is left in the unknown block.
 - **Running, but not on main.** The served page had been wired to an older output file for four
-  weeks; that delivery is repaired and verified page by page. Since 2026-09-27 the daily scan runs
-  from a cron entry at 07:19 (the installer had a bug that kept it from registering, now fixed), and
-  the alert fires only when a listing fits *and* looks right, because fit alone meant 248 hits on a
+  weeks; that delivery is repaired and verified page by page. The cron entry registered on
+  2026-09-27 skipped itself every morning until 2026-10-18: an outer `flock` and the script's own
+  `flock` on the same file made it exit 0 without running and without an alert. That is fixed on a
+  branch; the first real run waits for the merge. The alert fires only when a listing fits *and* looks right, because fit alone meant 248 hits on a
   single August scan day. The buying-loop round still lives on a feature branch that is not merged,
   and the repo is private. That is why this is honestly "in progress" and not "production".
