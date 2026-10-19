@@ -1,68 +1,82 @@
 ---
 title: "Data Center Tycoon"
 order: 26
-status: in-progress
+status: production
 year: "2026"
 stack: ["TypeScript", "React", "Vite", "vitest"]
-summary: "An idle game whose pacing is a test suite instead of a feeling. Phases 0–4 are built and playable; with the plan's numbers the balancing bot never reached its target, which is the finding."
-role: "design, economy and balancing harness"
+summary: "An idle game whose pacing is a test suite instead of a feeling. Bot players simulate hours of play in seconds; after a hand-played session the economy was retuned until the first prestige came 2.6× sooner."
+role: "design, economy, balancing harness and UI"
+github: https://github.com/sutheimernico/incremental-game
 featured: false
 domain: product
 context: personal
 reviewed: false
-fieldNote: "With the plan's own numbers the greedy bot never reached 1e9 in two simulated hours, so production was retuned ×12. The late pacing bands (3–8 minutes to the next buy) were not reached after hundreds of parameter combinations, so the guard tests assert only what holds."
+fieldNote: "The bots said the pacing was fine; a human said it was too slow. Retuning against the harness took the casual bot's first prestige from 54:30 to 20:43 and the longest wait for a new tier from 45 to 10 minutes. It also made later prestiges trivially fast, which the harness showed at once and which is the next thing to fix."
 ---
 
 ## What it is
 
-An idle/incremental game — click a job, buy a CPU node, end up running a hyperscaler, then
-prestige by "shipping a model generation" and start over faster. The working title is *Data Center
-Tycoon*; the theme is deliberately swappable, because it lives in content data rows rather than
-in code. The UI is in German.
+An idle/incremental game: click the processor, buy a CPU node, end up running a hyperscaler, then
+prestige by "shipping a model generation" and start over faster. The UI is in German.
 
-**Status: built through phase 4, plus offline credit from phase 5.** It has an economy module with
-invariant tests, a simulation stepping at 20 Hz outside React, 8 generator tiers, 15 research
-upgrades, prestige with an insight shop, save with offline credit (capped at 8 hours) and a
-bot-driven balancing harness. 63 tests, 66 kB gzip, and it has been played headless in Chromium.
-Not public yet: there is no remote.
+**Playable at [sutheimernico.github.io/incremental-game](https://sutheimernico.github.io/incremental-game/).**
+It has eight generator tiers, a 35-node skill tree in five branches, prestige with an insight shop,
+and a save that migrates between schema versions. A tab in the background keeps producing at full
+rate, and a closed page earns offline credit up to 8 hours. 97 tests, about 82 kB gzip.
 
 ## Architecture
 
 One dependency direction, `ui → store → sim → economy`, never backwards, with `economy` and `sim`
-importable from a plain Node script with no DOM — which is what makes the balancing harness
-possible. Game state lives in a module store outside React, read through `useSyncExternalStore`
-and notified at 10 Hz while the simulation steps at a fixed 20 Hz; content is data, and derived
-values are never persisted.
+importable from a plain Node script with no DOM. That is what makes the balancing harness possible.
+Game state lives in a module store outside React and is read through `useSyncExternalStore`.
+Content is data: generators and skill-tree nodes, including prerequisites and positions, are rows
+in a table, and derived values are never persisted.
+
+The simulation runs on wall-clock time, not frames. Browsers throttle hidden tabs to almost nothing,
+so every tick measures the real elapsed time and drains it as a backlog in small slices. The game
+keeps running in the background without freezing the page when you come back.
 
 ## Why it's built this way
 
-The central claim is that in this genre **the code is the easy part** — the economy decides
-whether the result is fun. So the balancing harness came *before* content: `tools/balance.ts` runs
-bot policies (greedy, efficient, prestige-loop) over 120 simulated minutes in about 0.3 s and
-prints the pacing curve. Those targets become assertions where they can hold, so a balance change
-that breaks pacing fails the suite instead of failing players.
+In this genre **the code is the easy part**; the economy decides whether the result is fun. So the
+balancing harness came *before* the content. `tools/balance.ts` runs bot policies (greedy, efficient,
+prestige-loop) over two simulated hours in about three seconds and prints the pacing curve. The
+targets become assertions, so a balance change that breaks pacing fails the suite instead of
+failing players.
 
 ## Implementation
 
-- **Economy with invariant tests**, written before the content that uses it.
-- **Three bots** drive the harness; a full two-hour simulation costs about 0.3 s, cheap enough to
-  sweep parameters in bulk.
-- **Prestige works as designed on the numbers that matter most:** the first prestige unlocks at
-  54:30 minutes (target 40–70), and the second run is 2.47× faster than the first (target 2–5×).
-- **Offline credit** is linear with autobuyers paused, so offline equals online exactly; it is
-  capped at 8 hours.
-- Played headless in Chromium to check the loop end to end; 63 tests in total.
+- **Processor as the click target:** an SVG chip whose eight die tiles stand for the eight tiers
+  and light up as you own them. Data pulses run along the traces in step with production. Click
+  effects bypass React renders, and `prefers-reduced-motion` turns them off.
+- **Skill tree instead of a research list:** 35 nodes with prerequisites in five branches (click
+  power, infrastructure, network synergies, automation, cooling), each with a capstone. A run
+  affords about 15 of them before prestige, so it is a choice of path.
+- **Save schema v2 with a migration:** saves from before the skill tree keep their research.
+- **Pacing, before and after the retune** (harness, deterministic):
+
+| | before | after |
+| --- | --- | --- |
+| first prestige, casual bot | 54:30 | 20:43 |
+| first prestige, efficient bot | 21:55 | 9:20 |
+| longest gap between new tiers, casual | 45:35 | 10:18 |
+| longest gap between new tiers, efficient | 6:11 | 2:01 |
 
 ## Trade-offs & what I considered
 
-- **The plan's numbers were wrong, and the harness said so.** The greedy bot never reached 1e9 in
-  two hours with the planned values, so production was retuned ×12. That is the harness doing its
-  job, but it also shows how far a spreadsheet estimate sits from a simulated economy.
-- **Some pacing targets were not reached.** The late bands (3–8 minutes to the next buy) stayed
-  out of reach across hundreds of parameter combinations. The guard tests assert only what holds,
-  rather than asserting the target and being red or loosening it until it passes silently.
-- **float64 with a ~1e15 design ceiling** instead of a big-number library, which taxes every
-  arithmetic expression forever; currency math stays in one directory so a later swap is local.
-- **Flat generator topology** rather than chained — chaining feels deeper and balances much harder,
-  so it is a v2 decision if v1 proves boring.
-- **Not public.** No remote yet; the phases after 5 (polish, retention, ship) are not built.
+- **The bots were not enough.** The first version met most of its pacing targets and still played
+  too slowly by hand. The harness turned a vague "faster, especially late" into numbers to hit,
+  but the request had to come from a person.
+- **Later prestiges are now too quick:** 3:40, 1:50, 1:10 and 0:50 to the threshold after the first
+  run, because the insight reward was not rebalanced when run 1 got faster. A threshold that rises
+  per generation is the next lever.
+- **float64 with a ~1e15 design ceiling** instead of a big-number library. The largest value seen
+  so far is about 1.3e12, and currency math stays in one directory so a later swap stays local.
+- **Flat generator topology** rather than chained: chaining feels deeper and balances much harder.
+- **Not built:** achievements, a stats page, and save export or import.
+
+<!-- Sources (2026-10-19): incremental-game README.md and PLAN.md section 11 (harness before/after
+tables); `npm run balance` output on main c24e790 (tier unlocks, first prestige 20:43 / 9:20,
+prestige-loop 3:40 1:50 1:10 0:50, largest run 1.29T); `npm run gate` 97 tests; build gzip
+JS 75.69 + CSS 6.00 + HTML 0.43 kB; skill tree: src/content/upgrades.ts (35 nodes, 5 branches).
+Pre-retune numbers: README as of 2026-10-18 (54:30, 21:55, longest tier gap 45:35 / 6:11). -->
