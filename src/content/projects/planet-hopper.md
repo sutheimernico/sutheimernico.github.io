@@ -1,7 +1,7 @@
 ---
 title: "Planet Hopper"
 order: 20
-status: in-progress
+status: production
 year: "2026"
 stack: ["Three.js", "TypeScript", "Vite", "Vitest", "WebAudio"]
 summary: "A 3D slingshot-gravity browser game whose physics core is pure, deterministic and unit-tested without a GPU — ghost replays and daily seeds with no backend, 150 kB gzip."
@@ -11,7 +11,7 @@ github: https://github.com/sutheimernico/planet-hopper
 domain: product
 context: personal
 reviewed: false
-fieldNote: "Rendered and played headlessly for the first time — a bot caught 10 of 10 hops with real mouse drags — but not yet felt on a real GPU. That first render also showed the dev fps overlay reporting 362 fps at a real ~10: it would have confirmed the 60 fps target falsely. The target is still a requirement, not a result."
+fieldNote: "Rendered and played headlessly for the first time — a bot caught 10 of 10 hops with real mouse drags — and on 2026-10-19 played by hand on a real laptop GPU. That first render also showed the dev fps overlay reporting 362 fps at a real ~10: it would have confirmed the 60 fps target falsely. The target is still a requirement, not a result."
 ---
 
 ## What it is
@@ -22,7 +22,7 @@ bonuses, run out of fuel and die. Everything on screen is rendered live with Thr
 no prerendered assets, no backend, no install, and no network access at runtime. On top of the
 endless mode there is a **daily challenge** and shareable `?seed=` links, each with a **ghost** of
 your best run flying alongside, plus milestone toasts and a synthesized soundtrack. It has been
-rendered and played headlessly; the game-feel and frame-rate session on a real GPU is still open.
+rendered and played headlessly, and on 2026-10-19 played by hand on a laptop GPU; the frame rate on a phone is still unmeasured.
 
 ![The ship in flight between two planets, rendered in headless Chromium](../../assets/projects/planet-hopper-flight.jpg)
 

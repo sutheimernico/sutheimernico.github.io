@@ -1,7 +1,7 @@
 ---
 title: "Face Scout"
 order: 17
-status: in-progress
+status: research
 year: "2026"
 stack: ["Python", "MediaPipe", "InsightFace", "scikit-learn", "OpenCV"]
 summary: "A staged webcam CV system: multi-face tracking, 468-point mesh, ArcFace identity — plus a lip-reading v1 built on the same landmarks."
