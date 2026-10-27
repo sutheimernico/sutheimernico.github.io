@@ -29,7 +29,7 @@ export const SKILL_AREAS: SkillArea[] = [
   {
     id: 'data',
     label: 'Data & BI',
-    blurb: 'Where I started: SQL, dbt models and reports. Today it is the pipelines and models behind the product.',
+    blurb: 'Where I started during my dual studies: SQL, dbt models and reports.',
     tools: ['SQL', 'dbt', 'Airflow', 'DuckDB', 'pandas', 'Power BI', 'Azure Synapse'],
     match: ['dbt', 'DuckDB', 'InfluxDB', 'Parquet', 'Grafana', 'OPC UA'],
   },
