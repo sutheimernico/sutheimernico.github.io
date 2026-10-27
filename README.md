@@ -6,10 +6,10 @@ an animated "Shift" mode), deliberate motion design, no generic template aesthet
 
 ## Status
 
-Live at **https://sutheimernico.github.io/** — the landing is **Descent**, a scroll-driven
-camera ride: the name in 3D space, then one window per project approaching left and right as
-you dolly past, a HUD depth gauge, an exit gate — followed by a filterable process-table index
-of every project, the skill constellation, about and contact. Each project has a detail page at
+Live at **https://sutheimernico.github.io/** — the landing is a fast static page: hero with CV
+download, a filterable index of every project, six skill areas with the projects that show
+them, about and contact. The earlier scroll-driven 3D landing, **Descent**, lives on at
+`/descent` as a design lab. Each project has a detail page at
 `/projects/<slug>` with field note, live-proof line and prev/next; client-side navigation with
 view transitions. Projects are an `astro:content` collection — see `CLAUDE.md` → "Adding a
 project" for the how-to. Content is drafted by Claude and flagged `reviewed: false` until Nico
